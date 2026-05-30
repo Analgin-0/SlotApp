@@ -1,0 +1,8 @@
+config.ini
+Constants.hpp
+build/
+Core/build/
+.vs/
+Debug/
+Release/
+x64/
