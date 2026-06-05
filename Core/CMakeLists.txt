@@ -34,6 +34,7 @@ qt_add_qml_module(${APP_NAME}
     QML_FILES ChangePasswordPage.qml
     QML_FILES AdminSchedulePage.qml
     QML_FILES AdminScheduleEditorPage.qml
+    SOURCES sha.hpp sha.cpp
 )
 
 

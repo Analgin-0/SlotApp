@@ -81,14 +81,6 @@ Db::Db(QObject* parent, QString ip)
         for (const QSslError& error : errors)
             qWarning() << "TLS warning:" << error.errorString();
 
-        /*
-            ВАЖНО:
-
-            Для настоящего продакшена лучше:
-            1) купить/выпустить нормальный сертификат,
-            или
-            2) сделать certificate pinning.
-        */
         m_socket->ignoreSslErrors();
     });
 
@@ -119,11 +111,7 @@ void Db::configureTls()
     QSslConfiguration config = m_socket->sslConfiguration();
     config.setProtocol(QSsl::TlsV1_2OrLater);
 
-    /*
-        Для локального self-signed сертификата.
-        Сервер всё равно шифрует трафик TLS-ом, но клиент не проверяет доверенность сертификата.
-        Когда будет домен и нормальный сертификат — можно вернуть VerifyPeer.
-    */
+
     config.setPeerVerifyMode(QSslSocket::VerifyNone);
 
     m_socket->setSslConfiguration(config);
@@ -341,7 +329,7 @@ void Db::login(const QString& login, const QString& password)
 {
     QJsonObject params;
     params["login"] = login;
-    params["password"] = password;
+    params["password"] = QString::fromStdString(m_sha.hash(password.toStdString()));
     params["device_name"] = deviceName();
     params["platform"] = platformName();
 
@@ -450,9 +438,19 @@ void Db::createUser(const QVariantMap& userData,
                     const QVariantMap& studentData,
                     const QVariantMap& teacherData)
 {
-    QJsonObject params;
+    QVariantMap secureUserData = userData;
 
-    params["user"] = QJsonObject::fromVariantMap(userData);
+    if (secureUserData.contains("password")) {
+        QString plainPass = secureUserData["password"].toString();
+        if (!plainPass.isEmpty()) {
+            secureUserData["password"] = QString::fromStdString(m_sha.hash(plainPass.toStdString()));
+        } else {
+            secureUserData["password"] = "";
+        }
+    }
+
+    QJsonObject params;
+    params["user"] = QJsonObject::fromVariantMap(secureUserData);
     params["student"] = QJsonObject::fromVariantMap(studentData);
     params["teacher"] = QJsonObject::fromVariantMap(teacherData);
 
@@ -490,7 +488,8 @@ void Db::resetPassword(const QString& email, const QString& code, const QString&
     QJsonObject params;
     params["email"] = email;
     params["code"] = code;
-    params["new_password"] = newPassword;
+
+    params["new_password"] = newPassword.isEmpty() ? "" : QString::fromStdString(m_sha.hash(newPassword.toStdString()));
 
     sendCommand("reset_password_by_code", params);
 }
@@ -500,7 +499,8 @@ void Db::resetPasswordByCode(const QString& email, const QString& code, const QS
     QJsonObject params;
     params["email"] = email;
     params["code"] = code;
-    params["new_password"] = newPassword;
+
+    params["new_password"] = newPassword.isEmpty() ? "" : QString::fromStdString(m_sha.hash(newPassword.toStdString()));
 
     sendCommand("reset_password_by_code", params);
 }
@@ -508,8 +508,9 @@ void Db::resetPasswordByCode(const QString& email, const QString& code, const QS
 void Db::changePassword(const QString& oldPassword, const QString& newPassword)
 {
     QJsonObject params;
-    params["old_password"] = oldPassword;
-    params["new_password"] = newPassword;
+
+    params["old_password"] = oldPassword.isEmpty() ? "" : QString::fromStdString(m_sha.hash(oldPassword.toStdString()));
+    params["new_password"] = newPassword.isEmpty() ? "" : QString::fromStdString(m_sha.hash(newPassword.toStdString()));
 
     sendCommand("change_password", params);
 }

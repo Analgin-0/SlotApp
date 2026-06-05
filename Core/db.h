@@ -8,6 +8,8 @@
 #include <QString>
 #include <QByteArray>
 
+#include "sha.hpp"
+
 class Db : public QObject
 {
     Q_OBJECT
@@ -86,6 +88,8 @@ private:
     QString m_token;
 
     bool m_connectionReadyEmitted = false;
+
+    SHA512 m_sha;
 
     void configureTls();
 };
