@@ -84,8 +84,6 @@ Page {
         var itemTop = p.y
         var itemBottom = itemTop + item.height
 
-        // adjustResize уже уменьшает высоту окна. Тут считаем только реальную
-        // видимую область ScrollView, без прибавления высоты клавиатуры.
         var viewportHeight = Math.max(140, scrollView.height - scrollView.topPadding - scrollView.bottomPadding)
         var currentY = flick.contentY
         var maxY = Math.max(0, rootColumn.implicitHeight - viewportHeight)
@@ -386,9 +384,7 @@ Page {
 
     Timer {
         id: keyboardEnsureTimer
-        // Ждём, пока Android закончит adjustResize-анимацию окна.
-        // Если скроллить раньше — переход получается кривой.
-        interval: 420
+            interval: 420
         repeat: false
 
         onTriggered: {

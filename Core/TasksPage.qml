@@ -637,9 +637,7 @@ Item {
 
         page.loadError = ""
 
-        // Если данные уже есть, обновляем тихо.
-        // Старый список остаётся на экране, loading-карточка не появляется.
-        page.loading = true
+          page.loading = true
 
         if (Db.isConnect()) {
             console.log("TasksPage: Db.getAppointments()")
@@ -2453,7 +2451,7 @@ Item {
         }
 
         Canvas {
-            id: starCanvas  // ✅ Добавили id
+            id: starCanvas
             anchors.fill: parent
 
             onPaint: {
@@ -2494,11 +2492,11 @@ Item {
             Connections {
                 target: star
                 function onFilledChanged() {
-                    starCanvas.requestPaint()  // ✅ Обращаемся к Canvas по id
+                    starCanvas.requestPaint()
                 }
 
                 function onEnabledChanged() {
-                    starCanvas.requestPaint()  // ✅
+                    starCanvas.requestPaint()
                 }
 
                 function onHoveredChanged() {

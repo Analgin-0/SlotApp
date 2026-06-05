@@ -434,9 +434,8 @@ Page {
                     Rectangle {
                         id: errorBox
 
-                        // Блок существует, пока есть текст или пока идет анимация скрытия
-                        visible: opacity > 0 || Layout.preferredHeight > 0
-                        clip: true // Запрещаем контенту вылезать за рамки при нулевой высоте
+                         visible: opacity > 0 || Layout.preferredHeight > 0
+                        clip: true
 
                         color: page.dangerSoft
                         radius: 16
@@ -444,8 +443,7 @@ Page {
                         border.color: "#5A2D31"
 
                         Layout.fillWidth: true
-                        // Декларативно вычисляем высоту и прозрачность на основе наличия текста
-                        Layout.preferredHeight: errorText.text !== "" ? (errorText.implicitHeight + 20) : 0
+                         Layout.preferredHeight: errorText.text !== "" ? (errorText.implicitHeight + 20) : 0
                         opacity: errorText.text !== "" ? 1.0 : 0.0
 
                         Behavior on opacity {
@@ -463,8 +461,7 @@ Page {
                         }
 
                         RowLayout {
-                            // Привязываем только к центру и краям, чтобы избежать отрицательной высоты при Layout.preferredHeight = 0
-                            anchors.left: parent.left
+                                 anchors.left: parent.left
                             anchors.right: parent.right
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.leftMargin: 10

@@ -585,6 +585,7 @@ Item {
                 spacing: 10
 
                ActionRow  {
+                    visible: false
                     title: "Сменить email"
                     subtitle: "Раздел пока в разработке"
                     iconName: "mail"

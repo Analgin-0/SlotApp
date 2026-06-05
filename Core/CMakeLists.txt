@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.16)
 
-# 1. Задаем имя нашего таргета в одну переменную
+
 set(APP_NAME "SlotApp")
 
-# Команда project сама создаст системную переменную PROJECT_NAME со значением "SlotApp"
+
 project(${APP_NAME} VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_AUTOMOC ON)
@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt6 6.2 COMPONENTS Quick Quick3D Network Multimedia REQUIRED)
 
-# 2. Везде дальше передаем наш ${APP_NAME}
+
 qt_add_executable(${APP_NAME}
     main.cpp
 )
@@ -54,8 +54,7 @@ if(ANDROID)
     add_android_openssl_libraries(${APP_NAME})
 endif()
 
-# 3. Здесь отлично видно автоматические переменные сборки:
-# PROJECT_VERSION подтянется из команды project() выше
+
 set_target_properties(${APP_NAME} PROPERTIES
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}

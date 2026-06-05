@@ -37,5 +37,5 @@ private:
 	QByteArray tokenHash(const QString& token) const;
 
 private:
-	QHash<QByteArray, SessionData> m_sessions; // sha256(token) -> session
+	QHash<QByteArray, SessionData> m_sessions;
 };

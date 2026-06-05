@@ -71,15 +71,12 @@ Item {
 
         var deletedCount = 0
 
-        // Проходим по списку с конца, чтобы безопасно удалять элементы по индексу
-        for (var i = sessionsModel.count - 1; i >= 0; i--) {
+             for (var i = sessionsModel.count - 1; i >= 0; i--) {
             var item = sessionsModel.get(i)
 
             if (item.isRevoked && !item.isCurrent) {
-                // Отправляем команду на удаление в БД
-                Db.deleteTableData("UserSession", item.sessionId)
-                // Сразу убираем из визуала, чтобы интерфейс реагировал мгновенно
-                sessionsModel.remove(i)
+                  Db.deleteTableData("UserSession", item.sessionId)
+                  sessionsModel.remove(i)
                 deletedCount++
             }
         }
@@ -102,8 +99,7 @@ Item {
 
         errorText = ""
 
-        // Не чистим список до прихода ответа, чтобы экран не схлопывался при обновлении.
-        sessionsMessage = sessionsModel.count === 0 ? "Загружаем сессии..." : ""
+         sessionsMessage = sessionsModel.count === 0 ? "Загружаем сессии..." : ""
 
         waitingList = true
         Db.getMySessions()
@@ -837,11 +833,11 @@ Item {
 
                 AppButton {
                     text: page.waitingList ? "Загрузка..." : "Обновить"
-                    variant: "tonal" // Синяя кнопка (основное действие)
+                    variant: "tonal"
                     enabled: !page.busy()
 
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 38 // Уменьшили высоту
+                    Layout.preferredHeight: 38
 
                     onClicked: {
                         page.startLoad()
@@ -850,11 +846,11 @@ Item {
 
                 AppButton {
                     text: "Удалить старые"
-                    variant: "neutral" // Серая кнопка (второстепенное действие)
+                    variant: "neutral"
                     enabled: !page.busy()
 
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 38 // Уменьшили высоту
+                    Layout.preferredHeight: 38
 
                     onClicked: {
                         page.clearRevokedSessions()
@@ -863,14 +859,13 @@ Item {
 
                 AppButton {
                     text: page.waitingRevokeOthers ? "Завершаем..." : "Выйти везде"
-                    variant: "danger" // Красная кнопка (опасное действие)
+                    variant: "danger"
                     enabled: !page.busy()
 
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 38 // Уменьшили высоту
+                    Layout.preferredHeight: 38
 
-                    // Магия сетки: на телефоне растягиваем эту кнопку на обе колонки (на всю ширину)
-                    Layout.columnSpan: page.width < 550 ? 2 : 1
+                      Layout.columnSpan: page.width < 550 ? 2 : 1
 
                     onClicked: {
                         page.revokeOtherSessions()
