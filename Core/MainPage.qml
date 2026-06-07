@@ -53,6 +53,7 @@ Item {
     readonly property bool isAdminScheduleEditorPage: root.currentTab === root.adminScheduleEditorPageIndex
 
     readonly property bool isInnerPage: root.isAddTaskPage
+                                    || root.isAdminUsersPage
                                     || root.isSessionsPage
                                     || root.isChangePasswordPage
                                     || root.isResetPasswordPage
@@ -219,8 +220,6 @@ Item {
         if (index === root.tasksPageIndex)
             return !root.isAdmin
 
-        if (index === root.adminUsersPageIndex)
-            return root.isAdmin
 
         return false
     }
@@ -240,6 +239,11 @@ Item {
 
         root.hideKeyboardAndTakeFocus()
         root.currentTab = root.adminUsersPageIndex
+    }
+
+    function returnToAdminHomePage() {
+        root.hideKeyboardAndTakeFocus()
+        root.currentTab = root.homePageIndex
     }
 
     function openAddTaskPage() {
@@ -310,6 +314,164 @@ Item {
         root.hideKeyboardAndTakeFocus()
         root.adminScheduleEditorItem = null
         root.currentTab = root.schedulePageIndex
+    }
+
+    function clearAddUserForm() {
+        lastNameField.text = ""
+        firstNameField.text = ""
+        middleNameField.text = ""
+        birthDateField.text = ""
+        genderCombo.currentIndex = 0
+        phoneField.text = ""
+
+        loginField.text = ""
+        passwordField.text = ""
+
+        // Студент
+        groupField.text = ""
+        courseField.text = ""
+        facultyField.text = ""
+        specialityField.text = ""
+        studentCardField.text = ""
+        educationFormField.text = ""
+
+        // Преподаватель
+        departmentField.text = ""
+        postField.text = ""
+        teacherCabinetField.text = ""
+        academicDegreeField.text = ""
+        academicTitleField.text = ""
+
+        roleCombo.currentIndex = 0
+        root.addUserError = ""
+        root.addUserSuccess = ""
+        root.hideKeyboardAndTakeFocus()
+    }
+
+    function submitAddUser() {
+        root.addUserError = ""
+        root.addUserSuccess = ""
+
+        if (!root.isAdmin) {
+            root.addUserError = "Создавать пользователей может только администратор."
+            return
+        }
+
+        var lastName = lastNameField.text.trim()
+        var firstName = firstNameField.text.trim()
+        var middleName = middleNameField.text.trim()
+        var birthDate = birthDateField.text.trim()
+        var gender = genderCombo.selectedGender
+        var phone = phoneField.text.trim()
+
+        var login = loginField.text.trim()
+        var password = passwordField.text.trim()
+        var role = roleCombo.selectedRole
+
+        if (lastName.length === 0) {
+            root.addUserError = "Введите фамилию."
+            return
+        }
+
+        if (firstName.length === 0) {
+            root.addUserError = "Введите имя."
+            return
+        }
+
+        if (login.length === 0) {
+            root.addUserError = "Введите логин или email."
+            return
+        }
+
+        if (password.length < 4) {
+            root.addUserError = "Пароль должен быть не менее 4 символов."
+            return
+        }
+
+        if (role === 1 && groupField.text.trim().length === 0) {
+            root.addUserError = "Для студента укажите группу."
+            return
+        }
+
+        if (!Db.isConnect()) {
+            root.addUserError = "Нет соединения с сервером."
+            Db.connectToServer()
+            return
+        }
+
+        root.hideKeyboardAndTakeFocus()
+        root.addUserLoading = true
+
+        var postVal = ""
+        if (role === 2) {
+            postVal = postField.text.trim()
+        }
+
+        var userData = {
+            last_name: lastName,
+            name: firstName,
+            middle_name: middleName,
+            birth_date: birthDate,
+            gender: gender,
+            phone: phone,
+            login: login,
+            password: password,
+            role: role,
+            post: postVal,
+
+            LastName: lastName,
+            Name: firstName,
+            MiddleName: middleName,
+            BirthDate: birthDate,
+            Gender: gender,
+            Phone: phone,
+            Login: login,
+            Password: password,
+            Role: role,
+            Post: postVal
+        }
+
+        var studentData = {}
+        var teacherData = {}
+
+        if (role === 1) {
+            var courseVal = parseInt(courseField.text.trim())
+            if (isNaN(courseVal)) courseVal = 0
+
+            studentData = {
+                group_name: groupField.text.trim(),
+                course: courseVal,
+                faculty: facultyField.text.trim(),
+                speciality: specialityField.text.trim(),
+                student_card_number: studentCardField.text.trim(),
+                education_form: educationFormField.text.trim(),
+
+                GroupName: groupField.text.trim(),
+                Course: courseVal,
+                Faculty: facultyField.text.trim(),
+                Speciality: specialityField.text.trim(),
+                StudentCardNumber: studentCardField.text.trim(),
+                EducationForm: educationFormField.text.trim()
+            }
+        }
+
+        if (role === 2) {
+            teacherData = {
+                department: departmentField.text.trim(),
+                post: postVal,
+                cabinet: teacherCabinetField.text.trim(),
+                academic_degree: academicDegreeField.text.trim(),
+                academic_title: academicTitleField.text.trim(),
+
+                Department: departmentField.text.trim(),
+                Post: postVal,
+                Cabinet: teacherCabinetField.text.trim(),
+                AcademicDegree: academicDegreeField.text.trim(),
+                AcademicTitle: academicTitleField.text.trim()
+            }
+        }
+
+        Db.createUser(userData, studentData, teacherData)
     }
 
     Rectangle {
@@ -469,6 +631,59 @@ Item {
                         Layout.rightMargin: 20
                         spacing: 12
 
+                        Button {
+                            id: backFromAddUserButton
+
+                            hoverEnabled: true
+
+                            Layout.preferredWidth: 46
+                            Layout.preferredHeight: 46
+                            Layout.alignment: Qt.AlignVCenter
+
+                            scale: down ? 0.94 : hovered ? 1.05 : 1.0
+
+                            Behavior on scale {
+                                NumberAnimation {
+                                    duration: 120
+                                    easing.type: Easing.OutCubic
+                                }
+                            }
+
+                            background: Rectangle {
+                                radius: 16
+                                color: backFromAddUserButton.down ? root.surface3
+                                      : backFromAddUserButton.hovered ? root.accentSoft
+                                      : root.surface2
+                                border.width: 1
+                                border.color: backFromAddUserButton.hovered ? root.accent : root.border
+
+                                Behavior on color {
+                                    ColorAnimation { duration: 130 }
+                                }
+
+                                Behavior on border.color {
+                                    ColorAnimation { duration: 130 }
+                                }
+                            }
+
+                            contentItem: Text {
+                                text: "‹"
+                                color: backFromAddUserButton.hovered ? root.accent : root.textMain
+                                font.pixelSize: 30
+                                font.bold: true
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+
+                                Behavior on color {
+                                    ColorAnimation { duration: 130 }
+                                }
+                            }
+
+                            onClicked: {
+                                root.returnToAdminHomePage()
+                            }
+                        }
+
                         Rectangle {
                             Layout.preferredWidth: 58
                             Layout.preferredHeight: 58
@@ -548,7 +763,7 @@ Item {
                             }
 
                             Text {
-                                text: "Заполните основные поля. Для студентов нужна группа, для преподавателей можно указать кафедру и кабинет."
+                                text: "Заполните основные поля.\nДля студентов нужна группа, для преподавателей можно указать кафедру и кабинет."
                                 color: root.textSub
                                 font.pixelSize: 14
                                 wrapMode: Text.WordWrap
@@ -582,32 +797,101 @@ Item {
                                 iconName: "user"
                             }
 
-                            FieldLabel {
-                                text: "Фамилия"
+                            FieldLabel { text: "Фамилия" }
+                            AppField { id: lastNameField; placeholderText: "Введите фамилию" }
+
+                            FieldLabel { text: "Имя" }
+                            AppField { id: firstNameField; placeholderText: "Введите имя" }
+
+                            FieldLabel { text: "Отчество" }
+                            AppField { id: middleNameField; placeholderText: "Введите отчество (необязательно)" }
+
+                            FieldLabel { text: "Дата рождения" }
+                            AppField { id: birthDateField; placeholderText: "ГГГГ-ММ-ДД" }
+
+                            FieldLabel { text: "Пол" }
+                            ComboBox {
+                                id: genderCombo
+
+                                model: ["Не указан", "Мужской", "Женский"]
+
+                                property string selectedGender: currentIndex === 0 ? "" : currentText
+
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 52
+                                font.pixelSize: 15
+
+                                background: Rectangle {
+                                    radius: 17
+                                    color: genderCombo.activeFocus ? root.surface3 : root.surface2
+                                    border.width: genderCombo.activeFocus ? 2 : 1
+                                    border.color: genderCombo.activeFocus ? root.accent : root.border
+                                }
+
+                                contentItem: Text {
+                                    text: genderCombo.displayText
+                                    color: root.textMain
+                                    font.pixelSize: 15
+                                    font.bold: true
+                                    verticalAlignment: Text.AlignVCenter
+                                    leftPadding: 16
+                                    rightPadding: 44
+                                    maximumLineCount: 1
+                                    elide: Text.ElideRight
+                                }
+
+                                indicator: DrawIcon {
+                                    x: genderCombo.width - width - 16
+                                    y: genderCombo.topPadding + (genderCombo.availableHeight - height) / 2
+                                    width: 20
+                                    height: 20
+                                    name: "chevronDown"
+                                    iconColor: root.textMuted
+                                }
+
+                                popup: Popup {
+                                    y: genderCombo.height + 6
+                                    width: genderCombo.width
+                                    implicitHeight: contentItem.implicitHeight
+                                    padding: 6
+
+                                    background: Rectangle {
+                                        color: root.surface2
+                                        radius: 18
+                                        border.width: 1
+                                        border.color: root.border
+                                    }
+
+                                    contentItem: ListView {
+                                        clip: true
+                                        implicitHeight: contentHeight
+                                        model: genderCombo.popup.visible ? genderCombo.delegateModel : null
+                                        currentIndex: genderCombo.highlightedIndex
+                                    }
+                                }
+
+                                delegate: ItemDelegate {
+                                    width: genderCombo.width - 12
+                                    height: 44
+
+                                    background: Rectangle {
+                                        radius: 14
+                                        color: highlighted ? root.surface3 : "transparent"
+                                    }
+
+                                    contentItem: Text {
+                                        text: modelData
+                                        color: root.textMain
+                                        font.pixelSize: 15
+                                        font.bold: genderCombo.currentIndex === index
+                                        verticalAlignment: Text.AlignVCenter
+                                        leftPadding: 10
+                                    }
+                                }
                             }
 
-                            AppField {
-                                id: lastNameField
-                                placeholderText: "Введите фамилию"
-                            }
-
-                            FieldLabel {
-                                text: "Имя"
-                            }
-
-                            AppField {
-                                id: firstNameField
-                                placeholderText: "Введите имя"
-                            }
-
-                            FieldLabel {
-                                text: "Отчество"
-                            }
-
-                            AppField {
-                                id: middleNameField
-                                placeholderText: "Введите отчество (необязательно)"
-                            }
+                            FieldLabel { text: "Телефон" }
+                            AppField { id: phoneField; placeholderText: "+7 (999) 000-00-00" }
 
                             FormDivider {}
 
@@ -616,30 +900,21 @@ Item {
                                 iconName: "lock"
                             }
 
-                            FieldLabel {
-                                text: "Логин / email"
-                            }
-
+                            FieldLabel { text: "Логин / email" }
                             AppField {
                                 id: loginField
                                 placeholderText: "Введите логин или email"
                                 inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText
                             }
 
-                            FieldLabel {
-                                text: "Пароль"
-                            }
-
+                            FieldLabel { text: "Пароль" }
                             AppField {
                                 id: passwordField
                                 placeholderText: "Введите пароль"
                                 echoMode: TextInput.Password
                             }
 
-                            FieldLabel {
-                                text: "Роль"
-                            }
-
+                            FieldLabel { text: "Роль" }
                             ComboBox {
                                 id: roleCombo
 
@@ -720,38 +995,44 @@ Item {
                                 }
                             }
 
-                            FieldLabel {
-                                visible: roleCombo.selectedRole === 1
-                                text: "Группа"
-                            }
+                            // ═══════════════════════════════════════════
+                            // ПОЛЯ ДЛЯ СТУДЕНТА (РОЛЬ 1)
+                            // ═══════════════════════════════════════════
+                            FieldLabel { visible: roleCombo.selectedRole === 1; text: "Группа" }
+                            AppField { id: groupField; visible: roleCombo.selectedRole === 1; placeholderText: "Например: ИС-21" }
 
-                            AppField {
-                                id: groupField
-                                visible: roleCombo.selectedRole === 1
-                                placeholderText: "Например: ИС-21"
-                            }
+                            FieldLabel { visible: roleCombo.selectedRole === 1; text: "Курс" }
+                            AppField { id: courseField; visible: roleCombo.selectedRole === 1; placeholderText: "Например: 3" }
 
-                            FieldLabel {
-                                visible: roleCombo.selectedRole === 2
-                                text: "Кафедра"
-                            }
+                            FieldLabel { visible: roleCombo.selectedRole === 1; text: "Факультет" }
+                            AppField { id: facultyField; visible: roleCombo.selectedRole === 1; placeholderText: "Например: ФИТ" }
 
-                            AppField {
-                                id: departmentField
-                                visible: roleCombo.selectedRole === 2
-                                placeholderText: "Например: Информатика"
-                            }
+                            FieldLabel { visible: roleCombo.selectedRole === 1; text: "Специальность" }
+                            AppField { id: specialityField; visible: roleCombo.selectedRole === 1; placeholderText: "Например: Программная инженерия" }
 
-                            FieldLabel {
-                                visible: roleCombo.selectedRole === 2
-                                text: "Кабинет"
-                            }
+                            FieldLabel { visible: roleCombo.selectedRole === 1; text: "Номер зачетной книжки" }
+                            AppField { id: studentCardField; visible: roleCombo.selectedRole === 1; placeholderText: "Например: 123456" }
 
-                            AppField {
-                                id: teacherCabinetField
-                                visible: roleCombo.selectedRole === 2
-                                placeholderText: "Например: 301"
-                            }
+                            FieldLabel { visible: roleCombo.selectedRole === 1; text: "Форма обучения" }
+                            AppField { id: educationFormField; visible: roleCombo.selectedRole === 1; placeholderText: "Например: Очная" }
+
+                            // ═══════════════════════════════════════════
+                            // ПОЛЯ ДЛЯ ПРЕПОДАВАТЕЛЯ (РОЛЬ 2)
+                            // ═══════════════════════════════════════════
+                            FieldLabel { visible: roleCombo.selectedRole === 2; text: "Кафедра" }
+                            AppField { id: departmentField; visible: roleCombo.selectedRole === 2; placeholderText: "Например: Информатика" }
+
+                            FieldLabel { visible: roleCombo.selectedRole === 2; text: "Должность" }
+                            AppField { id: postField; visible: roleCombo.selectedRole === 2; placeholderText: "Например: Доцент" }
+
+                            FieldLabel { visible: roleCombo.selectedRole === 2; text: "Кабинет" }
+                            AppField { id: teacherCabinetField; visible: roleCombo.selectedRole === 2; placeholderText: "Например: 301" }
+
+                            FieldLabel { visible: roleCombo.selectedRole === 2; text: "Ученая степень" }
+                            AppField { id: academicDegreeField; visible: roleCombo.selectedRole === 2; placeholderText: "Например: Кандидат техн. наук" }
+
+                            FieldLabel { visible: roleCombo.selectedRole === 2; text: "Ученое звание" }
+                            AppField { id: academicTitleField; visible: roleCombo.selectedRole === 2; placeholderText: "Например: Доцент" }
 
                             MessageBox {
                                 visible: root.addUserError.length > 0
@@ -775,84 +1056,42 @@ Item {
                                 Layout.fillWidth: true
                             }
 
-                            Button {
+                            AppWideButton {
                                 id: createUserBtn
 
                                 text: root.addUserLoading ? "Создание..." : "Создать пользователя"
                                 enabled: !root.addUserLoading
+                                loading: root.addUserLoading
 
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: 54
                                 Layout.topMargin: 4
 
-                                background: Rectangle {
-                                    radius: 18
-                                    color: {
-                                        if (!createUserBtn.enabled)
-                                            return root.surface3
-
-                                        return createUserBtn.down ? "#5B95EA" : root.accent
-                                    }
-                                }
-
-                                contentItem: RowLayout {
-                                    spacing: 10
-
-                                    Item {
-                                        Layout.fillWidth: true
-                                    }
-
-                                    BusyIndicator {
-                                        running: root.addUserLoading
-                                        visible: root.addUserLoading
-
-                                        Layout.preferredWidth: 22
-                                        Layout.preferredHeight: 22
-                                    }
-
-                                    Text {
-                                        text: createUserBtn.text
-                                        color: "#FFFFFF"
-                                        font.pixelSize: 15
-                                        font.bold: true
-                                        horizontalAlignment: Text.AlignHCenter
-                                        verticalAlignment: Text.AlignVCenter
-                                    }
-
-                                    Item {
-                                        Layout.fillWidth: true
-                                    }
-                                }
+                                normalColor: root.accent
+                                hoverColor: "#7DB3FF"
+                                pressColor: "#5B95EA"
+                                disabledColor: root.surface3
+                                textColor: "#FFFFFF"
+                                showBorder: false
 
                                 onClicked: {
                                     root.submitAddUser()
                                 }
                             }
 
-                            Button {
+                            AppWideButton {
                                 id: clearFormButton
 
                                 text: "Очистить форму"
                                 enabled: !root.addUserLoading
 
-                                Layout.fillWidth: true
                                 Layout.preferredHeight: 48
 
-                                background: Rectangle {
-                                    radius: 18
-                                    color: clearFormButton.down ? root.surface3 : root.surface2
-                                    border.width: 1
-                                    border.color: root.border
-                                }
-
-                                contentItem: Text {
-                                    text: clearFormButton.text
-                                    color: root.textMain
-                                    font.pixelSize: 14
-                                    font.bold: true
-                                    horizontalAlignment: Text.AlignHCenter
-                                    verticalAlignment: Text.AlignVCenter
-                                }
+                                normalColor: root.surface2
+                                hoverColor: root.surface3
+                                pressColor: "#252A33"
+                                disabledColor: root.surface2
+                                textColor: root.textMain
+                                borderColor: root.border
+                                showBorder: true
 
                                 onClicked: {
                                     root.clearAddUserForm()
@@ -1063,9 +1302,12 @@ Item {
             }
 
             ScrollView {
+                id: adminHomeScroll
+
                 anchors.fill: parent
                 clip: true
                 contentWidth: availableWidth
+                contentHeight: adminHomeColumn.implicitHeight
 
                 topPadding: 22
                 bottomPadding: 26
@@ -1075,7 +1317,9 @@ Item {
                 }
 
                 ColumnLayout {
-                    width: parent.availableWidth
+                    id: adminHomeColumn
+
+                    width: adminHomeScroll.availableWidth
                     spacing: 16
 
                     RowLayout {
@@ -1157,56 +1401,33 @@ Item {
                                 Layout.fillWidth: true
                             }
 
-                            Button {
+                            AppWideButton {
                                 id: goUsersButton
 
                                 text: "Создать пользователя"
 
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: 54
-
-                                background: Rectangle {
-                                    radius: 18
-                                    color: goUsersButton.down ? "#5B95EA" : root.accent
-                                }
-
-                                contentItem: Text {
-                                    text: goUsersButton.text
-                                    color: "#FFFFFF"
-                                    font.pixelSize: 15
-                                    font.bold: true
-                                    horizontalAlignment: Text.AlignHCenter
-                                    verticalAlignment: Text.AlignVCenter
-                                }
+                                normalColor: root.accent
+                                hoverColor: "#7DB3FF"
+                                pressColor: "#5B95EA"
+                                textColor: "#FFFFFF"
+                                showBorder: false
 
                                 onClicked: {
                                     root.openAdminUsersPage()
                                 }
                             }
 
-                            Button {
+                            AppWideButton {
                                 id: goScheduleButton
 
                                 text: "Открыть расписание"
 
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: 54
-
-                                background: Rectangle {
-                                    radius: 18
-                                    color: goScheduleButton.down ? root.surface3 : root.surface2
-                                    border.width: 1
-                                    border.color: root.border
-                                }
-
-                                contentItem: Text {
-                                    text: goScheduleButton.text
-                                    color: root.textMain
-                                    font.pixelSize: 15
-                                    font.bold: true
-                                    horizontalAlignment: Text.AlignHCenter
-                                    verticalAlignment: Text.AlignVCenter
-                                }
+                                normalColor: root.surface2
+                                hoverColor: root.surface3
+                                pressColor: "#252A33"
+                                textColor: root.textMain
+                                borderColor: root.border
+                                showBorder: true
 
                                 onClicked: {
                                     root.openTab(root.schedulePageIndex)
@@ -1258,109 +1479,6 @@ Item {
         }
     }
 
-    function clearAddUserForm() {
-        lastNameField.text = ""
-        firstNameField.text = ""
-        middleNameField.text = ""
-        loginField.text = ""
-        passwordField.text = ""
-        groupField.text = ""
-        departmentField.text = ""
-        teacherCabinetField.text = ""
-        roleCombo.currentIndex = 0
-        root.addUserError = ""
-        root.addUserSuccess = ""
-        root.hideKeyboardAndTakeFocus()
-    }
-
-    function submitAddUser() {
-        root.addUserError = ""
-        root.addUserSuccess = ""
-
-        if (!root.isAdmin) {
-            root.addUserError = "Создавать пользователей может только администратор."
-            return
-        }
-
-        var lastName = lastNameField.text.trim()
-        var firstName = firstNameField.text.trim()
-        var middleName = middleNameField.text.trim()
-        var login = loginField.text.trim()
-        var password = passwordField.text.trim()
-        var role = roleCombo.selectedRole
-
-        if (lastName.length === 0) {
-            root.addUserError = "Введите фамилию."
-            return
-        }
-
-        if (firstName.length === 0) {
-            root.addUserError = "Введите имя."
-            return
-        }
-
-        if (login.length === 0) {
-            root.addUserError = "Введите логин или email."
-            return
-        }
-
-        if (password.length < 4) {
-            root.addUserError = "Пароль должен быть не менее 4 символов."
-            return
-        }
-
-        if (role === 1 && groupField.text.trim().length === 0) {
-            root.addUserError = "Для студента укажите группу."
-            return
-        }
-
-        if (!Db.isConnect()) {
-            root.addUserError = "Нет соединения с сервером."
-            Db.connectToServer()
-            return
-        }
-
-        root.hideKeyboardAndTakeFocus()
-        root.addUserLoading = true
-
-        var userData = {
-            last_name: lastName,
-            name: firstName,
-            middle_name: middleName,
-            login: login,
-            password: password,
-            role: role,
-
-            LastName: lastName,
-            Name: firstName,
-            MiddleName: middleName,
-            Login: login,
-            Password: password,
-            Role: role
-        }
-
-        var studentData = {}
-        var teacherData = {}
-
-        if (role === 1) {
-            studentData = {
-                group_name: groupField.text.trim(),
-                GroupName: groupField.text.trim()
-            }
-        }
-
-        if (role === 2) {
-            teacherData = {
-                department: departmentField.text.trim(),
-                Department: departmentField.text.trim(),
-                cabinet: teacherCabinetField.text.trim(),
-                Cabinet: teacherCabinetField.text.trim()
-            }
-        }
-
-        Db.createUser(userData, studentData, teacherData)
-    }
-
     Connections {
         target: Db
         ignoreUnknownSignals: true
@@ -1395,7 +1513,6 @@ Item {
                 root.addUserSuccess = "Пользователь успешно создан!"
                 root.addUserError = ""
                 root.clearAddUserForm()
-                root.addUserSuccess = "Пользователь успешно создан!"
             } else {
                 root.addUserError = response.error || "Не удалось создать пользователя."
                 root.addUserSuccess = ""
@@ -1662,16 +1779,6 @@ Item {
                 }
             }
 
-            SideNavButton {
-                visible: root.isAdmin
-                title: "Пользователи"
-                iconType: "adminUsers"
-                active: root.currentTab === root.adminUsersPageIndex
-
-                onClicked: {
-                    root.openAdminUsersPage()
-                }
-            }
 
             Item {
                 Layout.fillWidth: true
@@ -1691,6 +1798,7 @@ Item {
 
         height: root.bottomBarHeight
         color: root.bg
+        z: 100
 
         Rectangle {
             anchors.left: parent.left
@@ -1767,19 +1875,91 @@ Item {
                 }
             }
 
-            NavButton {
-                visible: root.isAdmin
+        }
+    }
 
+    component AppWideButton: Button {
+        id: control
+
+        property color normalColor: root.surface2
+        property color hoverColor: root.surface3
+        property color pressColor: root.surface3
+        property color disabledColor: root.surface3
+        property color textColor: root.textMain
+        property color borderColor: root.border
+        property bool showBorder: true
+        property bool loading: false
+        property int radiusValue: 18
+
+        hoverEnabled: true
+
+        Layout.fillWidth: true
+        Layout.preferredHeight: 54
+
+        opacity: enabled ? 1.0 : 0.62
+        scale: !enabled ? 1.0 : down ? 0.985 : hovered ? 1.012 : 1.0
+
+        Behavior on scale {
+            NumberAnimation {
+                duration: 120
+                easing.type: Easing.OutCubic
+            }
+        }
+
+        Behavior on opacity {
+            NumberAnimation { duration: 120 }
+        }
+
+        background: Rectangle {
+            radius: control.radiusValue
+            color: !control.enabled ? control.disabledColor
+                  : control.down ? control.pressColor
+                  : control.hovered ? control.hoverColor
+                  : control.normalColor
+            border.width: control.showBorder ? 1 : 0
+            border.color: control.hovered && control.enabled ? root.accent : control.borderColor
+
+            Behavior on color {
+                ColorAnimation { duration: 130 }
+            }
+
+            Behavior on border.color {
+                ColorAnimation { duration: 130 }
+            }
+        }
+
+        contentItem: RowLayout {
+            spacing: 10
+
+            Item {
                 Layout.fillWidth: true
-                Layout.fillHeight: true
+            }
 
-                title: "Польз."
-                iconType: "adminUsers"
-                active: root.currentTab === root.adminUsersPageIndex
+            BusyIndicator {
+                running: control.loading
+                visible: control.loading
 
-                onClicked: {
-                    root.openAdminUsersPage()
+                Layout.preferredWidth: 22
+                Layout.preferredHeight: 22
+            }
+
+            Text {
+                text: control.text
+                color: control.textColor
+                font.pixelSize: 15
+                font.bold: true
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                maximumLineCount: 1
+                elide: Text.ElideRight
+
+                Behavior on color {
+                    ColorAnimation { duration: 130 }
                 }
+            }
+
+            Item {
+                Layout.fillWidth: true
             }
         }
     }
@@ -1812,11 +1992,6 @@ Item {
             color: control.activeFocus ? root.surface3 : root.surface2
             border.width: control.activeFocus ? 2 : 1
             border.color: control.activeFocus ? root.accent : root.border
-        }
-
-        cursorDelegate: Rectangle {
-            width: 2
-            color: root.accent
         }
     }
 
@@ -2181,7 +2356,6 @@ Item {
                 ctx.quadraticCurveTo(left, top, left + r, top)
                 ctx.closePath()
             }
-
 
             if (icon.name === "slotLogo") {
                 roundedRectPath(px(0.16), py(0.18), s * 0.68, s * 0.64, s * 0.14)
