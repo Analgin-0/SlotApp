@@ -97,6 +97,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AppLogger.cpp" />
     <ClCompile Include="Db.cpp" />
     <ClCompile Include="EmailSender.cpp" />
     <ClCompile Include="main.cpp" />
@@ -107,6 +108,7 @@
     <QtMoc Include="Server.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AppLogger.h" />
     <ClInclude Include="Constants.hpp" />
     <ClInclude Include="Db.h" />
     <QtMoc Include="EmailSender.h" />

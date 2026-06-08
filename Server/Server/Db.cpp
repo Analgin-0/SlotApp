@@ -7,7 +7,60 @@
 #include <QRegularExpression>
 #include <QHash>
 #include <QtGlobal>
+#include <QByteArray>
 #include <iostream>
+
+
+namespace
+{
+	QString dbLogPartToString(const QString& value)
+	{
+		return value;
+	}
+
+	QString dbLogPartToString(const QByteArray& value)
+	{
+		return QString::fromUtf8(value);
+	}
+
+	QString dbLogPartToString(const char* value)
+	{
+		return QString::fromUtf8(value ? value : "");
+	}
+
+	QString dbLogPartToString(char* value)
+	{
+		return QString::fromUtf8(value ? value : "");
+	}
+
+	QString dbLogPartToString(bool value)
+	{
+		return value ? "true" : "false";
+	}
+
+	QString dbLogPartToString(const QSqlError& value)
+	{
+		return value.text();
+	}
+
+	template <typename T>
+	QString dbLogPartToString(T value)
+	{
+		return QString::number(value);
+	}
+
+	template <typename... Args>
+	QString makeDbLogMessage(const Args&... args)
+	{
+		QStringList parts;
+		using Expander = int[];
+		(void)Expander {
+			0, ((void)(parts << dbLogPartToString(args)), 0)...
+		};
+		return parts.join(' ');
+	}
+
+}
 
 static QString connectionName()
 {
@@ -197,7 +250,7 @@ static QString roleToCancelText(int role)
 	return "не указано";
 }
 
-static QHash<QString, QString> getTableColumnMap(QSqlDatabase& db, const QString& tableName)
+static QHash<QString, QString> getTableColumnMap(QSqlDatabase& db, const QString& tableName, AppLogger& log)
 {
 	QHash<QString, QString> result;
 
@@ -208,7 +261,7 @@ static QHash<QString, QString> getTableColumnMap(QSqlDatabase& db, const QString
 	const QString sql = "SELECT TOP 0 * FROM " + safeTableName(tableName);
 
 	if (!query.exec(sql)) {
-		qWarning() << "getTableColumnMap failed:" << query.lastError().text();
+		log.warning("Db", makeDbLogMessage("getTableColumnMap failed:", query.lastError().text()));
 		return result;
 	}
 
@@ -294,11 +347,11 @@ bool Db::connectToDatabase()
 	m_sql_context.setDatabaseName(connectionString);
 
 	if (!m_sql_context.open()) {
-		qDebug() << "[Database] Connection error:" << m_sql_context.lastError().text();
+		m_log.debug("Db", makeDbLogMessage("[Database] Connection error:", m_sql_context.lastError().text()));
 		return false;
 	}
 
-	qDebug() << "[Database] Connected";
+	m_log.debug("Db", "[Database] Connected");
 	return true;
 }
 
@@ -318,7 +371,7 @@ void Db::init()
 		return;
 
 	if (!connectToDatabase()) {
-		std::cout << "Failed connectToDatabase\n";
+		m_log.error("Db", "Failed connectToDatabase");
 		throw std::runtime_error("Failed connectToDatabase");
 	}
 
@@ -328,17 +381,17 @@ void Db::init()
 bool Db::createTable(const QString& name, const table_params& params)
 {
 	if (!ensureOpen()) {
-		qWarning() << "Database connection not open!";
+		m_log.warning("Db", "Database connection not open!");
 		return false;
 	}
 
 	if (!isSafeSqlIdentifier(name)) {
-		qWarning() << "Unsafe table name:" << name;
+		m_log.warning("Db", makeDbLogMessage("Unsafe table name:", name));
 		return false;
 	}
 
 	if (m_sql_context.tables().contains(name)) {
-		qWarning() << "Table" << name << "already exists!";
+		m_log.warning("Db", makeDbLogMessage("Table", name, "already exists!"));
 		return false;
 	}
 
@@ -398,12 +451,12 @@ bool Db::createTable(const QString& name, const table_params& params)
 
 		m_sql_context.commit();
 
-		qDebug() << "Table" << name << "created successfully";
+		m_log.debug("Db", makeDbLogMessage("Table", name, "created successfully"));
 		return true;
 	}
 	catch (const std::exception& e) {
 		m_sql_context.rollback();
-		qCritical() << "Operation failed:" << e.what();
+		m_log.error("Db", makeDbLogMessage("Operation failed:", e.what()));
 		return false;
 	}
 }
@@ -413,17 +466,17 @@ table_row Db::get_id_data(QString nameTb, int id)
 	table_row result;
 
 	if (!ensureOpen()) {
-		qWarning() << "Database connection is not open!";
+		m_log.warning("Db", "Database connection is not open!");
 		return result;
 	}
 
 	if (!isSafeSqlIdentifier(nameTb)) {
-		qWarning() << "Unsafe table name:" << nameTb;
+		m_log.warning("Db", makeDbLogMessage("Unsafe table name:", nameTb));
 		return result;
 	}
 
 	if (!isValidTable(nameTb)) {
-		qWarning() << "Table" << nameTb << "does not exist!";
+		m_log.warning("Db", makeDbLogMessage("Table", nameTb, "does not exist!"));
 		return result;
 	}
 
@@ -432,12 +485,12 @@ table_row Db::get_id_data(QString nameTb, int id)
 	query.bindValue(":id", id);
 
 	if (!query.exec()) {
-		qWarning() << "Failed to execute query:" << query.lastError().text();
+		m_log.warning("Db", makeDbLogMessage("Failed to execute query:", query.lastError().text()));
 		return result;
 	}
 
 	if (!query.next()) {
-		qDebug() << "No record found with ID" << id << "in table" << nameTb;
+		m_log.debug("Db", makeDbLogMessage("No record found with ID", id, "in table", nameTb));
 		return result;
 	}
 
@@ -484,19 +537,19 @@ table_row Db::get_id_data(QString nameTb, int id)
 bool Db::set_table_colums(QString nameTb, int id, table_row newData)
 {
 	if (!ensureOpen()) {
-		qDebug() << "Database is not connected!";
+		m_log.debug("Db", "Database is not connected!");
 		return false;
 	}
 
 	if (!isSafeSqlIdentifier(nameTb)) {
-		qWarning() << "Unsafe table name:" << nameTb;
+		m_log.warning("Db", makeDbLogMessage("Unsafe table name:", nameTb));
 		return false;
 	}
 
 	const table_params tableStructure = fetchTableSchema(nameTb);
 
 	if (tableStructure.empty()) {
-		qDebug() << "Failed to get table structure for table:" << nameTb;
+		m_log.debug("Db", makeDbLogMessage("Failed to get table structure for table:", nameTb));
 		return false;
 	}
 
@@ -523,16 +576,14 @@ bool Db::set_table_colums(QString nameTb, int id, table_row newData)
 		);
 
 		if (it == tableStructure.end()) {
-			qDebug() << "Field" << fieldName << "not found in table" << nameTb;
+			m_log.debug("Db", makeDbLogMessage("Field", fieldName, "not found in table", nameTb));
 			continue;
 		}
 
 		const FieldDataType expectedType = std::get<1>(*it);
 
 		if (fieldType != expectedType) {
-			qDebug() << "Type mismatch for field" << fieldName
-				<< "Expected:" << expectedType
-				<< "Got:" << fieldType;
+			m_log.debug("Db", makeDbLogMessage("Type mismatch for field", fieldName, "Expected:", expectedType, "Got:", fieldType));
 			continue;
 		}
 
@@ -541,7 +592,7 @@ bool Db::set_table_colums(QString nameTb, int id, table_row newData)
 	}
 
 	if (setClauses.isEmpty()) {
-		qDebug() << "No valid fields to update";
+		m_log.debug("Db", "No valid fields to update");
 		return false;
 	}
 
@@ -559,12 +610,12 @@ bool Db::set_table_colums(QString nameTb, int id, table_row newData)
 	query.addBindValue(id);
 
 	if (!query.exec()) {
-		qDebug() << "Failed to update record:" << query.lastError().text();
+		m_log.debug("Db", makeDbLogMessage("Failed to update record:", query.lastError().text()));
 		return false;
 	}
 
 	if (query.numRowsAffected() <= 0) {
-		qDebug() << "No rows affected, record with id" << id << "might not exist";
+		m_log.debug("Db", makeDbLogMessage("No rows affected, record with id", id, "might not exist"));
 		return false;
 	}
 
@@ -574,17 +625,17 @@ bool Db::set_table_colums(QString nameTb, int id, table_row newData)
 void Db::removeRecordById(const QString& tableName, int id)
 {
 	if (!ensureOpen()) {
-		qWarning() << "Database connection is not open!";
+		m_log.warning("Db", "Database connection is not open!");
 		return;
 	}
 
 	if (!isSafeSqlIdentifier(tableName)) {
-		qWarning() << "Unsafe table name:" << tableName;
+		m_log.warning("Db", makeDbLogMessage("Unsafe table name:", tableName));
 		return;
 	}
 
 	if (!isValidTable(tableName)) {
-		qWarning() << "Table" << tableName << "does not exist!";
+		m_log.warning("Db", makeDbLogMessage("Table", tableName, "does not exist!"));
 		return;
 	}
 
@@ -593,27 +644,27 @@ void Db::removeRecordById(const QString& tableName, int id)
 	query.bindValue(":id", id);
 
 	if (!query.exec()) {
-		qWarning() << "Failed to delete record:" << query.lastError().text();
+		m_log.warning("Db", makeDbLogMessage("Failed to delete record:", query.lastError().text()));
 		return;
 	}
 
-	qDebug() << "Deleted rows:" << query.numRowsAffected();
+	m_log.debug("Db", makeDbLogMessage("Deleted rows:", query.numRowsAffected()));
 }
 
 void Db::dropTable(QString name)
 {
 	if (!ensureOpen()) {
-		qWarning() << "Database connection is not open!";
+		m_log.warning("Db", "Database connection is not open!");
 		return;
 	}
 
 	if (!isSafeSqlIdentifier(name)) {
-		qWarning() << "Unsafe table name:" << name;
+		m_log.warning("Db", makeDbLogMessage("Unsafe table name:", name));
 		return;
 	}
 
 	if (!isValidTable(name)) {
-		qWarning() << "Table" << name << "does not exist!";
+		m_log.warning("Db", makeDbLogMessage("Table", name, "does not exist!"));
 		return;
 	}
 
@@ -621,45 +672,44 @@ void Db::dropTable(QString name)
 	query.prepare("DROP TABLE " + safeTableName(name));
 
 	if (!query.exec()) {
-		qWarning() << "Failed to delete table" << name << ":" << query.lastError().text();
+		m_log.warning("Db", makeDbLogMessage("Failed to delete table", name, ":", query.lastError().text()));
 	}
 	else {
-		qDebug() << "Table" << name << "deleted successfully";
+		m_log.debug("Db", makeDbLogMessage("Table", name, "deleted successfully"));
 	}
 }
 
 void Db::clearTableData(QString nameTb)
 {
 	if (!ensureOpen()) {
-		qWarning() << "Database connection is not open!";
+		m_log.warning("Db", "Database connection is not open!");
 		return;
 	}
 
 	if (!isSafeSqlIdentifier(nameTb)) {
-		qWarning() << "Unsafe table name:" << nameTb;
+		m_log.warning("Db", makeDbLogMessage("Unsafe table name:", nameTb));
 		return;
 	}
 
 	if (!isValidTable(nameTb)) {
-		qWarning() << "Table" << nameTb << "does not exist!";
+		m_log.warning("Db", makeDbLogMessage("Table", nameTb, "does not exist!"));
 		return;
 	}
 
 	QSqlQuery query(m_sql_context);
 
 	if (!query.exec("DELETE FROM " + safeTableName(nameTb))) {
-		qWarning() << "Failed to clear table" << nameTb << ":" << query.lastError().text();
+		m_log.warning("Db", makeDbLogMessage("Failed to clear table", nameTb, ":", query.lastError().text()));
 	}
 	else {
-		qDebug() << "Table" << nameTb << "data cleared."
-			<< query.numRowsAffected() << "rows affected.";
+		m_log.debug("Db", makeDbLogMessage("Table", nameTb, "data cleared.", query.numRowsAffected(), "rows affected."));
 	}
 }
 
 bool Db::isValidTable(QString nameTb)
 {
 	if (!ensureOpen()) {
-		qDebug() << "Error: there is no connection to the database!";
+		m_log.debug("Db", "Error: there is no connection to the database!");
 		return false;
 	}
 
@@ -675,7 +725,7 @@ bool Db::isValidTable(QString nameTb)
 	query.addBindValue(nameTb);
 
 	if (!query.exec()) {
-		qDebug() << "Error checking the table:" << query.lastError().text();
+		m_log.debug("Db", makeDbLogMessage("Error checking the table:", query.lastError().text()));
 		return false;
 	}
 
@@ -688,7 +738,7 @@ bool Db::isValidTable(QString nameTb)
 bool Db::isValidIdOnTable(QString nameTb, int id)
 {
 	if (!ensureOpen()) {
-		qWarning() << "Database connection is not open!";
+		m_log.warning("Db", "Database connection is not open!");
 		return false;
 	}
 
@@ -704,7 +754,7 @@ bool Db::isValidIdOnTable(QString nameTb, int id)
 	query.bindValue(":id", id);
 
 	if (!query.exec()) {
-		qWarning() << "isValidIdOnTable failed:" << query.lastError().text();
+		m_log.warning("Db", makeDbLogMessage("isValidIdOnTable failed:", query.lastError().text()));
 		return false;
 	}
 
@@ -721,12 +771,12 @@ void Db::addTableData(
 )
 {
 	if (!ensureOpen()) {
-		qWarning() << "Database is not connected!";
+		m_log.warning("Db", "Database is not connected!");
 		return;
 	}
 
 	if (!isSafeSqlIdentifier(tableName)) {
-		qWarning() << "Unsafe table name:" << tableName;
+		m_log.warning("Db", makeDbLogMessage("Unsafe table name:", tableName));
 		return;
 	}
 
@@ -746,7 +796,7 @@ void Db::addTableData(
 			continue;
 
 		if (i >= dataToAdd.size()) {
-			qWarning() << "Data index out of range";
+			m_log.warning("Db", "Data index out of range");
 			return;
 		}
 
@@ -784,7 +834,7 @@ void Db::addTableData(
 	QSqlQuery query(m_sql_context);
 
 	if (!query.prepare(queryStr)) {
-		qWarning() << "Prepare failed:" << query.lastError().text();
+		m_log.warning("Db", makeDbLogMessage("Prepare failed:", query.lastError().text()));
 		return;
 	}
 
@@ -792,17 +842,17 @@ void Db::addTableData(
 		query.addBindValue(val);
 
 	if (!query.exec()) {
-		qWarning() << "Failed to insert data:" << query.lastError().text();
+		m_log.warning("Db", makeDbLogMessage("Failed to insert data:", query.lastError().text()));
 	}
 	else {
-		qDebug() << "Successfully added data to" << tableName;
+		m_log.debug("Db", makeDbLogMessage("Successfully added data to", tableName));
 	}
 }
 
 bool Db::checkUserCredentials(const QString& login, const QString& password, int* userId)
 {
 	if (!ensureOpen()) {
-		qWarning() << "Database connection is not open!";
+		m_log.warning("Db", "Database connection is not open!");
 		return false;
 	}
 
@@ -811,12 +861,12 @@ bool Db::checkUserCredentials(const QString& login, const QString& password, int
 	query.bindValue(":login", login);
 
 	if (!query.exec()) {
-		qWarning() << "Auth query failed:" << query.lastError().text();
+		m_log.warning("Db", makeDbLogMessage("Auth query failed:", query.lastError().text()));
 		return false;
 	}
 
 	if (!query.next()) {
-		qWarning() << "User not found:" << login;
+		m_log.warning("Db", makeDbLogMessage("User not found:", login));
 		return false;
 	}
 
@@ -824,7 +874,7 @@ bool Db::checkUserCredentials(const QString& login, const QString& password, int
 	const QString dbPassword = query.value("Password").toString();
 
 	if (dbPassword != password) {
-		qWarning() << "Wrong password for user:" << login;
+		m_log.warning("Db", makeDbLogMessage("Wrong password for user:", login));
 		return false;
 	}
 
@@ -839,7 +889,7 @@ table_params Db::fetchTableSchema(const QString& tableName)
 	table_params structure;
 
 	if (!ensureOpen()) {
-		qDebug() << "Database is not open!";
+		m_log.debug("Db", "Database is not open!");
 		return structure;
 	}
 
@@ -850,7 +900,7 @@ table_params Db::fetchTableSchema(const QString& tableName)
 	const QString sql = "SELECT TOP 0 * FROM " + safeTableName(tableName);
 
 	if (!query.exec(sql)) {
-		qDebug() << "Failed to execute query:" << query.lastError().text();
+		m_log.debug("Db", makeDbLogMessage("Failed to execute query:", query.lastError().text()));
 		return structure;
 	}
 
@@ -901,19 +951,19 @@ table_data Db::getTableValues(const QString& tableName)
 	table_data result;
 
 	if (!ensureOpen()) {
-		qWarning() << "Database not connected!";
+		m_log.warning("Db", "Database not connected!");
 		return result;
 	}
 
 	if (!isSafeSqlIdentifier(tableName)) {
-		qWarning() << "Unsafe table name:" << tableName;
+		m_log.warning("Db", makeDbLogMessage("Unsafe table name:", tableName));
 		return result;
 	}
 
 	QSqlQuery query(m_sql_context);
 
 	if (!query.exec("SELECT * FROM " + safeTableName(tableName))) {
-		qWarning() << "Query failed:" << query.lastError();
+		m_log.warning("Db", makeDbLogMessage("Query failed:", query.lastError()));
 		return result;
 	}
 
@@ -971,7 +1021,7 @@ QJsonObject Db::getMyProfile(int userId)
 	QJsonObject result;
 
 	if (!ensureOpen()) {
-		qWarning() << "Database connection is not open!";
+		m_log.warning("Db", "Database connection is not open!");
 		return result;
 	}
 
@@ -984,12 +1034,12 @@ QJsonObject Db::getMyProfile(int userId)
 	userQuery.bindValue(":id", userId);
 
 	if (!userQuery.exec()) {
-		qWarning() << "getMyProfile user query failed:" << userQuery.lastError().text();
+		m_log.warning("Db", makeDbLogMessage("getMyProfile user query failed:", userQuery.lastError().text()));
 		return result;
 	}
 
 	if (!userQuery.next()) {
-		qWarning() << "User not found, id =" << userId;
+		m_log.warning("Db", makeDbLogMessage("User not found, id =", userId));
 		return result;
 	}
 
@@ -1069,7 +1119,7 @@ QJsonArray Db::getUserSessions(int userId, const QString& currentToken)
 	QJsonArray sessions;
 
 	if (!ensureOpen()) {
-		qWarning() << "Database connection is not open!";
+		m_log.warning("Db", "Database connection is not open!");
 		return sessions;
 	}
 
@@ -1084,7 +1134,7 @@ QJsonArray Db::getUserSessions(int userId, const QString& currentToken)
 	query.bindValue(":user_id", userId);
 
 	if (!query.exec()) {
-		qWarning() << "getUserSessions query failed:" << query.lastError().text();
+		m_log.warning("Db", makeDbLogMessage("getUserSessions query failed:", query.lastError().text()));
 		return sessions;
 	}
 
@@ -1120,7 +1170,7 @@ bool Db::createUserSession(
 )
 {
 	if (!ensureOpen()) {
-		qWarning() << "Database connection is not open!";
+		m_log.warning("Db", "Database connection is not open!");
 		return false;
 	}
 
@@ -1139,7 +1189,7 @@ bool Db::createUserSession(
 	query.bindValue(":expires_in", expiresInSeconds);
 
 	if (!query.exec()) {
-		qWarning() << "createUserSession failed:" << query.lastError().text();
+		m_log.warning("Db", makeDbLogMessage("createUserSession failed:", query.lastError().text()));
 		return false;
 	}
 
@@ -1149,7 +1199,7 @@ bool Db::createUserSession(
 bool Db::revokeUserSessionByToken(const QString& token)
 {
 	if (!ensureOpen()) {
-		qWarning() << "Database connection is not open!";
+		m_log.warning("Db", "Database connection is not open!");
 		return false;
 	}
 
@@ -1162,7 +1212,7 @@ bool Db::revokeUserSessionByToken(const QString& token)
 	query.bindValue(":token", token);
 
 	if (!query.exec()) {
-		qWarning() << "revokeUserSessionByToken failed:" << query.lastError().text();
+		m_log.warning("Db", makeDbLogMessage("revokeUserSessionByToken failed:", query.lastError().text()));
 		return false;
 	}
 
@@ -1226,8 +1276,8 @@ QJsonObject Db::addTableData(const QString& tableName, const QJsonObject& data)
 		resp["ok"] = false;
 		resp["error"] = query.lastError().text();
 
-		qWarning() << "addTableData error:" << query.lastError().text();
-		qWarning() << "SQL:" << sql;
+		m_log.warning("Db", makeDbLogMessage("addTableData error:", query.lastError().text()));
+		m_log.warning("Db", makeDbLogMessage("SQL:", sql));
 
 		return resp;
 	}
@@ -1299,8 +1349,8 @@ QJsonObject Db::updateTableData(const QString& tableName, int id, const QJsonObj
 		resp["ok"] = false;
 		resp["error"] = query.lastError().text();
 
-		qWarning() << "updateTableData error:" << query.lastError().text();
-		qWarning() << "SQL:" << sql;
+		m_log.warning("Db", makeDbLogMessage("updateTableData error:", query.lastError().text()));
+		m_log.warning("Db", makeDbLogMessage("SQL:", sql));
 
 		return resp;
 	}
@@ -1339,8 +1389,8 @@ QJsonObject Db::deleteTableData(const QString& tableName, int id)
 		resp["ok"] = false;
 		resp["error"] = query.lastError().text();
 
-		qWarning() << "deleteTableData error:" << query.lastError().text();
-		qWarning() << "SQL:" << sql;
+		m_log.warning("Db", makeDbLogMessage("deleteTableData error:", query.lastError().text()));
+		m_log.warning("Db", makeDbLogMessage("SQL:", sql));
 
 		return resp;
 	}
@@ -1363,7 +1413,7 @@ QJsonObject Db::deleteTableData(const QString& tableName, int id)
 int Db::getUserRole(int userId)
 {
 	if (!ensureOpen()) {
-		qWarning() << "Database connection is not open!";
+		m_log.warning("Db", "Database connection is not open!");
 		return 0;
 	}
 
@@ -1376,7 +1426,7 @@ int Db::getUserRole(int userId)
 	query.bindValue(":id", userId);
 
 	if (!query.exec()) {
-		qWarning() << "getUserRole failed:" << query.lastError().text();
+		m_log.warning("Db", makeDbLogMessage("getUserRole failed:", query.lastError().text()));
 		return 0;
 	}
 
@@ -1389,7 +1439,7 @@ int Db::getUserRole(int userId)
 QString Db::getUserFullName(int userId)
 {
 	if (!ensureOpen()) {
-		qWarning() << "Database connection is not open!";
+		m_log.warning("Db", "Database connection is not open!");
 		return {};
 	}
 
@@ -1407,7 +1457,7 @@ QString Db::getUserFullName(int userId)
 	query.bindValue(":id", userId);
 
 	if (!query.exec()) {
-		qWarning() << "getUserFullName failed:" << query.lastError().text();
+		m_log.warning("Db", makeDbLogMessage("getUserFullName failed:", query.lastError().text()));
 		return {};
 	}
 
@@ -1422,7 +1472,7 @@ QJsonObject Db::getTeacherShortInfo(int teacherId)
 	QJsonObject obj;
 
 	if (!ensureOpen()) {
-		qWarning() << "Database connection is not open!";
+		m_log.warning("Db", "Database connection is not open!");
 		return obj;
 	}
 
@@ -1444,7 +1494,7 @@ QJsonObject Db::getTeacherShortInfo(int teacherId)
 	query.bindValue(":id", teacherId);
 
 	if (!query.exec()) {
-		qWarning() << "getTeacherShortInfo failed:" << query.lastError().text();
+		m_log.warning("Db", makeDbLogMessage("getTeacherShortInfo failed:", query.lastError().text()));
 		return obj;
 	}
 
@@ -1462,7 +1512,7 @@ QJsonObject Db::getTeacherShortInfo(int teacherId)
 bool Db::canUserAccessRow(const QString& tableName, int rowId, int userId)
 {
 	if (!ensureOpen()) {
-		qWarning() << "Database connection is not open!";
+		m_log.warning("Db", "Database connection is not open!");
 		return false;
 	}
 
@@ -1503,7 +1553,7 @@ bool Db::canUserAccessRow(const QString& tableName, int rowId, int userId)
 		}
 
 		if (!query.exec()) {
-			qWarning() << "canUserAccessRow Appointments failed:" << query.lastError().text();
+			m_log.warning("Db", makeDbLogMessage("canUserAccessRow Appointments failed:", query.lastError().text()));
 			return false;
 		}
 
@@ -1528,7 +1578,7 @@ bool Db::canUserAccessRow(const QString& tableName, int rowId, int userId)
 		query.bindValue(":user_id", userId);
 
 		if (!query.exec()) {
-			qWarning() << "canUserAccessRow UserSession failed:" << query.lastError().text();
+			m_log.warning("Db", makeDbLogMessage("canUserAccessRow UserSession failed:", query.lastError().text()));
 			return false;
 		}
 
@@ -1538,8 +1588,36 @@ bool Db::canUserAccessRow(const QString& tableName, int rowId, int userId)
 		return query.value(0).toInt() > 0;
 	}
 
+	if (tableName == "Schedule") {
+		const int role = getUserRole(userId);
+
+		if (role != 3)
+			return false;
+
+		QSqlQuery query(m_sql_context);
+		query.prepare(
+			"SELECT COUNT(*) "
+			"FROM [dbo].[Schedule] "
+			"WHERE [id] = :id"
+		);
+		query.bindValue(":id", rowId);
+
+		if (!query.exec()) {
+			m_log.warning("Db", makeDbLogMessage("canUserAccessRow Schedule failed:", query.lastError().text()));
+			return false;
+		}
+
+		if (!query.next())
+			return false;
+
+		return query.value(0).toInt() > 0;
+	}
+
+
+
 	return false;
 }
+
 QString Db::getUserSessionTokenById(int userId, int sessionId)
 {
 	if (!ensureOpen())
@@ -1555,7 +1633,7 @@ QString Db::getUserSessionTokenById(int userId, int sessionId)
 	query.bindValue(":user_id", userId);
 
 	if (!query.exec()) {
-		qWarning() << "getUserSessionTokenById failed:" << query.lastError().text();
+		m_log.warning("Db", makeDbLogMessage("getUserSessionTokenById failed:", query.lastError().text()));
 		return {};
 	}
 
@@ -1584,7 +1662,7 @@ QStringList Db::getOtherUserSessionTokens(int userId, const QString& currentToke
 	query.bindValue(":current_token", currentToken);
 
 	if (!query.exec()) {
-		qWarning() << "getOtherUserSessionTokens failed:" << query.lastError().text();
+		m_log.warning("Db", makeDbLogMessage("getOtherUserSessionTokens failed:", query.lastError().text()));
 		return tokens;
 	}
 
@@ -1609,7 +1687,7 @@ bool Db::revokeUserSessionById(int userId, int sessionId)
 	query.bindValue(":user_id", userId);
 
 	if (!query.exec()) {
-		qWarning() << "revokeUserSessionById failed:" << query.lastError().text();
+		m_log.warning("Db", makeDbLogMessage("revokeUserSessionById failed:", query.lastError().text()));
 		return false;
 	}
 
@@ -1632,7 +1710,7 @@ bool Db::revokeOtherUserSessions(int userId, const QString& currentToken)
 	query.bindValue(":current_token", currentToken);
 
 	if (!query.exec()) {
-		qWarning() << "revokeOtherUserSessions failed:" << query.lastError().text();
+		m_log.warning("Db", makeDbLogMessage("revokeOtherUserSessions failed:", query.lastError().text()));
 		return false;
 	}
 
@@ -1704,8 +1782,8 @@ QJsonObject Db::getAppointments(int userId)
 	if (!query.exec()) {
 		resp["error"] = query.lastError().text();
 
-		qWarning() << "getAppointments failed:" << query.lastError().text();
-		qWarning() << "SQL:" << sql;
+		m_log.warning("Db", makeDbLogMessage("getAppointments failed:", query.lastError().text()));
+		m_log.warning("Db", makeDbLogMessage("SQL:", sql));
 
 		return resp;
 	}
@@ -1924,10 +2002,7 @@ QJsonObject Db::getAppointments(int userId)
 			"canceledBy"
 			});
 
-		qDebug() << "Appointment:"
-			<< "id =" << appointmentId
-			<< "date =" << dateText
-			<< "time =" << timeText;
+		m_log.debug("Db", makeDbLogMessage("Appointment:", "id =", appointmentId, "date =", dateText, "time =", timeText));
 
 		appointments.append(item);
 	}
@@ -1965,7 +2040,7 @@ QJsonObject Db::cancelAppointment(int userId, int appointmentId)
 	const int role = getUserRole(userId);
 	const QString cancelText = roleToCancelText(role);
 
-	const QHash<QString, QString> columns = getTableColumnMap(m_sql_context, "Appointments");
+	const QHash<QString, QString> columns = getTableColumnMap(m_sql_context, "Appointments", m_log);
 
 	QStringList setParts;
 	QVariantMap values;
@@ -2028,8 +2103,8 @@ QJsonObject Db::cancelAppointment(int userId, int appointmentId)
 		resp["ok"] = false;
 		resp["error"] = query.lastError().text();
 
-		qWarning() << "cancelAppointment failed:" << query.lastError().text();
-		qWarning() << "SQL:" << sql;
+		m_log.warning("Db", makeDbLogMessage("cancelAppointment failed:", query.lastError().text()));
+		m_log.warning("Db", makeDbLogMessage("SQL:", sql));
 
 		return resp;
 	}
@@ -2069,7 +2144,7 @@ QJsonObject Db::rateAppointment(int userId, int appointmentId, int rating)
 		return resp;
 	}
 
-	const QHash<QString, QString> columns = getTableColumnMap(m_sql_context, "Appointments");
+	const QHash<QString, QString> columns = getTableColumnMap(m_sql_context, "Appointments", m_log);
 	const QString ratingColumn = findColumn(columns, {
 		"Rating",
 		"rating",
@@ -2099,8 +2174,8 @@ QJsonObject Db::rateAppointment(int userId, int appointmentId, int rating)
 		resp["ok"] = false;
 		resp["error"] = query.lastError().text();
 
-		qWarning() << "rateAppointment failed:" << query.lastError().text();
-		qWarning() << "SQL:" << sql;
+		m_log.warning("Db", makeDbLogMessage("rateAppointment failed:", query.lastError().text()));
+		m_log.warning("Db", makeDbLogMessage("SQL:", sql));
 
 		return resp;
 	}
@@ -2144,7 +2219,7 @@ QJsonObject Db::getTeachers()
 		resp["error"] = query.lastError().text();
 		resp["teachers"] = QJsonArray();
 
-		qWarning() << "getTeachers failed:" << query.lastError().text();
+		m_log.warning("Db", makeDbLogMessage("getTeachers failed:", query.lastError().text()));
 
 		return resp;
 	}
@@ -2336,7 +2411,7 @@ QJsonObject Db::createUserWithRoleData(const QJsonObject& userData,
 			resp["ok"] = false;
 			resp["error"] = query.lastError().text();
 
-			qWarning() << "createUserWithRoleData User insert failed:" << query.lastError().text();
+			m_log.warning("Db", makeDbLogMessage("createUserWithRoleData User insert failed:", query.lastError().text()));
 
 			return resp;
 		}
@@ -2376,7 +2451,7 @@ QJsonObject Db::createUserWithRoleData(const QJsonObject& userData,
 			resp["ok"] = false;
 			resp["error"] = query.lastError().text();
 
-			qWarning() << "createUserWithRoleData Student insert failed:" << query.lastError().text();
+			m_log.warning("Db", makeDbLogMessage("createUserWithRoleData Student insert failed:", query.lastError().text()));
 
 			return resp;
 		}
@@ -2405,7 +2480,7 @@ QJsonObject Db::createUserWithRoleData(const QJsonObject& userData,
 			resp["ok"] = false;
 			resp["error"] = query.lastError().text();
 
-			qWarning() << "createUserWithRoleData Teacher insert failed:" << query.lastError().text();
+			m_log.warning("Db", makeDbLogMessage("createUserWithRoleData Teacher insert failed:", query.lastError().text()));
 
 			return resp;
 		}
@@ -2430,14 +2505,14 @@ QJsonObject Db::createUserWithRoleData(const QJsonObject& userData,
 bool Db::resetPasswordByEmail(const QString& email, const QString& newPassword)
 {
 	if (!ensureOpen()) {
-		qWarning() << "resetPasswordByEmail error: database is not open";
+		m_log.warning("Db", "resetPasswordByEmail error: database is not open");
 		return false;
 	}
 
 	const QString normalizedEmail = email.trimmed().toLower();
 
 	if (normalizedEmail.isEmpty() || newPassword.isEmpty()) {
-		qWarning() << "resetPasswordByEmail error: email/password is empty";
+		m_log.warning("Db", "resetPasswordByEmail error: email/password is empty");
 		return false;
 	}
 
@@ -2453,14 +2528,14 @@ bool Db::resetPasswordByEmail(const QString& email, const QString& newPassword)
 	query.bindValue(":email", normalizedEmail);
 
 	if (!query.exec()) {
-		qWarning() << "resetPasswordByEmail error:" << query.lastError().text();
+		m_log.warning("Db", makeDbLogMessage("resetPasswordByEmail error:", query.lastError().text()));
 		return false;
 	}
 
 	const int affected = query.numRowsAffected();
 
 	if (affected <= 0) {
-		qWarning() << "resetPasswordByEmail: user not found by email/login:" << normalizedEmail;
+		m_log.warning("Db", makeDbLogMessage("resetPasswordByEmail: user not found by email/login:", normalizedEmail));
 		return false;
 	}
 
@@ -2489,7 +2564,7 @@ bool Db::changePasswordByUserId(int userId, const QString& oldPassword, const QS
 	checkQuery.bindValue(":old_password", oldPassword);
 
 	if (!checkQuery.exec()) {
-		qWarning() << "changePasswordByUserId check error:" << checkQuery.lastError().text();
+		m_log.warning("Db", makeDbLogMessage("changePasswordByUserId check error:", checkQuery.lastError().text()));
 		return false;
 	}
 
@@ -2508,7 +2583,7 @@ bool Db::changePasswordByUserId(int userId, const QString& oldPassword, const QS
 	updateQuery.bindValue(":id", userId);
 
 	if (!updateQuery.exec()) {
-		qWarning() << "changePasswordByUserId update error:" << updateQuery.lastError().text();
+		m_log.warning("Db", makeDbLogMessage("changePasswordByUserId update error:", updateQuery.lastError().text()));
 		return false;
 	}
 

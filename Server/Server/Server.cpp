@@ -4,7 +4,6 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
-#include <QDebug>
 #include <QHostAddress>
 #include <QDateTime>
 #include <QSet>
@@ -32,22 +31,76 @@
 #include "Constants.hpp"
 #include "EmailSender.h"
 
+
+namespace
+{
+	QString logPartToString(const QString& value)
+	{
+		return value;
+	}
+
+	QString logPartToString(const QByteArray& value)
+	{
+		return QString::fromUtf8(value);
+	}
+
+	QString logPartToString(const char* value)
+	{
+		return QString::fromUtf8(value ? value : "");
+	}
+
+	QString logPartToString(char* value)
+	{
+		return QString::fromUtf8(value ? value : "");
+	}
+
+	QString logPartToString(bool value)
+	{
+		return value ? "true" : "false";
+	}
+
+	template <typename T>
+	QString logPartToString(T value)
+	{
+		return QString::number(value);
+	}
+
+	template <typename... Args>
+	QString makeLogMessage(const Args&... args)
+	{
+		QStringList parts;
+		using Expander = int[];
+		(void)Expander {
+			0, ((void)(parts << logPartToString(args)), 0)...
+		};
+		return parts.join(' ');
+	}
+}
+
 Server::Server()
 	: m_sessions(new SessionManager(this))
 {
 	if (!QSslSocket::supportsSsl()) {
-		qCritical() << "[SSL] OpenSSL is not available."
-			<< "Build version:" << QSslSocket::sslLibraryBuildVersionString()
-			<< "| Runtime version:" << QSslSocket::sslLibraryVersionString();
+		m_log.error("Server", makeLogMessage(
+			"[SSL] OpenSSL is not available.",
+			"Build version:",
+			QSslSocket::sslLibraryBuildVersionString(),
+			"| Runtime version:",
+			QSslSocket::sslLibraryVersionString()
+		));
 	}
 
-	qDebug() << "[SSL] Build version:" << QSslSocket::sslLibraryBuildVersionString()
-		<< "| Runtime version:" << QSslSocket::sslLibraryVersionString();
+	m_log.debug("Server", makeLogMessage(
+		"[SSL] Build version:",
+		QSslSocket::sslLibraryBuildVersionString(),
+		"| Runtime version:",
+		QSslSocket::sslLibraryVersionString()
+	));
 
 	if (listen(QHostAddress::Any, 2323))
-		qDebug() << "[Server] TLS server started on port 2323";
+		m_log.debug("Server", makeLogMessage("[Server] TLS server started on port 2323"));
 	else
-		qCritical() << "[Server] Failed to start server:" << errorString();
+		m_log.error("Server", makeLogMessage("[Server] Failed to start server:", errorString()));
 }
 
 QString Server::tlsCertificatePath()
@@ -133,7 +186,7 @@ void Server::incomingConnection(qintptr socketDescription)
 	auto* s = new QSslSocket(this);
 
 	if (!s->setSocketDescriptor(socketDescription)) {
-		qWarning() << "[Server] Failed to set socket descriptor:" << s->errorString();
+		m_log.warning("Server", makeLogMessage("[Server] Failed to set socket descriptor:", s->errorString()));
 		delete s;
 		return;
 	}
@@ -141,40 +194,65 @@ void Server::incomingConnection(qintptr socketDescription)
 	QString tlsError;
 
 	if (!setupTlsSocket(s, &tlsError)) {
-		qWarning() << "[TLS] Failed to configure TLS for socket" << socketDescription << ":" << tlsError;
+		m_log.warning("Server", makeLogMessage(
+			"[TLS] Failed to configure TLS for socket",
+			socketDescription,
+			":",
+			tlsError
+		));
 		s->disconnectFromHost();
 		s->deleteLater();
 		return;
 	}
 
-	connect(s, &QSslSocket::encrypted, this, [s]() {
-		qDebug() << "[TLS] Connection encrypted."
-			<< "IP:" << s->peerAddress().toString()
-			<< "| Port:" << s->peerPort()
-			<< "| Cipher:" << s->sessionCipher().name()
-			<< "| Protocol:" << s->sessionCipher().protocolString();
+	connect(s, &QSslSocket::encrypted, this, [this, s]() {
+		m_log.debug("Server", makeLogMessage(
+			"[TLS] Connection encrypted.",
+			"IP:",
+			s->peerAddress().toString(),
+			"| Port:",
+			s->peerPort(),
+			"| Cipher:",
+			s->sessionCipher().name(),
+			"| Protocol:",
+			s->sessionCipher().protocolString()
+		));
 		});
 
-	connect(s, &QSslSocket::sslErrors, this, [s](const QList<QSslError>& errors) {
-		qWarning() << "[TLS] SSL errors for" << s->peerAddress().toString() << ":";
+	connect(s, &QSslSocket::sslErrors, this, [this, s](const QList<QSslError>& errors) {
+		m_log.warning("Server", makeLogMessage(
+			"[TLS] SSL errors for",
+			s->peerAddress().toString(),
+			":"
+		));
 		for (const QSslError& error : errors)
-			qWarning() << "  -" << error.errorString();
+			m_log.warning("Server", makeLogMessage("  -", error.errorString()));
 
 		s->disconnectFromHost();
 		});
 
-	connect(s, &QSslSocket::errorOccurred, this, [s](QAbstractSocket::SocketError socketError) {
-		qWarning() << "[Socket] Socket error from" << s->peerAddress().toString()
-			<< "| Code:" << socketError
-			<< "| Description:" << s->errorString();
+	connect(s, &QSslSocket::errorOccurred, this, [this, s](QAbstractSocket::SocketError socketError) {
+		m_log.warning("Server", makeLogMessage(
+			"[Socket] Socket error from",
+			s->peerAddress().toString(),
+			"| Code:",
+			socketError,
+			"| Description:",
+			s->errorString()
+		));
 		});
 
 	connect(s, &QSslSocket::readyRead, this, &Server::slotReadyRead);
 
 	connect(s, &QSslSocket::disconnected, this, [this, s]() {
-		qDebug() << "[Server] Client disconnected. IP:" << s->peerAddress().toString()
-			<< "| Port:" << s->peerPort()
-			<< "| Active connections:" << m_sockets.size() - 1;
+		m_log.debug("Server", makeLogMessage(
+			"[Server] Client disconnected. IP:",
+			s->peerAddress().toString(),
+			"| Port:",
+			s->peerPort(),
+			"| Active connections:",
+			m_sockets.size() - 1
+		));
 
 		m_sockets.removeAll(s);
 		s->disconnect();
@@ -183,11 +261,17 @@ void Server::incomingConnection(qintptr socketDescription)
 
 	m_sockets.push_back(s);
 
-	qDebug() << "[Server] Incoming TCP connection. Descriptor:" << socketDescription
-		<< "| IP:" << s->peerAddress().toString()
-		<< "| Port:" << s->peerPort()
-		<< "| Total connections:" << m_sockets.size()
-		<< "| Starting TLS handshake...";
+	m_log.debug("Server", makeLogMessage(
+		"[Server] Incoming TCP connection. Descriptor:",
+		socketDescription,
+		"| IP:",
+		s->peerAddress().toString(),
+		"| Port:",
+		s->peerPort(),
+		"| Total connections:",
+		m_sockets.size(),
+		"| Starting TLS handshake..."
+	));
 
 	s->startServerEncryption();
 }
@@ -200,9 +284,11 @@ void Server::slotReadyRead()
 		return;
 
 	if (!client->isEncrypted()) {
-		qWarning() << "[Server] Data received before TLS handshake was completed from"
-			<< client->peerAddress().toString()
-			<< ". Closing connection.";
+		m_log.warning("Server", makeLogMessage(
+			"[Server] Data received before TLS handshake was completed from",
+			client->peerAddress().toString(),
+			". Closing connection."
+		));
 
 		client->disconnectFromHost();
 		return;
@@ -224,9 +310,14 @@ void Server::slotReadyRead()
 		const QJsonDocument doc = QJsonDocument::fromJson(payload, &pe);
 
 		if (doc.isNull() || !doc.isObject()) {
-			qWarning() << "[Server] Invalid JSON from" << client->peerAddress().toString()
-				<< "| Error:" << pe.errorString()
-				<< "| Offset:" << pe.offset;
+			m_log.warning("Server", makeLogMessage(
+				"[Server] Invalid JSON from",
+				client->peerAddress().toString(),
+				"| Error:",
+				pe.errorString(),
+				"| Offset:",
+				pe.offset
+			));
 
 			QJsonObject err;
 			err["ok"] = false;
@@ -247,7 +338,7 @@ void Server::sendBytes(QSslSocket* client, const QByteArray& payload)
 		return;
 
 	if (!client->isEncrypted()) {
-		qWarning() << "[Server] Attempted to send data before TLS handshake was completed.";
+		m_log.warning("Server", makeLogMessage("[Server] Attempted to send data before TLS handshake was completed."));
 		return;
 	}
 
@@ -286,9 +377,14 @@ void Server::processCommand(const QJsonObject& json, QSslSocket* client)
 
 
 
-	qDebug() << "[CMD] Command:" << command
-		<< "| From:" << client->peerAddress().toString()
-		<< "| Port:" << client->peerPort();
+	m_log.debug("Server", makeLogMessage(
+		"[CMD] Command:",
+		command,
+		"| From:",
+		client->peerAddress().toString(),
+		"| Port:",
+		client->peerPort()
+	));
 
 	if (publicCommandHandlers.contains(command)) {
 		publicCommandHandlers[command]();
@@ -299,8 +395,12 @@ void Server::processCommand(const QJsonObject& json, QSslSocket* client)
 	int userId = -1;
 
 	if (!m_sessions->validateToken(token, &userId)) {
-		qWarning() << "[Auth] Invalid or expired token for command:" << command
-			<< "| IP:" << client->peerAddress().toString();
+		m_log.warning("Server", makeLogMessage(
+			"[Auth] Invalid or expired token for command:",
+			command,
+			"| IP:",
+			client->peerAddress().toString()
+		));
 
 		QJsonObject err;
 		err["ok"] = false;
@@ -311,7 +411,12 @@ void Server::processCommand(const QJsonObject& json, QSslSocket* client)
 		return;
 	}
 
-	qDebug() << "[CMD] Authorized. userId:" << userId << "| Command:" << command;
+	m_log.debug("Server", makeLogMessage(
+		"[CMD] Authorized. userId:",
+		userId,
+		"| Command:",
+		command
+	));
 
 	std::map<QString, std::function<void()>> privateCommand = {
 		{"logout",                [&]() { handleLogout(json, client); }},
@@ -328,7 +433,7 @@ void Server::processCommand(const QJsonObject& json, QSslSocket* client)
 		{"change_password",       [&]() { handleChangePassword(params, userId, client); }}
 	};
 
-	
+
 
 	if (privateCommand.contains(command))
 	{
@@ -336,9 +441,14 @@ void Server::processCommand(const QJsonObject& json, QSslSocket* client)
 		return;
 	}
 
-	qWarning() << "[CMD] Unknown command:" << command
-		<< "| userId:" << userId
-		<< "| IP:" << client->peerAddress().toString();
+	m_log.warning("Server", makeLogMessage(
+		"[CMD] Unknown command:",
+		command,
+		"| userId:",
+		userId,
+		"| IP:",
+		client->peerAddress().toString()
+	));
 
 	QJsonObject err;
 	err["ok"] = false;
@@ -354,11 +464,15 @@ void Server::handleLogin(const QJsonObject& params, QSslSocket* client)
 	const QString login = params.value("login").toString().trimmed();
 	const QString password = params.value("password").toString();
 
-	qDebug() << "[Login] Login attempt. Login:" << login
-		<< "| IP:" << client->peerAddress().toString();
+	m_log.debug("Server", makeLogMessage(
+		"[Login] Login attempt. Login:",
+		login,
+		"| IP:",
+		client->peerAddress().toString()
+	));
 
 	if (login.isEmpty() || password.isEmpty()) {
-		qWarning() << "[Login] Login or password is missing. IP:" << client->peerAddress().toString();
+		m_log.warning("Server", makeLogMessage("[Login] Login or password is missing. IP:", client->peerAddress().toString()));
 
 		QJsonObject err;
 		err["ok"] = false;
@@ -372,8 +486,12 @@ void Server::handleLogin(const QJsonObject& params, QSslSocket* client)
 	int userId = -1;
 
 	if (!Db::get()->checkUserCredentials(login, password, &userId)) {
-		qWarning() << "[Login] Invalid login or password. Login:" << login
-			<< "| IP:" << client->peerAddress().toString();
+		m_log.warning("Server", makeLogMessage(
+			"[Login] Invalid login or password. Login:",
+			login,
+			"| IP:",
+			client->peerAddress().toString()
+		));
 
 		QJsonObject err;
 		err["ok"] = false;
@@ -399,11 +517,18 @@ void Server::handleLogin(const QJsonObject& params, QSslSocket* client)
 		24 * 60 * 60
 	);
 
-	qDebug() << "[Login] Login successful. userId:" << userId
-		<< "| Login:" << login
-		<< "| Device:" << deviceName
-		<< "| Platform:" << platform
-		<< "| IP:" << ipAddress;
+	m_log.debug("Server", makeLogMessage(
+		"[Login] Login successful. userId:",
+		userId,
+		"| Login:",
+		login,
+		"| Device:",
+		deviceName,
+		"| Platform:",
+		platform,
+		"| IP:",
+		ipAddress
+	));
 
 	QJsonObject resp;
 	resp["ok"] = true;
@@ -422,10 +547,10 @@ void Server::handleLogout(const QJsonObject& json, QSslSocket* client)
 		m_sessions->removeSession(token);
 		Db::get()->revokeUserSessionByToken(token);
 
-		qDebug() << "[Logout] Session closed. IP:" << client->peerAddress().toString();
+		m_log.debug("Server", makeLogMessage("[Logout] Session closed. IP:", client->peerAddress().toString()));
 	}
 	else {
-		qWarning() << "[Logout] Token was not provided. IP:" << client->peerAddress().toString();
+		m_log.warning("Server", makeLogMessage("[Logout] Token was not provided. IP:", client->peerAddress().toString()));
 	}
 
 	QJsonObject resp;
@@ -457,7 +582,9 @@ bool Server::isAllowedWriteTableName(const QString& tableName) const
 	static const QSet<QString> kAllowedTables = {
 		"Appointments",
 		"UserSession",
-		"Schedule"
+		"Schedule",
+		"Subject",
+		"LessonTime"
 	};
 
 	return kAllowedTables.contains(tableName);
@@ -503,7 +630,14 @@ QSet<QString> Server::allowedColumnsForTable(const QString& tableName) const
 			"updated_at"
 		};
 	}
-
+	if (tableName == "Subject") {
+		return {
+			"title",
+			"short_title",
+			"description",
+			"is_active"
+		};
+	}
 	return {};
 }
 
@@ -523,9 +657,13 @@ QJsonObject Server::prepareInsertData(
 		const int role = Db::get()->getUserRole(userId);
 
 		if (role != 1) {
-			qWarning() << "[AddTableData] Appointment creation denied. userId:" << userId
-				<< "| role:" << role
-				<< "| required role: student (1)";
+			m_log.warning("Server", makeLogMessage(
+				"[AddTableData] Appointment creation denied. userId:",
+				userId,
+				"| role:",
+				role,
+				"| required role: student (1)"
+			));
 
 			(*error)["ok"] = false;
 			(*error)["code"] = "forbidden";
@@ -572,7 +710,7 @@ QJsonObject Server::prepareInsertData(
 		const QJsonObject teacher = Db::get()->getTeacherShortInfo(teacherId);
 
 		if (teacher.isEmpty()) {
-			qWarning() << "[AddTableData] Teacher not found. teacherId:" << teacherId;
+			m_log.warning("Server", makeLogMessage("[AddTableData] Teacher not found. teacherId:", teacherId));
 
 			(*error)["ok"] = false;
 			(*error)["code"] = "not_found";
@@ -583,7 +721,7 @@ QJsonObject Server::prepareInsertData(
 		const QString studentName = Db::get()->getUserFullName(userId);
 
 		if (studentName.trimmed().isEmpty()) {
-			qWarning() << "[AddTableData] Student not found. userId:" << userId;
+			m_log.warning("Server", makeLogMessage("[AddTableData] Student not found. userId:", userId));
 
 			(*error)["ok"] = false;
 			(*error)["code"] = "not_found";
@@ -615,12 +753,21 @@ QJsonObject Server::prepareInsertData(
 		result["rating"] = 0;
 		result["created_at"] = QDateTime::currentDateTime().toString(Qt::ISODate);
 
-		qDebug() << "[AddTableData] Appointment prepared. userId:" << userId
-			<< "| teacherId:" << teacherId
-			<< "| Student:" << studentName
-			<< "| Date:" << appointmentDate
-			<< "| Time:" << appointmentTime
-			<< "| Duration:" << duration << "min.";
+		m_log.debug("Server", makeLogMessage(
+			"[AddTableData] Appointment prepared. userId:",
+			userId,
+			"| teacherId:",
+			teacherId,
+			"| Student:",
+			studentName,
+			"| Date:",
+			appointmentDate,
+			"| Time:",
+			appointmentTime,
+			"| Duration:",
+			duration,
+			"min."
+		));
 
 		return result;
 	}
@@ -629,9 +776,13 @@ QJsonObject Server::prepareInsertData(
 		const int role = Db::get()->getUserRole(userId);
 
 		if (role != 3) {
-			qWarning() << "[AddTableData] Schedule creation denied. userId:" << userId
-				<< "| role:" << role
-				<< "| required role: admin (3)";
+			m_log.warning("Server", makeLogMessage(
+				"[AddTableData] Schedule creation denied. userId:",
+				userId,
+				"| role:",
+				role,
+				"| required role: admin (3)"
+			));
 
 			(*error)["ok"] = false;
 			(*error)["code"] = "forbidden";
@@ -695,12 +846,20 @@ QJsonObject Server::prepareInsertData(
 		result["is_active"] = data.contains("is_active") ? data.value("is_active").toInt(1) : 1;
 		result["created_at"] = QDateTime::currentDateTime().toString(Qt::ISODate);
 
-		qDebug() << "[AddTableData] Schedule row prepared. userId:" << userId
-			<< "| group:" << groupName
-			<< "| subjectId:" << subjectId
-			<< "| day:" << dayOfWeek
-			<< "| weekType:" << weekType
-			<< "| lesson:" << lessonNumber;
+		m_log.debug("Server", makeLogMessage(
+			"[AddTableData] Schedule row prepared. userId:",
+			userId,
+			"| group:",
+			groupName,
+			"| subjectId:",
+			subjectId,
+			"| day:",
+			dayOfWeek,
+			"| weekType:",
+			weekType,
+			"| lesson:",
+			lessonNumber
+		));
 
 		return result;
 	}
@@ -744,8 +903,12 @@ QJsonObject Server::prepareUpdateData(
 			const int rating = result.value("rating").toInt();
 
 			if (rating < 0 || rating > 5) {
-				qWarning() << "[UpdateTableData] Invalid rating:" << rating
-					<< "| userId:" << userId;
+				m_log.warning("Server", makeLogMessage(
+					"[UpdateTableData] Invalid rating:",
+					rating,
+					"| userId:",
+					userId
+				));
 
 				(*error)["ok"] = false;
 				(*error)["code"] = "bad_request";
@@ -758,8 +921,12 @@ QJsonObject Server::prepareUpdateData(
 			const int duration = result.value("duration_minutes").toInt();
 
 			if (duration <= 0) {
-				qWarning() << "[UpdateTableData] Invalid duration:" << duration
-					<< "| userId:" << userId;
+				m_log.warning("Server", makeLogMessage(
+					"[UpdateTableData] Invalid duration:",
+					duration,
+					"| userId:",
+					userId
+				));
 
 				(*error)["ok"] = false;
 				(*error)["code"] = "bad_request";
@@ -772,8 +939,12 @@ QJsonObject Server::prepareUpdateData(
 			const int status = result.value("status").toInt();
 
 			if (status < 1 || status > 3) {
-				qWarning() << "[UpdateTableData] Invalid status:" << status
-					<< "| userId:" << userId;
+				m_log.warning("Server", makeLogMessage(
+					"[UpdateTableData] Invalid status:",
+					status,
+					"| userId:",
+					userId
+				));
 
 				(*error)["ok"] = false;
 				(*error)["code"] = "bad_request";
@@ -795,8 +966,12 @@ QJsonObject Server::prepareUpdateData(
 				result["cancelled_by_text"] = cancelledBy;
 				result["cancelled_at"] = QDateTime::currentDateTime().toString(Qt::ISODate);
 
-				qDebug() << "[UpdateTableData] Appointment cancelled. userId:" << userId
-					<< "| Cancelled by:" << cancelledBy;
+				m_log.debug("Server", makeLogMessage(
+					"[UpdateTableData] Appointment cancelled. userId:",
+					userId,
+					"| Cancelled by:",
+					cancelledBy
+				));
 			}
 		}
 
@@ -809,9 +984,13 @@ QJsonObject Server::prepareUpdateData(
 		const int role = Db::get()->getUserRole(userId);
 
 		if (role != 3) {
-			qWarning() << "[UpdateTableData] Schedule update denied. userId:" << userId
-				<< "| role:" << role
-				<< "| required role: admin (3)";
+			m_log.warning("Server", makeLogMessage(
+				"[UpdateTableData] Schedule update denied. userId:",
+				userId,
+				"| role:",
+				role,
+				"| required role: admin (3)"
+			));
 
 			(*error)["ok"] = false;
 			(*error)["code"] = "forbidden";
@@ -883,10 +1062,15 @@ void Server::handleGetTable(const QJsonObject& params, int userId, QSslSocket* c
 {
 	const QString tableName = params.value("table_name").toString().trimmed();
 
-	qDebug() << "[GetTable] userId:" << userId << "| Table:" << tableName;
+	m_log.debug("Server", makeLogMessage(
+		"[GetTable] userId:",
+		userId,
+		"| Table:",
+		tableName
+	));
 
 	if (tableName.isEmpty()) {
-		qWarning() << "[GetTable] Table name is missing. userId:" << userId;
+		m_log.warning("Server", makeLogMessage("[GetTable] Table name is missing. userId:", userId));
 
 		QJsonObject err;
 		err["ok"] = false;
@@ -898,8 +1082,12 @@ void Server::handleGetTable(const QJsonObject& params, int userId, QSslSocket* c
 	}
 
 	if (!isAllowedReadTableName(tableName)) {
-		qWarning() << "[GetTable] Table is not allowed for reading:" << tableName
-			<< "| userId:" << userId;
+		m_log.warning("Server", makeLogMessage(
+			"[GetTable] Table is not allowed for reading:",
+			tableName,
+			"| userId:",
+			userId
+		));
 
 		QJsonObject err;
 		err["ok"] = false;
@@ -911,8 +1099,12 @@ void Server::handleGetTable(const QJsonObject& params, int userId, QSslSocket* c
 	}
 
 	if (!Db::get()->isValidTable(tableName)) {
-		qWarning() << "[GetTable] Table does not exist in database:" << tableName
-			<< "| userId:" << userId;
+		m_log.warning("Server", makeLogMessage(
+			"[GetTable] Table does not exist in database:",
+			tableName,
+			"| userId:",
+			userId
+		));
 
 		QJsonObject err;
 		err["ok"] = false;
@@ -928,7 +1120,12 @@ void Server::handleGetTable(const QJsonObject& params, int userId, QSslSocket* c
 	response["command"] = "get_table";
 	response["table_name"] = tableName;
 
-	qDebug() << "[GetTable] Success. userId:" << userId << "| Table:" << tableName;
+	m_log.debug("Server", makeLogMessage(
+		"[GetTable] Success. userId:",
+		userId,
+		"| Table:",
+		tableName
+	));
 
 	sendJson(client, response);
 }
@@ -938,10 +1135,15 @@ void Server::handleAddTableData(const QJsonObject& params, int userId, QSslSocke
 	const QString tableName = params.value("table_name").toString().trimmed();
 	const QJsonObject data = params.value("data").toObject();
 
-	qDebug() << "[AddTableData] userId:" << userId << "| Table:" << tableName;
+	m_log.debug("Server", makeLogMessage(
+		"[AddTableData] userId:",
+		userId,
+		"| Table:",
+		tableName
+	));
 
 	if (tableName.isEmpty() || data.isEmpty()) {
-		qWarning() << "[AddTableData] table_name or data was not provided. userId:" << userId;
+		m_log.warning("Server", makeLogMessage("[AddTableData] table_name or data was not provided. userId:", userId));
 
 		QJsonObject err;
 		err["ok"] = false;
@@ -953,8 +1155,12 @@ void Server::handleAddTableData(const QJsonObject& params, int userId, QSslSocke
 	}
 
 	if (!isAllowedWriteTableName(tableName)) {
-		qWarning() << "[AddTableData] Writing to table is forbidden:" << tableName
-			<< "| userId:" << userId;
+		m_log.warning("Server", makeLogMessage(
+			"[AddTableData] Writing to table is forbidden:",
+			tableName,
+			"| userId:",
+			userId
+		));
 
 		QJsonObject err;
 		err["ok"] = false;
@@ -983,8 +1189,12 @@ void Server::handleAddTableData(const QJsonObject& params, int userId, QSslSocke
 	}
 
 	if (filteredData.isEmpty()) {
-		qWarning() << "[AddTableData] No allowed columns after filtering. userId:" << userId
-			<< "| Table:" << tableName;
+		m_log.warning("Server", makeLogMessage(
+			"[AddTableData] No allowed columns after filtering. userId:",
+			userId,
+			"| Table:",
+			tableName
+		));
 
 		QJsonObject err;
 		err["ok"] = false;
@@ -997,9 +1207,14 @@ void Server::handleAddTableData(const QJsonObject& params, int userId, QSslSocke
 
 	const QJsonObject result = Db::get()->addTableData(tableName, filteredData);
 
-	qDebug() << "[AddTableData] Result. userId:" << userId
-		<< "| Table:" << tableName
-		<< "| ok:" << result.value("ok").toBool();
+	m_log.debug("Server", makeLogMessage(
+		"[AddTableData] Result. userId:",
+		userId,
+		"| Table:",
+		tableName,
+		"| ok:",
+		result.value("ok").toBool()
+	));
 
 	QJsonObject resp = result;
 	resp["command"] = "add_table_data";
@@ -1014,14 +1229,24 @@ void Server::handleUpdateTableData(const QJsonObject& params, int userId, QSslSo
 	const int id = params.value("id").toInt();
 	const QJsonObject data = params.value("data").toObject();
 
-	qDebug() << "[UpdateTableData] userId:" << userId
-		<< "| Table:" << tableName
-		<< "| id:" << id;
+	m_log.debug("Server", makeLogMessage(
+		"[UpdateTableData] userId:",
+		userId,
+		"| Table:",
+		tableName,
+		"| id:",
+		id
+	));
 
 	if (tableName.isEmpty() || id <= 0 || data.isEmpty()) {
-		qWarning() << "[UpdateTableData] Required parameters are missing. userId:" << userId
-			<< "| Table:" << tableName
-			<< "| id:" << id;
+		m_log.warning("Server", makeLogMessage(
+			"[UpdateTableData] Required parameters are missing. userId:",
+			userId,
+			"| Table:",
+			tableName,
+			"| id:",
+			id
+		));
 
 		QJsonObject err;
 		err["ok"] = false;
@@ -1033,8 +1258,12 @@ void Server::handleUpdateTableData(const QJsonObject& params, int userId, QSslSo
 	}
 
 	if (!isAllowedWriteTableName(tableName)) {
-		qWarning() << "[UpdateTableData] Writing to table is forbidden:" << tableName
-			<< "| userId:" << userId;
+		m_log.warning("Server", makeLogMessage(
+			"[UpdateTableData] Writing to table is forbidden:",
+			tableName,
+			"| userId:",
+			userId
+		));
 
 		QJsonObject err;
 		err["ok"] = false;
@@ -1046,9 +1275,14 @@ void Server::handleUpdateTableData(const QJsonObject& params, int userId, QSslSo
 	}
 
 	if (!Db::get()->canUserAccessRow(tableName, id, userId)) {
-		qWarning() << "[UpdateTableData] Row access denied. userId:" << userId
-			<< "| Table:" << tableName
-			<< "| id:" << id;
+		m_log.warning("Server", makeLogMessage(
+			"[UpdateTableData] Row access denied. userId:",
+			userId,
+			"| Table:",
+			tableName,
+			"| id:",
+			id
+		));
 
 		QJsonObject err;
 		err["ok"] = false;
@@ -1080,9 +1314,14 @@ void Server::handleUpdateTableData(const QJsonObject& params, int userId, QSslSo
 	}
 
 	if (filteredData.isEmpty()) {
-		qWarning() << "[UpdateTableData] No allowed columns after filtering. userId:" << userId
-			<< "| Table:" << tableName
-			<< "| id:" << id;
+		m_log.warning("Server", makeLogMessage(
+			"[UpdateTableData] No allowed columns after filtering. userId:",
+			userId,
+			"| Table:",
+			tableName,
+			"| id:",
+			id
+		));
 
 		QJsonObject err;
 		err["ok"] = false;
@@ -1095,10 +1334,16 @@ void Server::handleUpdateTableData(const QJsonObject& params, int userId, QSslSo
 
 	const QJsonObject result = Db::get()->updateTableData(tableName, id, filteredData);
 
-	qDebug() << "[UpdateTableData] Result. userId:" << userId
-		<< "| Table:" << tableName
-		<< "| id:" << id
-		<< "| ok:" << result.value("ok").toBool();
+	m_log.debug("Server", makeLogMessage(
+		"[UpdateTableData] Result. userId:",
+		userId,
+		"| Table:",
+		tableName,
+		"| id:",
+		id,
+		"| ok:",
+		result.value("ok").toBool()
+	));
 
 	QJsonObject resp = result;
 	resp["command"] = "update_table_data";
@@ -1113,12 +1358,17 @@ void Server::handleDeleteTableData(const QJsonObject& params, int userId, QSslSo
 	const QString tableName = params.value("table_name").toString().trimmed();
 	const int id = params.value("id").toInt();
 
-	qDebug() << "[DeleteTableData] Delete request. userId:" << userId
-		<< "| Table:" << tableName
-		<< "| id:" << id;
+	m_log.debug("Server", makeLogMessage(
+		"[DeleteTableData] Delete request. userId:",
+		userId,
+		"| Table:",
+		tableName,
+		"| id:",
+		id
+	));
 
 	if (tableName.isEmpty() || id <= 0) {
-		qWarning() << "[DeleteTableData] table_name or id was not provided. userId:" << userId;
+		m_log.warning("Server", makeLogMessage("[DeleteTableData] table_name or id was not provided. userId:", userId));
 
 		QJsonObject err;
 		err["ok"] = false;
@@ -1133,8 +1383,12 @@ void Server::handleDeleteTableData(const QJsonObject& params, int userId, QSslSo
 	}
 
 	if (!isAllowedWriteTableName(tableName)) {
-		qWarning() << "[DeleteTableData] Delete from table is forbidden:" << tableName
-			<< "| userId:" << userId;
+		m_log.warning("Server", makeLogMessage(
+			"[DeleteTableData] Delete from table is forbidden:",
+			tableName,
+			"| userId:",
+			userId
+		));
 
 		QJsonObject err;
 		err["ok"] = false;
@@ -1149,7 +1403,7 @@ void Server::handleDeleteTableData(const QJsonObject& params, int userId, QSslSo
 	}
 
 	if (tableName == "Schedule" && Db::get()->getUserRole(userId) != 3) {
-		qWarning() << "[DeleteTableData] Schedule delete denied. userId:" << userId;
+		m_log.warning("Server", makeLogMessage("[DeleteTableData] Schedule delete denied. userId:", userId));
 
 		QJsonObject err;
 		err["ok"] = false;
@@ -1164,9 +1418,14 @@ void Server::handleDeleteTableData(const QJsonObject& params, int userId, QSslSo
 	}
 
 	if (!Db::get()->canUserAccessRow(tableName, id, userId)) {
-		qWarning() << "[DeleteTableData] Row access denied. userId:" << userId
-			<< "| Table:" << tableName
-			<< "| id:" << id;
+		m_log.warning("Server", makeLogMessage(
+			"[DeleteTableData] Row access denied. userId:",
+			userId,
+			"| Table:",
+			tableName,
+			"| id:",
+			id
+		));
 
 		QJsonObject err;
 		err["ok"] = false;
@@ -1182,10 +1441,16 @@ void Server::handleDeleteTableData(const QJsonObject& params, int userId, QSslSo
 
 	const QJsonObject result = Db::get()->deleteTableData(tableName, id);
 
-	qDebug() << "[DeleteTableData] Result. userId:" << userId
-		<< "| Table:" << tableName
-		<< "| id:" << id
-		<< "| ok:" << result.value("ok").toBool();
+	m_log.debug("Server", makeLogMessage(
+		"[DeleteTableData] Result. userId:",
+		userId,
+		"| Table:",
+		tableName,
+		"| id:",
+		id,
+		"| ok:",
+		result.value("ok").toBool()
+	));
 
 	QJsonObject resp = result;
 	resp["command"] = "delete_table_data";
@@ -1199,12 +1464,12 @@ void Server::handleGetMyProfile(const QJsonObject& params, int userId, QSslSocke
 {
 	Q_UNUSED(params);
 
-	qDebug() << "[GetMyProfile] userId:" << userId;
+	m_log.debug("Server", makeLogMessage("[GetMyProfile] userId:", userId));
 
 	QJsonObject profile = Db::get()->getMyProfile(userId);
 
 	if (profile.isEmpty()) {
-		qWarning() << "[GetMyProfile] Profile not found. userId:" << userId;
+		m_log.warning("Server", makeLogMessage("[GetMyProfile] Profile not found. userId:", userId));
 
 		QJsonObject err;
 		err["ok"] = false;
@@ -1218,7 +1483,7 @@ void Server::handleGetMyProfile(const QJsonObject& params, int userId, QSslSocke
 	profile["ok"] = true;
 	profile["command"] = "get_my_profile";
 
-	qDebug() << "[GetMyProfile] Profile sent. userId:" << userId;
+	m_log.debug("Server", makeLogMessage("[GetMyProfile] Profile sent. userId:", userId));
 
 	sendJson(client, profile);
 }
@@ -1227,7 +1492,7 @@ void Server::handleGetMySessions(const QJsonObject& json, int userId, QSslSocket
 {
 	const QString currentToken = json.value("token").toString();
 
-	qDebug() << "[GetMySessions] userId:" << userId;
+	m_log.debug("Server", makeLogMessage("[GetMySessions] userId:", userId));
 
 	QJsonObject resp;
 	resp["ok"] = true;
@@ -1242,7 +1507,7 @@ void Server::handleGetPhoto(const QJsonObject& params, int userId, QSslSocket* c
 	Q_UNUSED(params);
 	Q_UNUSED(userId);
 
-	qDebug() << "[SendJerboa] Function is not implemented. userId:" << userId;
+	m_log.debug("Server", makeLogMessage("[SendJerboa] Function is not implemented. userId:", userId));
 
 	QJsonObject resp;
 	resp["ok"] = true;
@@ -1255,11 +1520,20 @@ void Server::handleLogoutSession(const QJsonObject& params, int userId, QSslSock
 {
 	const int sessionId = params.value("session_id").toInt();
 
-	qDebug() << "[LogoutSession] userId:" << userId << "| sessionId:" << sessionId;
+	m_log.debug("Server", makeLogMessage(
+		"[LogoutSession] userId:",
+		userId,
+		"| sessionId:",
+		sessionId
+	));
 
 	if (sessionId <= 0) {
-		qWarning() << "[LogoutSession] Invalid session_id:" << sessionId
-			<< "| userId:" << userId;
+		m_log.warning("Server", makeLogMessage(
+			"[LogoutSession] Invalid session_id:",
+			sessionId,
+			"| userId:",
+			userId
+		));
 
 		QJsonObject err;
 		err["ok"] = false;
@@ -1273,8 +1547,12 @@ void Server::handleLogoutSession(const QJsonObject& params, int userId, QSslSock
 	const QString token = Db::get()->getUserSessionTokenById(userId, sessionId);
 
 	if (token.isEmpty()) {
-		qWarning() << "[LogoutSession] Session not found. userId:" << userId
-			<< "| sessionId:" << sessionId;
+		m_log.warning("Server", makeLogMessage(
+			"[LogoutSession] Session not found. userId:",
+			userId,
+			"| sessionId:",
+			sessionId
+		));
 
 		QJsonObject err;
 		err["ok"] = false;
@@ -1286,8 +1564,12 @@ void Server::handleLogoutSession(const QJsonObject& params, int userId, QSslSock
 	}
 
 	if (!Db::get()->revokeUserSessionById(userId, sessionId)) {
-		qWarning() << "[LogoutSession] Failed to revoke session. userId:" << userId
-			<< "| sessionId:" << sessionId;
+		m_log.warning("Server", makeLogMessage(
+			"[LogoutSession] Failed to revoke session. userId:",
+			userId,
+			"| sessionId:",
+			sessionId
+		));
 
 		QJsonObject err;
 		err["ok"] = false;
@@ -1299,8 +1581,12 @@ void Server::handleLogoutSession(const QJsonObject& params, int userId, QSslSock
 
 	m_sessions->removeSession(token);
 
-	qDebug() << "[LogoutSession] Session revoked successfully. userId:" << userId
-		<< "| sessionId:" << sessionId;
+	m_log.debug("Server", makeLogMessage(
+		"[LogoutSession] Session revoked successfully. userId:",
+		userId,
+		"| sessionId:",
+		sessionId
+	));
 
 	QJsonObject resp;
 	resp["ok"] = true;
@@ -1313,12 +1599,12 @@ void Server::handleLogoutOtherSessions(const QJsonObject& json, int userId, QSsl
 {
 	const QString currentToken = json.value("token").toString();
 
-	qDebug() << "[LogoutOtherSessions] userId:" << userId;
+	m_log.debug("Server", makeLogMessage("[LogoutOtherSessions] userId:", userId));
 
 	const QStringList tokens = Db::get()->getOtherUserSessionTokens(userId, currentToken);
 
 	if (!Db::get()->revokeOtherUserSessions(userId, currentToken)) {
-		qWarning() << "[LogoutOtherSessions] Failed to revoke other sessions. userId:" << userId;
+		m_log.warning("Server", makeLogMessage("[LogoutOtherSessions] Failed to revoke other sessions. userId:", userId));
 
 		QJsonObject err;
 		err["ok"] = false;
@@ -1331,8 +1617,12 @@ void Server::handleLogoutOtherSessions(const QJsonObject& json, int userId, QSsl
 	for (const QString& token : tokens)
 		m_sessions->removeSession(token);
 
-	qDebug() << "[LogoutOtherSessions] Revoked sessions:" << tokens.size()
-		<< "| userId:" << userId;
+	m_log.debug("Server", makeLogMessage(
+		"[LogoutOtherSessions] Revoked sessions:",
+		tokens.size(),
+		"| userId:",
+		userId
+	));
 
 	QJsonObject resp;
 	resp["ok"] = true;
@@ -1348,12 +1638,21 @@ void Server::handleCreateUser(const QJsonObject& params, int userId, QSslSocket*
 
 	const int role = Db::get()->getUserRole(userId);
 
-	qDebug() << "[CreateUser] userId:" << userId << "| role:" << role;
+	m_log.debug("Server", makeLogMessage(
+		"[CreateUser] userId:",
+		userId,
+		"| role:",
+		role
+	));
 
 	if (role != 3) {
-		qWarning() << "[CreateUser] Access denied. userId:" << userId
-			<< "| role:" << role
-			<< "| required role: admin (3)";
+		m_log.warning("Server", makeLogMessage(
+			"[CreateUser] Access denied. userId:",
+			userId,
+			"| role:",
+			role,
+			"| required role: admin (3)"
+		));
 
 		resp["ok"] = false;
 		resp["code"] = "forbidden";
@@ -1370,8 +1669,12 @@ void Server::handleCreateUser(const QJsonObject& params, int userId, QSslSocket*
 	resp = Db::get()->createUserWithRoleData(user, student, teacher);
 	resp["command"] = "create_user";
 
-	qDebug() << "[CreateUser] Result. userId:" << userId
-		<< "| ok:" << resp.value("ok").toBool();
+	m_log.debug("Server", makeLogMessage(
+		"[CreateUser] Result. userId:",
+		userId,
+		"| ok:",
+		resp.value("ok").toBool()
+	));
 
 	sendJson(client, resp);
 }
@@ -1391,8 +1694,12 @@ void Server::cleanupExpiredResetCodes()
 	}
 
 	if (removed > 0) {
-		qDebug() << "[ResetCode] Removed expired codes:" << removed
-			<< "| Active codes left:" << m_valid_hashes.size();
+		m_log.debug("Server", makeLogMessage(
+			"[ResetCode] Removed expired codes:",
+			removed,
+			"| Active codes left:",
+			m_valid_hashes.size()
+		));
 	}
 }
 
@@ -1444,13 +1751,13 @@ void Server::handleGetEmailCodeResetPassword(const QJsonObject& params, QSslSock
 
 	const QString email = params.value("email").toString().trimmed().toLower();
 
-	qDebug() << "[ResetPassword] Password reset code requested. Email:" << email;
+	m_log.debug("Server", makeLogMessage("[ResetPassword] Password reset code requested. Email:", email));
 
 	QJsonObject resp;
 	resp["command"] = "get_email_code_reset_password";
 
 	if (email.isEmpty()) {
-		qWarning() << "[ResetPassword] Email was not provided.";
+		m_log.warning("Server", makeLogMessage("[ResetPassword] Email was not provided."));
 
 		resp["ok"] = false;
 		resp["code"] = "bad_request";
@@ -1466,7 +1773,7 @@ void Server::handleGetEmailCodeResetPassword(const QJsonObject& params, QSslSock
 	);
 
 	if (!emailRegex.match(email).hasMatch()) {
-		qWarning() << "[ResetPassword] Invalid email format:" << email;
+		m_log.warning("Server", makeLogMessage("[ResetPassword] Invalid email format:", email));
 
 		resp["ok"] = false;
 		resp["code"] = "bad_request";
@@ -1480,8 +1787,12 @@ void Server::handleGetEmailCodeResetPassword(const QJsonObject& params, QSslSock
 	const QString hash = resetCodeHash(email, code);
 	const QDateTime expiresAt = QDateTime::currentDateTimeUtc().addSecs(10 * 60);
 
-	qDebug() << "[ResetPassword] Code generated. Email:" << email
-		<< "| Expires at:" << expiresAt.toString(Qt::ISODate);
+	m_log.debug("Server", makeLogMessage(
+		"[ResetPassword] Code generated. Email:",
+		email,
+		"| Expires at:",
+		expiresAt.toString(Qt::ISODate)
+	));
 
 	EmailSender::Config mailConfig;
 	mailConfig.host = "smtp.yandex.ru";
@@ -1505,8 +1816,12 @@ void Server::handleGetEmailCodeResetPassword(const QJsonObject& params, QSslSock
 			answer["command"] = "get_email_code_reset_password";
 
 			if (!ok) {
-				qWarning() << "[ResetPassword] Failed to send email. Email:" << email
-					<< "| Reason:" << message;
+				m_log.warning("Server", makeLogMessage(
+					"[ResetPassword] Failed to send email. Email:",
+					email,
+					"| Reason:",
+					message
+				));
 
 				answer["ok"] = false;
 				answer["code"] = "email_send_failed";
@@ -1522,8 +1837,12 @@ void Server::handleGetEmailCodeResetPassword(const QJsonObject& params, QSslSock
 
 			m_valid_hashes.push_back(std::make_tuple(expiresAt, hash));
 
-			qDebug() << "[ResetPassword] Email sent successfully. Email:" << email
-				<< "| Active codes:" << m_valid_hashes.size();
+			m_log.debug("Server", makeLogMessage(
+				"[ResetPassword] Email sent successfully. Email:",
+				email,
+				"| Active codes:",
+				m_valid_hashes.size()
+			));
 
 			answer["ok"] = true;
 			answer["expires_in"] = 10 * 60;
@@ -1554,13 +1873,13 @@ void Server::handleIsValidCode(const QJsonObject& params, QSslSocket* client)
 	const QString email = params.value("email").toString().trimmed().toLower();
 	const QString code = params.value("code").toString().trimmed();
 
-	qDebug() << "[IsValidCode] Checking reset code. Email:" << email;
+	m_log.debug("Server", makeLogMessage("[IsValidCode] Checking reset code. Email:", email));
 
 	QJsonObject resp;
 	resp["command"] = "IsValidCode";
 
 	if (email.isEmpty() || code.isEmpty()) {
-		qWarning() << "[IsValidCode] Email or code was not provided. Email:" << email;
+		m_log.warning("Server", makeLogMessage("[IsValidCode] Email or code was not provided. Email:", email));
 
 		resp["ok"] = false;
 		resp["valid"] = false;
@@ -1573,7 +1892,12 @@ void Server::handleIsValidCode(const QJsonObject& params, QSslSocket* client)
 
 	const bool valid = isResetCodeValid(email, code, false);
 
-	qDebug() << "[IsValidCode] Result. Email:" << email << "| Valid:" << valid;
+	m_log.debug("Server", makeLogMessage(
+		"[IsValidCode] Result. Email:",
+		email,
+		"| Valid:",
+		valid
+	));
 
 	resp["ok"] = true;
 	resp["valid"] = valid;
@@ -1589,13 +1913,13 @@ void Server::handleChangePassword(const QJsonObject& params, int userId, QSslSoc
 	const QString oldPassword = params.value("old_password").toString();
 	const QString newPassword = params.value("new_password").toString();
 
-	qDebug() << "[ChangePassword] Password change requested. userId:" << userId;
+	m_log.debug("Server", makeLogMessage("[ChangePassword] Password change requested. userId:", userId));
 
 	QJsonObject resp;
 	resp["command"] = "change_password";
 
 	if (oldPassword.isEmpty() || newPassword.isEmpty()) {
-		qWarning() << "[ChangePassword] Old or new password was not provided. userId:" << userId;
+		m_log.warning("Server", makeLogMessage("[ChangePassword] Old or new password was not provided. userId:", userId));
 
 		resp["ok"] = false;
 		resp["code"] = "bad_request";
@@ -1606,8 +1930,12 @@ void Server::handleChangePassword(const QJsonObject& params, int userId, QSslSoc
 	}
 
 	if (newPassword.length() < 6) {
-		qWarning() << "[ChangePassword] New password is too short. userId:" << userId
-			<< "| Length:" << newPassword.length();
+		m_log.warning("Server", makeLogMessage(
+			"[ChangePassword] New password is too short. userId:",
+			userId,
+			"| Length:",
+			newPassword.length()
+		));
 
 		resp["ok"] = false;
 		resp["code"] = "bad_request";
@@ -1618,7 +1946,7 @@ void Server::handleChangePassword(const QJsonObject& params, int userId, QSslSoc
 	}
 
 	if (!Db::get()->changePasswordByUserId(userId, oldPassword, newPassword)) {
-		qWarning() << "[ChangePassword] Old password is invalid. userId:" << userId;
+		m_log.warning("Server", makeLogMessage("[ChangePassword] Old password is invalid. userId:", userId));
 
 		resp["ok"] = false;
 		resp["code"] = "password_change_failed";
@@ -1628,7 +1956,7 @@ void Server::handleChangePassword(const QJsonObject& params, int userId, QSslSoc
 		return;
 	}
 
-	qDebug() << "[ChangePassword] Password changed successfully. userId:" << userId;
+	m_log.debug("Server", makeLogMessage("[ChangePassword] Password changed successfully. userId:", userId));
 
 	resp["ok"] = true;
 	resp["message"] = "Пароль успешно изменён.";
@@ -1644,13 +1972,13 @@ void Server::handleResetPasswordByCode(const QJsonObject& params, QSslSocket* cl
 	const QString code = params.value("code").toString().trimmed();
 	const QString newPassword = params.value("new_password").toString();
 
-	qDebug() << "[ResetPasswordByCode] Password reset requested. Email:" << email;
+	m_log.debug("Server", makeLogMessage("[ResetPasswordByCode] Password reset requested. Email:", email));
 
 	QJsonObject resp;
 	resp["command"] = "reset_password_by_code";
 
 	if (email.isEmpty() || code.isEmpty() || newPassword.isEmpty()) {
-		qWarning() << "[ResetPasswordByCode] Required parameters are missing. Email:" << email;
+		m_log.warning("Server", makeLogMessage("[ResetPasswordByCode] Required parameters are missing. Email:", email));
 
 		resp["ok"] = false;
 		resp["code"] = "bad_request";
@@ -1661,8 +1989,12 @@ void Server::handleResetPasswordByCode(const QJsonObject& params, QSslSocket* cl
 	}
 
 	if (newPassword.length() < 6) {
-		qWarning() << "[ResetPasswordByCode] New password is too short. Email:" << email
-			<< "| Length:" << newPassword.length();
+		m_log.warning("Server", makeLogMessage(
+			"[ResetPasswordByCode] New password is too short. Email:",
+			email,
+			"| Length:",
+			newPassword.length()
+		));
 
 		resp["ok"] = false;
 		resp["code"] = "bad_request";
@@ -1681,7 +2013,7 @@ void Server::handleResetPasswordByCode(const QJsonObject& params, QSslSocket* cl
 
 		if (storedHash == hash && expiresAt > now) {
 			if (!Db::get()->resetPasswordByEmail(email, newPassword)) {
-				qWarning() << "[ResetPasswordByCode] Failed to update password in database. Email:" << email;
+				m_log.warning("Server", makeLogMessage("[ResetPasswordByCode] Failed to update password in database. Email:", email));
 
 				resp["ok"] = false;
 				resp["code"] = "password_reset_failed";
@@ -1693,7 +2025,7 @@ void Server::handleResetPasswordByCode(const QJsonObject& params, QSslSocket* cl
 
 			m_valid_hashes.removeAt(i);
 
-			qDebug() << "[ResetPasswordByCode] Password reset successfully. Email:" << email;
+			m_log.debug("Server", makeLogMessage("[ResetPasswordByCode] Password reset successfully. Email:", email));
 
 			resp["ok"] = true;
 			resp["message"] = "Пароль успешно изменён.";
@@ -1703,7 +2035,7 @@ void Server::handleResetPasswordByCode(const QJsonObject& params, QSslSocket* cl
 		}
 	}
 
-	qWarning() << "[ResetPasswordByCode] Invalid or expired code. Email:" << email;
+	m_log.warning("Server", makeLogMessage("[ResetPasswordByCode] Invalid or expired code. Email:", email));
 
 	resp["ok"] = false;
 	resp["code"] = "invalid_code";

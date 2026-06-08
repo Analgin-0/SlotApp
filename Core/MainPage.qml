@@ -626,18 +626,23 @@ Item {
                     spacing: 16
 
                     RowLayout {
+                        id: addUserHeaderRow
+
+                        readonly property bool compactHeader: addUserScroll.availableWidth < 390
+                        readonly property bool veryCompactHeader: addUserScroll.availableWidth < 360
+
                         Layout.fillWidth: true
                         Layout.leftMargin: 20
                         Layout.rightMargin: 20
-                        spacing: 12
+                        spacing: compactHeader ? 8 : 12
 
                         Button {
                             id: backFromAddUserButton
 
                             hoverEnabled: true
 
-                            Layout.preferredWidth: 46
-                            Layout.preferredHeight: 46
+                            Layout.preferredWidth: addUserHeaderRow.compactHeader ? 42 : 46
+                            Layout.preferredHeight: addUserHeaderRow.compactHeader ? 42 : 46
                             Layout.alignment: Qt.AlignVCenter
 
                             scale: down ? 0.94 : hovered ? 1.05 : 1.0
@@ -685,17 +690,21 @@ Item {
                         }
 
                         Rectangle {
-                            Layout.preferredWidth: 58
-                            Layout.preferredHeight: 58
-                            radius: 20
+                            visible: !addUserHeaderRow.veryCompactHeader
+
+                            Layout.preferredWidth: addUserHeaderRow.compactHeader ? 50 : 58
+                            Layout.preferredHeight: addUserHeaderRow.compactHeader ? 50 : 58
+                            Layout.alignment: Qt.AlignVCenter
+
+                            radius: addUserHeaderRow.compactHeader ? 18 : 20
                             color: root.accentSoft
                             border.width: 1
                             border.color: "#284568"
 
                             DrawIcon {
                                 anchors.centerIn: parent
-                                width: 30
-                                height: 30
+                                width: addUserHeaderRow.compactHeader ? 26 : 30
+                                height: addUserHeaderRow.compactHeader ? 26 : 30
                                 name: "adminUsers"
                                 iconColor: root.accent
                             }
@@ -703,28 +712,33 @@ Item {
 
                         ColumnLayout {
                             Layout.fillWidth: true
+                            Layout.minimumWidth: 0
+                            Layout.alignment: Qt.AlignVCenter
                             spacing: 3
 
                             Text {
                                 text: "Пользователи"
                                 color: root.textMain
-                                font.pixelSize: 28
+                                font.pixelSize: addUserHeaderRow.compactHeader ? 24 : 28
+                                fontSizeMode: Text.HorizontalFit
                                 font.bold: true
-                                wrapMode: Text.WordWrap
-                                maximumLineCount: 2
+                                maximumLineCount: 1
                                 elide: Text.ElideRight
 
                                 Layout.fillWidth: true
+                                Layout.minimumWidth: 0
                             }
 
                             Text {
                                 text: "Создание нового аккаунта"
                                 color: root.textMuted
-                                font.pixelSize: 14
+                                font.pixelSize: addUserHeaderRow.compactHeader ? 13 : 14
+                                fontSizeMode: Text.HorizontalFit
                                 maximumLineCount: 1
                                 elide: Text.ElideRight
 
                                 Layout.fillWidth: true
+                                Layout.minimumWidth: 0
                             }
                         }
                     }

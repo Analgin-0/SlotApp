@@ -38,6 +38,9 @@
     <ClCompile Include="EmailSender.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AppLogger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="Server.h">
@@ -55,6 +58,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Constants.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AppLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -8,10 +8,10 @@
 #include <QByteArray>
 #include <QDateTime>
 #include <tuple>
+#include "AppLogger.h"
 
 class QJsonObject;
 class SessionManager;
-
 
 
 class Server : public QTcpServer
@@ -30,6 +30,7 @@ private slots:
 private:
     QVector<QSslSocket*> m_sockets;
     SessionManager* m_sessions = nullptr;
+    AppLogger m_log;
 
     // Код восстановления действует 10 минут.
     // Храним не сам код, а hash(email + code).

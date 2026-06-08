@@ -17,7 +17,7 @@
 #include <QJsonArray>
 #include <QJsonValue>
 
-
+#include "AppLogger.h"
 #include <algorithm>
 #include <type_traits>
 
@@ -122,7 +122,7 @@ private:
 	bool ensureOpen();
 
 	QSqlDatabase m_sql_context;
-
+	AppLogger m_log;
 	void init();
 
 public:
