@@ -12,15 +12,16 @@ Page {
     property real phase: 0
     property real progressPhase: 0
 
-    readonly property color bg: "#111318"
-    readonly property color surface: "#181B21"
-    readonly property color surface2: "#20242C"
-    readonly property color border: "#313640"
-    readonly property color textMain: "#F4F6F8"
-    readonly property color textMuted: "#8D96A3"
-    readonly property color accent: "#6EA8FE"
-    readonly property color accentSoft: "#1C2B44"
-    readonly property color success: "#6EE7A8"
+
+    readonly property color bg: "#000000"
+    readonly property color surface: "#111111"
+    readonly property color surface2: "#222222"
+    readonly property color border: "#555555"
+    readonly property color textMain: "#FFFFFF"
+    readonly property color textMuted: "#AAAAAA"
+    readonly property color accent: "#FFFFFF"
+    readonly property color accentSoft: "#333333"
+    readonly property color success: "#CCCCCC"
 
     function sin(offset) {
         return Math.sin((page.phase + offset) * Math.PI / 180)
@@ -68,7 +69,6 @@ Page {
         progressSequence.restart()
     }
 
-
     NumberAnimation on phase {
         running: page.play
         from: 0
@@ -79,45 +79,45 @@ Page {
     }
 
     SequentialAnimation {
-            id: progressSequence
-            running: false
+        id: progressSequence
+        running: false
 
-            NumberAnimation {
-                id: forwardAnim
-                target: page
-                property: "progressPhase"
-                from: 0
-                to: 1
-                duration: 1800
-                easing.type: Easing.InOutQuad
-            }
+        NumberAnimation {
+            id: forwardAnim
+            target: page
+            property: "progressPhase"
+            from: 0
+            to: 1
+            duration: 1800
+            easing.type: Easing.InOutQuad
+        }
 
-            ScriptAction {
-                script: {
+        ScriptAction {
+            script: {
 
-                }
-            }
-
-            NumberAnimation {
-                id: backwardAnim
-                target: page
-                property: "progressPhase"
-                from: 1
-                to: 0
-                duration: 1800
-                easing.type: Easing.InOutQuad
-            }
-
-            ScriptAction {
-                script: {
-
-                }
-            }
-
-            onFinished: {
-                startProgressAnimation()
             }
         }
+
+        NumberAnimation {
+            id: backwardAnim
+            target: page
+            property: "progressPhase"
+            from: 1
+            to: 0
+            duration: 1800
+            easing.type: Easing.InOutQuad
+        }
+
+        ScriptAction {
+            script: {
+
+            }
+        }
+
+        onFinished: {
+            startProgressAnimation()
+        }
+    }
 
     Component.onCompleted: {
         if (visible)
@@ -143,7 +143,6 @@ Page {
         Rectangle {
             width: 340
             height: 340
-            radius: 170
             x: -148
             y: -112
             color: page.accent
@@ -153,7 +152,6 @@ Page {
         Rectangle {
             width: 280
             height: 280
-            radius: 140
             anchors.right: parent.right
             anchors.rightMargin: -116
             anchors.bottom: parent.bottom
@@ -165,7 +163,6 @@ Page {
         Rectangle {
             width: 180
             height: 180
-            radius: 90
             anchors.right: parent.right
             anchors.rightMargin: 30
             anchors.top: parent.top
@@ -186,7 +183,6 @@ Page {
 
                 width: 264
                 height: 264
-                radius: 132
                 anchors.horizontalCenter: parent.horizontalCenter
                 y: 10
                 color: page.accent
@@ -199,7 +195,6 @@ Page {
 
                 width: 206
                 height: 206
-                radius: 103
                 anchors.horizontalCenter: parent.horizontalCenter
                 y: 38
                 color: page.success
@@ -224,7 +219,6 @@ Page {
                     Rectangle {
                         width: 160
                         height: 2
-                        radius: 1
                         x: -22 + index * 24
                         y: 22 + index * 24
                         rotation: -24
@@ -247,7 +241,6 @@ Page {
                 Rectangle {
                     width: 10
                     height: 10
-                    radius: 5
                     x: parent.width / 2 - width / 2
                     y: 4
                     color: page.accent
@@ -258,7 +251,6 @@ Page {
                 Rectangle {
                     width: 7
                     height: 7
-                    radius: 4
                     x: parent.width - width - 23
                     y: parent.height / 2 - height / 2
                     color: page.success
@@ -269,7 +261,6 @@ Page {
                 Rectangle {
                     width: 6
                     height: 6
-                    radius: 3
                     x: 24
                     y: parent.height / 2 - height / 2
                     color: page.textMuted
@@ -283,7 +274,6 @@ Page {
 
                 width: 192
                 height: 150
-                radius: 42
                 anchors.horizontalCenter: parent.horizontalCenter
                 y: 61
                 rotation: -8 + page.sin(140) * 0.6
@@ -297,7 +287,6 @@ Page {
 
                 width: 190
                 height: 148
-                radius: 42
                 anchors.horizontalCenter: parent.horizontalCenter
                 y: 60
                 rotation: -8 + page.sin(120) * 0.8
@@ -310,7 +299,6 @@ Page {
                 Rectangle {
                     anchors.fill: parent
                     anchors.margins: 10
-                    radius: 34
                     color: page.surface2
                     border.width: 1
                     border.color: page.border
@@ -328,21 +316,20 @@ Page {
 
                     gradient: Gradient {
                         orientation: Gradient.Horizontal
-                        GradientStop { position: 0.0; color: "#006EA8FE" }
-                        GradientStop { position: 0.5; color: "#446EA8FE" }
-                        GradientStop { position: 1.0; color: "#006EA8FE" }
+                        GradientStop { position: 0.0; color: "#00FFFFFF" }
+                        GradientStop { position: 0.5; color: "#44FFFFFF" }
+                        GradientStop { position: 1.0; color: "#00FFFFFF" }
                     }
                 }
 
                 Rectangle {
                     width: 72
                     height: 72
-                    radius: 26
                     x: 18
                     y: 19
                     color: page.accentSoft
                     border.width: 1
-                    border.color: "#284568"
+                    border.color: page.border
 
                     Canvas {
                         anchors.centerIn: parent
@@ -356,20 +343,20 @@ Page {
                             ctx.strokeStyle = page.accent
                             ctx.fillStyle = page.success
                             ctx.lineWidth = 3.6
-                            ctx.lineCap = "round"
-                            ctx.lineJoin = "round"
+
+                            ctx.lineCap = "square"
+                            ctx.lineJoin = "miter"
+
 
                             ctx.beginPath()
                             ctx.moveTo(12, 10)
-                            ctx.lineTo(30, 10)
-                            ctx.quadraticCurveTo(35, 10, 35, 15)
-                            ctx.lineTo(35, 32)
-                            ctx.quadraticCurveTo(35, 37, 30, 37)
-                            ctx.lineTo(12, 37)
-                            ctx.quadraticCurveTo(7, 37, 7, 32)
-                            ctx.lineTo(7, 15)
-                            ctx.quadraticCurveTo(7, 10, 12, 10)
+                            ctx.lineTo(35, 10)
+                            ctx.lineTo(35, 37)
+                            ctx.lineTo(7, 37)
+                            ctx.lineTo(7, 10)
+                            ctx.lineTo(12, 10)
                             ctx.stroke()
+
 
                             ctx.beginPath()
                             ctx.moveTo(15, 21)
@@ -378,9 +365,8 @@ Page {
                             ctx.lineTo(23, 29)
                             ctx.stroke()
 
-                            ctx.beginPath()
-                            ctx.arc(33, 11, 4.2, 0, Math.PI * 2)
-                            ctx.fill()
+
+                            ctx.fillRect(29, 7, 8, 8)
                         }
                     }
                 }
@@ -390,11 +376,10 @@ Page {
 
                     width: 92
                     height: 42
-                    radius: 16
                     x: 48
                     y: 80 + page.sin(40) * 4
                     rotation: -12 + page.sin(90) * 1.5
-                    color: "#232A34"
+                    color: "#111111"
                     opacity: 0.84 + page.cos(40) * 0.08
                     border.width: 1
                     border.color: page.border
@@ -402,7 +387,6 @@ Page {
                     Rectangle {
                         width: 38
                         height: 5
-                        radius: 3
                         x: 13
                         y: 12
                         color: page.accent
@@ -412,7 +396,6 @@ Page {
                     Rectangle {
                         width: 58
                         height: 5
-                        radius: 3
                         x: 13
                         y: 24
                         color: page.textMuted
@@ -425,19 +408,17 @@ Page {
 
                     width: 76
                     height: 38
-                    radius: 15
                     x: 112 + page.sin(170) * 4
                     y: 60
                     rotation: 9 + page.sin(210) * 1.3
-                    color: "#1D2631"
+                    color: "#050505"
                     opacity: 0.66 + page.cos(170) * 0.08
                     border.width: 1
-                    border.color: "#284568"
+                    border.color: page.border
 
                     Rectangle {
                         width: 28
                         height: 5
-                        radius: 3
                         x: 12
                         y: 12
                         color: page.success
@@ -447,7 +428,6 @@ Page {
                     Rectangle {
                         width: 44
                         height: 5
-                        radius: 3
                         x: 12
                         y: 24
                         color: page.textMuted
@@ -460,7 +440,6 @@ Page {
 
                     width: 64
                     height: 32
-                    radius: 14
                     x: 88
                     y: 126 + page.sin(260) * 3
                     rotation: 3 + page.sin(300) * 1.2
@@ -509,7 +488,6 @@ Page {
 
                 width: 190
                 height: 44
-                radius: 22
                 anchors.horizontalCenter: parent.horizontalCenter
                 y: 392
                 color: page.surface
@@ -526,7 +504,6 @@ Page {
 
                     Rectangle {
                         anchors.fill: parent
-                        radius: 7
                         color: page.surface2
                     }
 
@@ -534,7 +511,6 @@ Page {
                         id: progressFill
 
                         height: 14
-                        radius: 7
                         x: 0
                         width: 40 + page.progressPhase * 90
                         color: page.accent
@@ -546,7 +522,6 @@ Page {
 
                         width: 14
                         height: 14
-                        radius: 7
                         x: Math.max(0, Math.min(progressTrack.width - width,
                                                 progressFill.width - width / 2))
                         color: page.success

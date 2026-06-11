@@ -53,26 +53,27 @@ Item {
     readonly property bool isAdminScheduleEditorPage: root.currentTab === root.adminScheduleEditorPageIndex
 
     readonly property bool isInnerPage: root.isAddTaskPage
-                                    || root.isAdminUsersPage
-                                    || root.isSessionsPage
-                                    || root.isChangePasswordPage
-                                    || root.isResetPasswordPage
-                                    || root.isAdminScheduleEditorPage
+                                        || root.isAdminUsersPage
+                                        || root.isSessionsPage
+                                        || root.isChangePasswordPage
+                                        || root.isResetPasswordPage
+                                        || root.isAdminScheduleEditorPage
 
-    readonly property color bg: "#111318"
-    readonly property color surface: "#181B21"
-    readonly property color surface2: "#20242C"
-    readonly property color surface3: "#2A2F39"
-    readonly property color border: "#313640"
-    readonly property color textMain: "#F4F6F8"
-    readonly property color textSub: "#C8CDD4"
-    readonly property color textMuted: "#8D96A3"
-    readonly property color accent: "#6EA8FE"
-    readonly property color accentSoft: "#1C2B44"
-    readonly property color danger: "#FF6B6B"
-    readonly property color dangerSoft: "#3A2023"
-    readonly property color success: "#6EE7A8"
-    readonly property color successSoft: "#173427"
+
+    readonly property color bg: "#000000"
+    readonly property color surface: "#111111"
+    readonly property color surface2: "#222222"
+    readonly property color surface3: "#333333"
+    readonly property color border: "#555555"
+    readonly property color textMain: "#FFFFFF"
+    readonly property color textSub: "#DDDDDD"
+    readonly property color textMuted: "#AAAAAA"
+    readonly property color accent: "#FFFFFF"
+    readonly property color accentSoft: "#333333"
+    readonly property color danger: "#FFFFFF"
+    readonly property color dangerSoft: "#222222"
+    readonly property color success: "#FFFFFF"
+    readonly property color successSoft: "#222222"
 
     ListModel {
         id: appointmentsModel
@@ -220,7 +221,6 @@ Item {
         if (index === root.tasksPageIndex)
             return !root.isAdmin
 
-
         return false
     }
 
@@ -327,7 +327,7 @@ Item {
         loginField.text = ""
         passwordField.text = ""
 
-        // Студент
+
         groupField.text = ""
         courseField.text = ""
         facultyField.text = ""
@@ -335,7 +335,7 @@ Item {
         studentCardField.text = ""
         educationFormField.text = ""
 
-        // Преподаватель
+
         departmentField.text = ""
         postField.text = ""
         teacherCabinetField.text = ""
@@ -655,7 +655,6 @@ Item {
                             }
 
                             background: Rectangle {
-                                radius: 16
                                 color: backFromAddUserButton.down ? root.surface3
                                       : backFromAddUserButton.hovered ? root.accentSoft
                                       : root.surface2
@@ -696,10 +695,9 @@ Item {
                             Layout.preferredHeight: addUserHeaderRow.compactHeader ? 50 : 58
                             Layout.alignment: Qt.AlignVCenter
 
-                            radius: addUserHeaderRow.compactHeader ? 18 : 20
                             color: root.accentSoft
                             border.width: 1
-                            border.color: "#284568"
+                            border.color: "#555555"
 
                             DrawIcon {
                                 anchors.centerIn: parent
@@ -745,7 +743,6 @@ Item {
 
                     Rectangle {
                         color: root.surface
-                        radius: 26
                         border.width: 1
                         border.color: root.border
 
@@ -764,7 +761,6 @@ Item {
                             Rectangle {
                                 Layout.preferredWidth: 42
                                 Layout.preferredHeight: 42
-                                radius: 15
                                 color: root.surface2
 
                                 DrawIcon {
@@ -790,7 +786,6 @@ Item {
 
                     Rectangle {
                         color: root.surface
-                        radius: 26
                         border.width: 1
                         border.color: root.border
 
@@ -836,7 +831,6 @@ Item {
                                 font.pixelSize: 15
 
                                 background: Rectangle {
-                                    radius: 17
                                     color: genderCombo.activeFocus ? root.surface3 : root.surface2
                                     border.width: genderCombo.activeFocus ? 2 : 1
                                     border.color: genderCombo.activeFocus ? root.accent : root.border
@@ -871,7 +865,6 @@ Item {
 
                                     background: Rectangle {
                                         color: root.surface2
-                                        radius: 18
                                         border.width: 1
                                         border.color: root.border
                                     }
@@ -889,7 +882,6 @@ Item {
                                     height: 44
 
                                     background: Rectangle {
-                                        radius: 14
                                         color: highlighted ? root.surface3 : "transparent"
                                     }
 
@@ -941,7 +933,6 @@ Item {
                                 font.pixelSize: 15
 
                                 background: Rectangle {
-                                    radius: 17
                                     color: roleCombo.activeFocus ? root.surface3 : root.surface2
                                     border.width: roleCombo.activeFocus ? 2 : 1
                                     border.color: roleCombo.activeFocus ? root.accent : root.border
@@ -976,7 +967,6 @@ Item {
 
                                     background: Rectangle {
                                         color: root.surface2
-                                        radius: 18
                                         border.width: 1
                                         border.color: root.border
                                     }
@@ -994,7 +984,6 @@ Item {
                                     height: 44
 
                                     background: Rectangle {
-                                        radius: 14
                                         color: highlighted ? root.surface3 : "transparent"
                                     }
 
@@ -1009,9 +998,7 @@ Item {
                                 }
                             }
 
-                            // ═══════════════════════════════════════════
-                            // ПОЛЯ ДЛЯ СТУДЕНТА (РОЛЬ 1)
-                            // ═══════════════════════════════════════════
+
                             FieldLabel { visible: roleCombo.selectedRole === 1; text: "Группа" }
                             AppField { id: groupField; visible: roleCombo.selectedRole === 1; placeholderText: "Например: ИС-21" }
 
@@ -1030,9 +1017,7 @@ Item {
                             FieldLabel { visible: roleCombo.selectedRole === 1; text: "Форма обучения" }
                             AppField { id: educationFormField; visible: roleCombo.selectedRole === 1; placeholderText: "Например: Очная" }
 
-                            // ═══════════════════════════════════════════
-                            // ПОЛЯ ДЛЯ ПРЕПОДАВАТЕЛЯ (РОЛЬ 2)
-                            // ═══════════════════════════════════════════
+
                             FieldLabel { visible: roleCombo.selectedRole === 2; text: "Кафедра" }
                             AppField { id: departmentField; visible: roleCombo.selectedRole === 2; placeholderText: "Например: Информатика" }
 
@@ -1053,7 +1038,7 @@ Item {
                                 text: root.addUserError
                                 iconName: "warning"
                                 bgColor: root.dangerSoft
-                                fgColor: "#FFD7DA"
+                                fgColor: "#FFFFFF"
                                 iconColor: root.danger
 
                                 Layout.fillWidth: true
@@ -1064,7 +1049,7 @@ Item {
                                 text: root.addUserSuccess
                                 iconName: "check"
                                 bgColor: root.successSoft
-                                fgColor: "#DDFBE9"
+                                fgColor: "#FFFFFF"
                                 iconColor: root.success
 
                                 Layout.fillWidth: true
@@ -1080,10 +1065,10 @@ Item {
                                 Layout.topMargin: 4
 
                                 normalColor: root.accent
-                                hoverColor: "#7DB3FF"
-                                pressColor: "#5B95EA"
+                                hoverColor: "#CCCCCC"
+                                pressColor: "#999999"
                                 disabledColor: root.surface3
-                                textColor: "#FFFFFF"
+                                textColor: "#000000"
                                 showBorder: false
 
                                 onClicked: {
@@ -1101,7 +1086,7 @@ Item {
 
                                 normalColor: root.surface2
                                 hoverColor: root.surface3
-                                pressColor: "#252A33"
+                                pressColor: "#111111"
                                 disabledColor: root.surface2
                                 textColor: root.textMain
                                 borderColor: root.border
@@ -1345,10 +1330,9 @@ Item {
                         Rectangle {
                             Layout.preferredWidth: 58
                             Layout.preferredHeight: 58
-                            radius: 20
                             color: root.accentSoft
                             border.width: 1
-                            border.color: "#284568"
+                            border.color: "#555555"
 
                             DrawIcon {
                                 anchors.centerIn: parent
@@ -1382,7 +1366,6 @@ Item {
 
                     Rectangle {
                         color: root.surface
-                        radius: 26
                         border.width: 1
                         border.color: root.border
 
@@ -1421,9 +1404,9 @@ Item {
                                 text: "Создать пользователя"
 
                                 normalColor: root.accent
-                                hoverColor: "#7DB3FF"
-                                pressColor: "#5B95EA"
-                                textColor: "#FFFFFF"
+                                hoverColor: "#CCCCCC"
+                                pressColor: "#999999"
+                                textColor: "#000000"
                                 showBorder: false
 
                                 onClicked: {
@@ -1438,7 +1421,7 @@ Item {
 
                                 normalColor: root.surface2
                                 hoverColor: root.surface3
-                                pressColor: "#252A33"
+                                pressColor: "#111111"
                                 textColor: root.textMain
                                 borderColor: root.border
                                 showBorder: true
@@ -1650,10 +1633,9 @@ Item {
 
                     width: 44
                     height: 44
-                    radius: 16
                     color: root.accentSoft
                     border.width: 1
-                    border.color: "#284568"
+                    border.color: "#555555"
 
                     x: root.sideBarCollapsed ? Math.round((sideBarHeader.width - width) / 2) : 0
                     y: root.sideBarCollapsed ? 2 : Math.round((sideBarHeader.height - height) / 2)
@@ -1793,7 +1775,6 @@ Item {
                 }
             }
 
-
             Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -1888,7 +1869,6 @@ Item {
                     root.openTab(root.profilePageIndex)
                 }
             }
-
         }
     }
 
@@ -1903,7 +1883,6 @@ Item {
         property color borderColor: root.border
         property bool showBorder: true
         property bool loading: false
-        property int radiusValue: 18
 
         hoverEnabled: true
 
@@ -1925,7 +1904,6 @@ Item {
         }
 
         background: Rectangle {
-            radius: control.radiusValue
             color: !control.enabled ? control.disabledColor
                   : control.down ? control.pressColor
                   : control.hovered ? control.hoverColor
@@ -1995,14 +1973,13 @@ Item {
         color: root.textMain
         placeholderTextColor: root.textMuted
         selectionColor: root.accent
-        selectedTextColor: "#FFFFFF"
+        selectedTextColor: "#000000"
 
         font.pixelSize: 15
         leftPadding: 16
         rightPadding: 16
 
         background: Rectangle {
-            radius: 17
             color: control.activeFocus ? root.surface3 : root.surface2
             border.width: control.activeFocus ? 2 : 1
             border.color: control.activeFocus ? root.accent : root.border
@@ -2022,7 +1999,6 @@ Item {
         Rectangle {
             Layout.preferredWidth: 34
             Layout.preferredHeight: 34
-            radius: 12
             color: root.accentSoft
 
             DrawIcon {
@@ -2061,7 +2037,6 @@ Item {
         property color fgColor: root.textMain
         property color iconColor: root.accent
 
-        radius: 18
         color: bgColor
         border.width: 1
         border.color: Qt.rgba(iconColor.r, iconColor.g, iconColor.b, 0.35)
@@ -2078,7 +2053,6 @@ Item {
             Rectangle {
                 Layout.preferredWidth: 36
                 Layout.preferredHeight: 36
-                radius: 13
                 color: Qt.rgba(iconColor.r, iconColor.g, iconColor.b, 0.14)
 
                 DrawIcon {
@@ -2114,7 +2088,6 @@ Item {
 
         Rectangle {
             anchors.fill: parent
-            radius: 14
             color: collapseButton.hovered ? root.surface2 : "transparent"
             border.width: collapseButton.hovered ? 1 : 0
             border.color: root.border
@@ -2173,10 +2146,9 @@ Item {
 
         Rectangle {
             anchors.fill: parent
-            radius: 18
             color: sideBtn.active ? root.accentSoft : sideBtn.hovered ? root.surface2 : "transparent"
             border.width: sideBtn.active || sideBtn.hovered ? 1 : 0
-            border.color: sideBtn.active ? "#284568" : root.border
+            border.color: sideBtn.active ? "#555555" : root.border
 
             Behavior on color {
                 ColorAnimation {
@@ -2212,7 +2184,6 @@ Item {
                 Layout.preferredWidth: 34
                 Layout.preferredHeight: 34
                 Layout.alignment: root.sideBarCollapsed ? Qt.AlignHCenter | Qt.AlignVCenter : Qt.AlignVCenter
-                radius: 14
                 color: sideBtn.active ? Qt.rgba(root.accent.r, root.accent.g, root.accent.b, 0.12) : "transparent"
 
                 DrawIcon {
@@ -2252,7 +2223,6 @@ Item {
         Rectangle {
             anchors.fill: parent
             anchors.margins: 2
-            radius: 20
             color: navBtn.active ? root.surface2 : "transparent"
             border.width: navBtn.active ? 1 : 0
             border.color: root.border
@@ -2268,7 +2238,6 @@ Item {
             Rectangle {
                 anchors.fill: parent
                 anchors.margins: 2
-                radius: 20
                 color: root.surface3
                 opacity: parent.pressed ? 0.65 : 0.0
 
@@ -2292,7 +2261,6 @@ Item {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.preferredWidth: navBtn.active ? 44 : 36
                 Layout.preferredHeight: 30
-                radius: 15
                 color: navBtn.active ? root.accentSoft : "transparent"
 
                 Behavior on Layout.preferredWidth {
@@ -2346,8 +2314,9 @@ Item {
             ctx.strokeStyle = icon.iconColor
             ctx.fillStyle = icon.iconColor
             ctx.lineWidth = Math.max(1.8, s * 0.085)
-            ctx.lineCap = "round"
-            ctx.lineJoin = "round"
+
+            ctx.lineCap = "square"
+            ctx.lineJoin = "miter"
 
             function px(v) {
                 return x + s * v
@@ -2357,23 +2326,8 @@ Item {
                 return y + s * v
             }
 
-            function roundedRectPath(left, top, w, h, r) {
-                ctx.beginPath()
-                ctx.moveTo(left + r, top)
-                ctx.lineTo(left + w - r, top)
-                ctx.quadraticCurveTo(left + w, top, left + w, top + r)
-                ctx.lineTo(left + w, top + h - r)
-                ctx.quadraticCurveTo(left + w, top + h, left + w - r, top + h)
-                ctx.lineTo(left + r, top + h)
-                ctx.quadraticCurveTo(left, top + h, left, top + h - r)
-                ctx.lineTo(left, top + r)
-                ctx.quadraticCurveTo(left, top, left + r, top)
-                ctx.closePath()
-            }
-
             if (icon.name === "slotLogo") {
-                roundedRectPath(px(0.16), py(0.18), s * 0.68, s * 0.64, s * 0.14)
-                ctx.stroke()
+                ctx.strokeRect(px(0.16), py(0.18), s * 0.68, s * 0.64)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.33), py(0.18))
@@ -2384,14 +2338,13 @@ Item {
                 ctx.lineTo(px(0.84), py(0.50))
                 ctx.stroke()
 
-                ctx.beginPath()
-                ctx.arc(px(0.245), py(0.34), s * 0.035, 0, Math.PI * 2)
-                ctx.arc(px(0.50), py(0.34), s * 0.035, 0, Math.PI * 2)
-                ctx.arc(px(0.755), py(0.34), s * 0.035, 0, Math.PI * 2)
-                ctx.arc(px(0.245), py(0.66), s * 0.035, 0, Math.PI * 2)
-                ctx.arc(px(0.50), py(0.66), s * 0.035, 0, Math.PI * 2)
-                ctx.arc(px(0.755), py(0.66), s * 0.035, 0, Math.PI * 2)
-                ctx.fill()
+                var ds = s * 0.07
+                ctx.fillRect(px(0.245) - ds / 2, py(0.34) - ds / 2, ds, ds)
+                ctx.fillRect(px(0.50) - ds / 2, py(0.34) - ds / 2, ds, ds)
+                ctx.fillRect(px(0.755) - ds / 2, py(0.34) - ds / 2, ds, ds)
+                ctx.fillRect(px(0.245) - ds / 2, py(0.66) - ds / 2, ds, ds)
+                ctx.fillRect(px(0.50) - ds / 2, py(0.66) - ds / 2, ds, ds)
+                ctx.fillRect(px(0.755) - ds / 2, py(0.66) - ds / 2, ds, ds)
             } else if (icon.name === "home") {
                 ctx.beginPath()
                 ctx.moveTo(px(0.15), py(0.48))
@@ -2399,8 +2352,7 @@ Item {
                 ctx.lineTo(px(0.85), py(0.48))
                 ctx.stroke()
 
-                roundedRectPath(px(0.25), py(0.46), s * 0.5, s * 0.36, s * 0.06)
-                ctx.stroke()
+                ctx.strokeRect(px(0.25), py(0.46), s * 0.5, s * 0.36)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.43), py(0.82))
@@ -2409,8 +2361,7 @@ Item {
                 ctx.lineTo(px(0.57), py(0.82))
                 ctx.stroke()
             } else if (icon.name === "tasks") {
-                roundedRectPath(px(0.2), py(0.14), s * 0.6, s * 0.72, s * 0.08)
-                ctx.stroke()
+                ctx.strokeRect(px(0.2), py(0.14), s * 0.6, s * 0.72)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.34), py(0.34))
@@ -2421,14 +2372,12 @@ Item {
                 ctx.lineTo(px(0.58), py(0.66))
                 ctx.stroke()
 
-                ctx.beginPath()
-                ctx.arc(px(0.27), py(0.34), s * 0.015, 0, Math.PI * 2)
-                ctx.arc(px(0.27), py(0.5), s * 0.015, 0, Math.PI * 2)
-                ctx.arc(px(0.27), py(0.66), s * 0.015, 0, Math.PI * 2)
-                ctx.fill()
+                var tds = s * 0.05
+                ctx.fillRect(px(0.27) - tds / 2, py(0.34) - tds / 2, tds, tds)
+                ctx.fillRect(px(0.27) - tds / 2, py(0.5) - tds / 2, tds, tds)
+                ctx.fillRect(px(0.27) - tds / 2, py(0.66) - tds / 2, tds, tds)
             } else if (icon.name === "calendar") {
-                roundedRectPath(px(0.14), py(0.22), s * 0.72, s * 0.62, s * 0.08)
-                ctx.stroke()
+                ctx.strokeRect(px(0.14), py(0.22), s * 0.72, s * 0.62)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.14), py(0.4))
@@ -2439,67 +2388,59 @@ Item {
                 ctx.lineTo(px(0.68), py(0.28))
                 ctx.stroke()
 
-                ctx.beginPath()
-                ctx.arc(px(0.34), py(0.56), s * 0.025, 0, Math.PI * 2)
-                ctx.arc(px(0.5), py(0.56), s * 0.025, 0, Math.PI * 2)
-                ctx.arc(px(0.66), py(0.56), s * 0.025, 0, Math.PI * 2)
-                ctx.arc(px(0.34), py(0.7), s * 0.025, 0, Math.PI * 2)
-                ctx.arc(px(0.5), py(0.7), s * 0.025, 0, Math.PI * 2)
-                ctx.fill()
+                var cds = s * 0.05
+                ctx.fillRect(px(0.34) - cds / 2, py(0.56) - cds / 2, cds, cds)
+                ctx.fillRect(px(0.5) - cds / 2, py(0.56) - cds / 2, cds, cds)
+                ctx.fillRect(px(0.66) - cds / 2, py(0.56) - cds / 2, cds, cds)
+                ctx.fillRect(px(0.34) - cds / 2, py(0.7) - cds / 2, cds, cds)
+                ctx.fillRect(px(0.5) - cds / 2, py(0.7) - cds / 2, cds, cds)
             } else if (icon.name === "user") {
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.33), s * 0.16, 0, Math.PI * 2)
-                ctx.stroke()
+                ctx.strokeRect(px(0.34), py(0.17), s * 0.32, s * 0.32)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.22), py(0.82))
-                ctx.quadraticCurveTo(px(0.25), py(0.58), px(0.5), py(0.58))
-                ctx.quadraticCurveTo(px(0.75), py(0.58), px(0.78), py(0.82))
+                ctx.lineTo(px(0.22), py(0.58))
+                ctx.lineTo(px(0.78), py(0.58))
+                ctx.lineTo(px(0.78), py(0.82))
                 ctx.stroke()
             } else if (icon.name === "adminUsers") {
-                ctx.beginPath()
-                ctx.arc(px(0.36), py(0.30), s * 0.12, 0, Math.PI * 2)
-                ctx.stroke()
+                ctx.strokeRect(px(0.24), py(0.18), s * 0.24, s * 0.24)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.15), py(0.76))
-                ctx.quadraticCurveTo(px(0.18), py(0.58), px(0.36), py(0.58))
-                ctx.quadraticCurveTo(px(0.54), py(0.58), px(0.58), py(0.76))
+                ctx.lineTo(px(0.15), py(0.58))
+                ctx.lineTo(px(0.58), py(0.58))
+                ctx.lineTo(px(0.58), py(0.76))
                 ctx.stroke()
 
-                ctx.beginPath()
-                ctx.arc(px(0.66), py(0.34), s * 0.10, 0, Math.PI * 2)
-                ctx.stroke()
+                ctx.strokeRect(px(0.56), py(0.24), s * 0.2, s * 0.2)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.52), py(0.74))
-                ctx.quadraticCurveTo(px(0.55), py(0.60), px(0.66), py(0.60))
-                ctx.quadraticCurveTo(px(0.80), py(0.60), px(0.84), py(0.74))
+                ctx.lineTo(px(0.52), py(0.60))
+                ctx.lineTo(px(0.84), py(0.60))
+                ctx.lineTo(px(0.84), py(0.74))
                 ctx.stroke()
             } else if (icon.name === "lock") {
-                roundedRectPath(px(0.2), py(0.42), s * 0.6, s * 0.38, s * 0.08)
-                ctx.stroke()
+                ctx.strokeRect(px(0.2), py(0.42), s * 0.6, s * 0.38)
 
                 ctx.beginPath()
-                ctx.arc(px(0.5), py(0.42), s * 0.19, Math.PI, 0, false)
+                ctx.moveTo(px(0.31), py(0.42))
+                ctx.lineTo(px(0.31), py(0.23))
+                ctx.lineTo(px(0.69), py(0.23))
+                ctx.lineTo(px(0.69), py(0.42))
                 ctx.stroke()
 
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.6), s * 0.03, 0, Math.PI * 2)
-                ctx.fill()
+                ctx.fillRect(px(0.47), py(0.57), s * 0.06, s * 0.06)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.5), py(0.63))
                 ctx.lineTo(px(0.5), py(0.7))
                 ctx.stroke()
             } else if (icon.name === "info") {
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.34, 0, Math.PI * 2)
-                ctx.stroke()
+                ctx.strokeRect(px(0.16), py(0.16), s * 0.68, s * 0.68)
 
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.32), s * 0.025, 0, Math.PI * 2)
-                ctx.fill()
+                ctx.fillRect(px(0.475), py(0.295), s * 0.05, s * 0.05)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.5), py(0.46))
@@ -2518,13 +2459,10 @@ Item {
                 ctx.lineTo(px(0.5), py(0.58))
                 ctx.stroke()
 
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.69), s * 0.025, 0, Math.PI * 2)
-                ctx.fill()
+                var wds = s * 0.05
+                ctx.fillRect(px(0.5) - wds / 2, py(0.69) - wds / 2, wds, wds)
             } else if (icon.name === "check") {
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.34, 0, Math.PI * 2)
-                ctx.stroke()
+                ctx.strokeRect(px(0.16), py(0.16), s * 0.68, s * 0.68)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.34), py(0.51))
@@ -2538,9 +2476,8 @@ Item {
                 ctx.lineTo(px(0.72), py(0.38))
                 ctx.stroke()
             } else {
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.08, 0, Math.PI * 2)
-                ctx.fill()
+                var defs = s * 0.16
+                ctx.fillRect(px(0.5) - defs / 2, py(0.5) - defs / 2, defs, defs)
             }
         }
     }

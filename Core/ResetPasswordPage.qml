@@ -16,22 +16,23 @@ Page {
     property string infoText: ""
     property Item focusedField: null
 
-    readonly property color bg: "#111318"
-    readonly property color surface: "#181B21"
-    readonly property color surface2: "#20242C"
-    readonly property color surface3: "#2A2F39"
-    readonly property color border: "#313640"
-    readonly property color textMain: "#F4F6F8"
-    readonly property color textSub: "#C8CDD4"
-    readonly property color textMuted: "#8D96A3"
-    readonly property color accent: "#6EA8FE"
-    readonly property color accentSoft: "#1C2B44"
-    readonly property color danger: "#FF6B6B"
-    readonly property color dangerSoft: "#3A2023"
-    readonly property color success: "#6EE7A8"
-    readonly property color successSoft: "#173427"
-    readonly property color warning: "#FFD166"
-    readonly property color warningSoft: "#392F18"
+
+    readonly property color bg: "#000000"
+    readonly property color surface: "#111111"
+    readonly property color surface2: "#222222"
+    readonly property color surface3: "#333333"
+    readonly property color border: "#555555"
+    readonly property color textMain: "#FFFFFF"
+    readonly property color textSub: "#DDDDDD"
+    readonly property color textMuted: "#AAAAAA"
+    readonly property color accent: "#FFFFFF"
+    readonly property color accentSoft: "#333333"
+    readonly property color danger: "#FFFFFF"
+    readonly property color dangerSoft: "#222222"
+    readonly property color success: "#FFFFFF"
+    readonly property color successSoft: "#222222"
+    readonly property color warning: "#FFFFFF"
+    readonly property color warningSoft: "#222222"
 
     readonly property int contentMaxWidth: 660
 
@@ -793,10 +794,9 @@ Page {
     component HeaderCard: Rectangle {
         id: headerCard
 
-        color: headerHover.hovered ? "#1B1F27" : page.surface
-        radius: 26
+        color: headerHover.hovered ? "#1A1A1A" : page.surface
         border.width: 1
-        border.color: headerHover.hovered ? "#3D5E88" : page.border
+        border.color: headerHover.hovered ? "#777777" : page.border
         scale: headerHover.hovered ? 1.004 : 1.0
 
         Layout.preferredHeight: headerRow.implicitHeight + 32
@@ -903,10 +903,9 @@ Page {
         id: stepLine
 
         height: 62
-        radius: 22
-        color: stepHover.hovered ? "#1B1F27" : page.surface
+        color: stepHover.hovered ? "#1A1A1A" : page.surface
         border.width: 1
-        border.color: stepHover.hovered ? "#3A4352" : page.border
+        border.color: stepHover.hovered ? "#777777" : page.border
 
         Behavior on color {
             ColorAnimation {
@@ -965,10 +964,9 @@ Page {
         Layout.fillWidth: true
         Layout.fillHeight: true
 
-        radius: 17
         color: pill.active ? page.accentSoft : pill.done ? page.successSoft : page.surface2
         border.width: 1
-        border.color: pill.active ? "#284568" : pill.done ? "#24513C" : page.border
+        border.color: pill.active ? "#777777" : pill.done ? "#555555" : page.border
 
         RowLayout {
             anchors.centerIn: parent
@@ -977,13 +975,12 @@ Page {
             Rectangle {
                 Layout.preferredWidth: 24
                 Layout.preferredHeight: 24
-                radius: 12
                 color: pill.done ? page.success : pill.active ? page.accent : page.surface3
 
                 Text {
                     anchors.centerIn: parent
                     text: pill.done ? "✓" : String(pill.number)
-                    color: "#FFFFFF"
+                    color: pill.done || pill.active ? "#000000" : "#FFFFFF"
                     font.pixelSize: 12
                     font.bold: true
                 }
@@ -1001,10 +998,9 @@ Page {
     }
 
     component SelectedEmailBox: Rectangle {
-        radius: 18
         color: page.accentSoft
         border.width: 1
-        border.color: "#284568"
+        border.color: "#777777"
 
         Layout.preferredHeight: selectedEmailRow.implicitHeight + 22
 
@@ -1056,10 +1052,9 @@ Page {
         default property alias content: cardColumn.data
         property string title: ""
 
-        color: cardHover.hovered ? "#1B1F27" : page.surface
-        radius: 26
+        color: cardHover.hovered ? "#1A1A1A" : page.surface
         border.width: 1
-        border.color: cardHover.hovered ? "#3D5E88" : page.border
+        border.color: cardHover.hovered ? "#777777" : page.border
         scale: cardHover.hovered ? 1.004 : 1.0
 
         Layout.fillWidth: true
@@ -1125,9 +1120,8 @@ Page {
         property bool danger: false
 
         color: box.danger ? page.dangerSoft : page.successSoft
-        radius: 20
         border.width: 1
-        border.color: box.danger ? "#5A2D31" : "#24513C"
+        border.color: box.danger ? "#777777" : "#777777"
 
         Layout.preferredHeight: boxRow.implicitHeight + 24
 
@@ -1140,7 +1134,7 @@ Page {
 
             IconCircle {
                 iconText: box.danger ? "!" : "✓"
-                bgColor: box.danger ? "#4A2529" : "#123021"
+                bgColor: "#333333"
                 textColor: box.danger ? page.danger : page.success
 
                 Layout.preferredWidth: 38
@@ -1149,7 +1143,7 @@ Page {
 
             Text {
                 text: box.text
-                color: box.danger ? "#FFD7DA" : "#D8FFE8"
+                color: "#FFFFFF"
                 font.pixelSize: 13
                 font.bold: true
                 wrapMode: Text.WordWrap
@@ -1167,7 +1161,6 @@ Page {
         property color bgColor: page.surface2
         property color textColor: page.textMain
 
-        radius: width / 2
         color: icon.bgColor
         border.width: 1
         border.color: page.border
@@ -1204,14 +1197,13 @@ Page {
 
         Layout.preferredHeight: 56
 
-        radius: 18
         color: {
             if (!field.enabled)
                 return page.surface2
             if (input.activeFocus)
                 return page.surface3
             if (fieldHover.hovered)
-                return "#242A34"
+                return "#222222"
             return page.surface2
         }
         border.width: input.activeFocus ? 2 : 1
@@ -1221,7 +1213,7 @@ Page {
             if (input.activeFocus)
                 return page.accent
             if (fieldHover.hovered)
-                return "#3D4656"
+                return "#777777"
             return page.border
         }
         opacity: enabled ? 1.0 : 0.55
@@ -1261,7 +1253,7 @@ Page {
 
             color: page.textMain
             selectionColor: page.accent
-            selectedTextColor: "#FFFFFF"
+            selectedTextColor: "#000000"
             font.pixelSize: 16
 
             verticalAlignment: TextInput.AlignVCenter
@@ -1321,7 +1313,6 @@ Page {
         implicitHeight: 50
         Layout.preferredHeight: 50
 
-        radius: 17
         clip: true
         enabled: true
         activeFocusOnTab: enabled
@@ -1343,32 +1334,32 @@ Page {
 
             if (button.variant === "primary") {
                 if (button.down)
-                    return "#1E4F90"
+                    return "#222222"
                 if (button.hovered)
-                    return "#2B6CBE"
-                return "#255FA9"
+                    return "#444444"
+                return "#333333"
             }
 
             if (button.variant === "outlined") {
                 if (button.down)
-                    return "#202A38"
+                    return "#111111"
                 if (button.hovered)
-                    return "#182233"
+                    return "#222222"
                 return "transparent"
             }
 
             if (button.variant === "danger") {
                 if (button.down)
-                    return "#8E2F35"
+                    return "#222222"
                 if (button.hovered)
-                    return "#A63A42"
-                return "#94343B"
+                    return "#444444"
+                return "#333333"
             }
 
             if (button.down)
-                return "#202A38"
+                return "#111111"
             if (button.hovered)
-                return "#1E2C42"
+                return "#222222"
             return page.surface2
         }
 
@@ -1377,12 +1368,12 @@ Page {
             if (!button.enabled)
                 return page.border
             if (button.variant === "primary")
-                return button.hovered || button.activeFocus ? "#3D7FCC" : "#255FA9"
+                return button.hovered || button.activeFocus ? "#FFFFFF" : "#777777"
             if (button.variant === "danger")
-                return button.hovered || button.activeFocus ? "#BD4A52" : "#94343B"
+                return button.hovered || button.activeFocus ? "#FFFFFF" : "#777777"
             if (button.variant === "outlined")
-                return button.hovered || button.activeFocus ? "#3D5E88" : page.border
-            return button.hovered || button.activeFocus ? "#34455E" : page.border
+                return button.hovered || button.activeFocus ? "#777777" : page.border
+            return button.hovered || button.activeFocus ? "#777777" : page.border
         }
 
         Behavior on color {
@@ -1428,7 +1419,7 @@ Page {
                     return "#FFFFFF"
 
                 if (button.variant === "outlined")
-                    return button.hovered || button.activeFocus ? "#91C0FF" : page.accent
+                    return button.hovered || button.activeFocus ? "#FFFFFF" : page.accent
 
                 return button.hovered || button.activeFocus ? page.textMain : page.textSub
             }

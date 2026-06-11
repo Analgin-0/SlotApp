@@ -26,27 +26,28 @@ Item {
 
     property int pendingCancelRow: -1
 
-    readonly property color bg: "#111318"
-    readonly property color surface: "#181B21"
-    readonly property color surface2: "#20242C"
-    readonly property color surface3: "#2A2F39"
-    readonly property color border: "#313640"
-    readonly property color textMain: "#F4F6F8"
-    readonly property color textSub: "#C8CDD4"
-    readonly property color textMuted: "#8D96A3"
-    readonly property color accent: "#6EA8FE"
-    readonly property color accentSoft: "#1C2B44"
-    readonly property color success: "#6EE7A8"
-    readonly property color successSoft: "#173427"
-    readonly property color danger: "#FF6B6B"
-    readonly property color dangerSoft: "#3A2023"
-    readonly property color warning: "#FFD166"
-    readonly property color warningSoft: "#392F18"
+
+    readonly property color bg: "#000000"
+    readonly property color surface: "#111111"
+    readonly property color surface2: "#222222"
+    readonly property color surface3: "#333333"
+    readonly property color border: "#555555"
+    readonly property color textMain: "#FFFFFF"
+    readonly property color textSub: "#DDDDDD"
+    readonly property color textMuted: "#AAAAAA"
+    readonly property color accent: "#FFFFFF"
+    readonly property color accentSoft: "#333333"
+    readonly property color success: "#FFFFFF"
+    readonly property color successSoft: "#222222"
+    readonly property color danger: "#FFFFFF"
+    readonly property color dangerSoft: "#222222"
+    readonly property color warning: "#FFFFFF"
+    readonly property color warningSoft: "#222222"
 
     readonly property int desktopBreakpoint: 900
     readonly property bool desktopMode: page.width >= page.desktopBreakpoint
     readonly property int desktopContentMaxWidth: 1180
-    readonly property int desktopCardRadius: 28
+    readonly property int desktopCardRadius: 0
 
     function canAddTask() {
         return Number(page.viewerRole) === 1
@@ -608,7 +609,6 @@ Item {
 
     function sectionCount(section) {
         var revision = page.modelRevision
-        revision = revision
 
         if (!page.tasksModel)
             return 0
@@ -636,8 +636,7 @@ Item {
             return
 
         page.loadError = ""
-
-          page.loading = true
+        page.loading = true
 
         if (Db.isConnect()) {
             console.log("TasksPage: Db.getAppointments()")
@@ -654,7 +653,6 @@ Item {
             page.loading = false
             return
         }
-
 
         var hasItems = items && items.length
 
@@ -1131,7 +1129,6 @@ Item {
 
         background: Rectangle {
             color: page.surface
-            radius: 26
             border.width: 1
             border.color: page.border
         }
@@ -1142,7 +1139,6 @@ Item {
             Rectangle {
                 Layout.preferredWidth: 54
                 Layout.preferredHeight: 54
-                radius: 18
                 color: page.dangerSoft
                 border.width: 1
                 border.color: "#5A2D31"
@@ -1230,7 +1226,6 @@ Item {
 
         Rectangle {
             anchors.fill: parent
-            radius: height >= 48 ? 17 : 15
             color: control.backgroundColor()
             border.width: control.variant === "primary" || control.variant === "danger" ? 0 : 1
             border.color: control.borderColor()
@@ -1273,15 +1268,15 @@ Item {
                 return page.surface3
 
             if (control.variant === "danger")
-                return control.pressed ? "#D95858" : control.hovered ? "#F26666" : page.danger
+                return control.pressed ? "#222222" : control.hovered ? "#444444" : page.surface3
 
             if (control.variant === "dangerSoft")
-                return control.pressed ? "#44272A" : control.hovered ? "#4A2529" : page.dangerSoft
+                return control.pressed ? "#111111" : control.hovered ? "#222222" : page.dangerSoft
 
             if (control.variant === "secondary")
-                return control.pressed ? page.surface3 : control.hovered ? "#252A34" : page.surface2
+                return control.pressed ? "#111111" : control.hovered ? "#222222" : page.surface2
 
-            return control.pressed ? "#255FA9" : control.hovered ? "#2B6CBE" : page.accent
+            return control.pressed ? "#222222" : control.hovered ? "#444444" : page.surface3
         }
 
         function borderColor() {
@@ -1289,12 +1284,12 @@ Item {
                 return page.border
 
             if (control.variant === "dangerSoft")
-                return control.hovered ? page.danger : "#5A2D31"
+                return control.hovered ? page.danger : "#555555"
 
             if (control.variant === "secondary")
-                return control.hovered ? "#3B4658" : page.border
+                return control.hovered ? "#777777" : page.border
 
-            return page.border
+            return "transparent"
         }
 
         function textColor() {
@@ -1331,13 +1326,12 @@ Item {
 
         Rectangle {
             anchors.fill: parent
-            radius: 24
             color: !fabButton.enabled ? page.surface3
                   : fabButton.pressed ? page.accentSoft
-                  : fabButton.hovered ? "#1D2634"
-                  : page.surface
+                  : fabButton.hovered ? "#222222"
+                  : page.surface2
             border.width: 1
-            border.color: !fabButton.enabled ? page.border : fabButton.hovered ? "#8BBCFF" : page.accent
+            border.color: !fabButton.enabled ? page.border : fabButton.hovered ? "#777777" : page.accent
 
             Behavior on color {
                 ColorAnimation { duration: 140 }
@@ -1350,8 +1344,7 @@ Item {
             Rectangle {
                 anchors.fill: parent
                 anchors.margins: fabButton.hovered ? 5 : 6
-                radius: 19
-                color: !fabButton.enabled ? "transparent" : fabButton.pressed ? "#255FA9" : page.accent
+                color: !fabButton.enabled ? "transparent" : fabButton.pressed ? "#111111" : page.accent
                 opacity: fabButton.pressed ? 0.78 : 1.0
 
                 Behavior on color {
@@ -1365,7 +1358,7 @@ Item {
             width: 28
             height: 28
             name: "plus"
-            iconColor: "#FFFFFF"
+            iconColor: "#000000"
         }
 
         MouseArea {
@@ -1386,10 +1379,10 @@ Item {
 
         property bool hovered: headerHoverArea.containsMouse
 
-        color: headerCard.hovered ? "#1B2029" : page.surface
-        radius: page.desktopCardRadius
+
+        color: headerCard.hovered ? "#333333" : page.surface2
         border.width: 1
-        border.color: headerCard.hovered ? "#284568" : page.border
+        border.color: headerCard.hovered ? "#777777" : page.border
         scale: headerCard.hovered ? 1.004 : 1.0
 
         Layout.preferredHeight: headerColumn.implicitHeight + (page.desktopMode ? 38 : 34)
@@ -1419,10 +1412,9 @@ Item {
                 Rectangle {
                     Layout.preferredWidth: 58
                     Layout.preferredHeight: 58
-                    radius: 20
-                    color: page.accentSoft
+                    color: page.surface3
                     border.width: 1
-                    border.color: "#284568"
+                    border.color: "#555555"
 
                     DrawIcon {
                         anchors.centerIn: parent
@@ -1479,21 +1471,21 @@ Item {
                 CountBadge {
                     text: "Активные"
                     count: page.sectionCount("upcoming")
-                    colorBg: page.successSoft
+                    colorBg: page.surface3
                     colorText: page.success
                 }
 
                 CountBadge {
                     text: "Прошедшие"
                     count: page.sectionCount("past")
-                    colorBg: page.surface2
+                    colorBg: page.surface3
                     colorText: page.textSub
                 }
 
                 CountBadge {
                     text: "Отменённые"
                     count: page.sectionCount("cancelled")
-                    colorBg: page.dangerSoft
+                    colorBg: page.surface3
                     colorText: page.danger
                 }
 
@@ -1509,12 +1501,11 @@ Item {
 
         property string text: ""
         property int count: 0
-        property color colorBg: page.surface2
+        property color colorBg: page.surface3
         property color colorText: page.textSub
         property bool hovered: badgeHoverArea.containsMouse
 
-        radius: 999
-        color: badge.hovered ? page.surface3 : badge.colorBg
+        color: badge.hovered ? "#444444" : badge.colorBg
         border.width: badge.hovered ? 1 : 0
         border.color: Qt.rgba(badge.colorText.r, badge.colorText.g, badge.colorText.b, 0.38)
         scale: badge.hovered ? 1.035 : 1.0
@@ -1554,8 +1545,7 @@ Item {
         property color bgColor: page.surface2
         property bool hovered: cardHoverArea.containsMouse
 
-        radius: 22
-        color: card.bgColor
+        color: card.hovered ? "#333333" : page.surface2
         border.width: 1
         border.color: card.hovered ? Qt.rgba(card.iconColor.r, card.iconColor.g, card.iconColor.b, 0.55) : page.border
         scale: card.hovered ? 1.003 : 1.0
@@ -1582,7 +1572,6 @@ Item {
             Rectangle {
                 Layout.preferredWidth: 40
                 Layout.preferredHeight: 40
-                radius: 14
                 color: Qt.rgba(card.iconColor.r, card.iconColor.g, card.iconColor.b, 0.14)
 
                 DrawIcon {
@@ -1613,10 +1602,9 @@ Item {
         property string text: ""
         property bool hovered: errorHoverArea.containsMouse
 
-        color: box.hovered ? "#44272A" : page.dangerSoft
-        radius: 22
+        color: box.hovered ? "#333333" : page.dangerSoft
         border.width: 1
-        border.color: box.hovered ? page.danger : "#5A2D31"
+        border.color: box.hovered ? page.danger : "#555555"
         scale: box.hovered ? 1.003 : 1.0
 
         Layout.preferredHeight: errRow.implicitHeight + 24
@@ -1642,8 +1630,7 @@ Item {
             Rectangle {
                 Layout.preferredWidth: 42
                 Layout.preferredHeight: 42
-                radius: 15
-                color: "#4A2529"
+                color: "#333333"
 
                 DrawIcon {
                     anchors.centerIn: parent
@@ -1656,7 +1643,7 @@ Item {
 
             Text {
                 text: box.text
-                color: "#FFD7DA"
+                color: "#FFFFFF"
                 font.pixelSize: 13
                 font.bold: true
                 wrapMode: Text.WordWrap
@@ -1673,10 +1660,10 @@ Item {
         property bool hovered: emptyHoverArea.containsMouse
 
         Layout.preferredHeight: page.desktopMode ? 196 : 178
-        color: emptyState.hovered ? "#1B2029" : page.surface
-        radius: page.desktopCardRadius
+
+        color: emptyState.hovered ? "#333333" : page.surface2
         border.width: 1
-        border.color: emptyState.hovered ? "#284568" : page.border
+        border.color: emptyState.hovered ? "#777777" : page.border
         scale: emptyState.hovered ? 1.004 : 1.0
 
         Behavior on color { ColorAnimation { duration: 140 } }
@@ -1699,8 +1686,7 @@ Item {
                 Layout.preferredWidth: 54
                 Layout.preferredHeight: 54
                 Layout.alignment: Qt.AlignHCenter
-                radius: 19
-                color: page.surface2
+                color: page.surface3
 
                 DrawIcon {
                     anchors.centerIn: parent
@@ -1755,8 +1741,8 @@ Item {
             Layout.fillWidth: true
             Layout.preferredHeight: 50
 
-            radius: 20
-            color: section.hovered ? "#1B2029" : page.surface
+
+            color: section.hovered ? "#333333" : page.surface2
             border.width: 1
             border.color: section.hovered ? Qt.rgba(section.dotColor.r, section.dotColor.g, section.dotColor.b, 0.55) : page.border
             scale: sectionHeaderMouseArea.pressed ? 0.992 : section.hovered ? 1.004 : 1.0
@@ -1774,7 +1760,6 @@ Item {
                 Rectangle {
                     Layout.preferredWidth: 10
                     Layout.preferredHeight: 10
-                    radius: 5
                     color: section.dotColor
                 }
 
@@ -1791,8 +1776,7 @@ Item {
                 Rectangle {
                     Layout.preferredWidth: countText.implicitWidth + 18
                     Layout.preferredHeight: 28
-                    radius: 14
-                    color: page.surface2
+                    color: page.surface3
                     border.width: 1
                     border.color: page.border
 
@@ -1810,10 +1794,9 @@ Item {
                 Rectangle {
                     Layout.preferredWidth: 34
                     Layout.preferredHeight: 34
-                    radius: 13
-                    color: section.expanded ? page.accentSoft : section.hovered ? page.surface3 : page.surface2
+                    color: section.expanded ? page.accentSoft : section.hovered ? page.surface3 : page.surface3
                     border.width: 1
-                    border.color: section.expanded ? "#284568" : section.hovered ? "#3B4658" : page.border
+                    border.color: section.expanded ? "#555555" : section.hovered ? "#777777" : page.border
 
                     Behavior on color { ColorAnimation { duration: 130 } }
                     Behavior on border.color { ColorAnimation { duration: 130 } }
@@ -1950,11 +1933,11 @@ Item {
         implicitHeight: contentColumn.implicitHeight + (page.desktopMode ? 36 : 32)
         height: implicitHeight
 
-        radius: page.desktopMode ? 26 : 24
-        color: card.hovered ? "#1B2029" : page.surface
+
+        color: card.hovered ? "#222222" : page.surface
         border.width: 1
         border.color: card.isCanceled ? (card.hovered ? page.danger : "#5A2D31")
-                     : card.hovered ? "#284568"
+                     : card.hovered ? "#777777"
                      : page.border
         scale: bookingHoverArea.pressed ? 0.996 : card.hovered ? 1.004 : 1.0
         clip: true
@@ -1987,7 +1970,6 @@ Item {
                 Rectangle {
                     Layout.preferredWidth: 48
                     Layout.preferredHeight: 48
-                    radius: 17
                     color: card.iconBackgroundColor()
                     border.width: 1
                     border.color: card.iconBorderColor()
@@ -2012,7 +1994,6 @@ Item {
                         Rectangle {
                             Layout.preferredWidth: roleBadgeText.implicitWidth + 20
                             Layout.preferredHeight: 26
-                            radius: 13
                             color: card.badgeBackgroundColor()
                             border.width: 1
                             border.color: card.badgeBorderColor()
@@ -2201,7 +2182,7 @@ Item {
             if (card.consultationPassed)
                 return page.border
 
-            return "#24513C"
+            return "#555555"
         }
 
         function badgeText() {
@@ -2232,10 +2213,10 @@ Item {
             var role = Number(card.viewerRole)
 
             if (role === 1)
-                return "#284568"
+                return "#555555"
 
             if (role === 2)
-                return "#24513C"
+                return "#555555"
 
             return page.border
         }
@@ -2339,10 +2320,9 @@ Item {
         Layout.preferredWidth: Math.min(label.implicitWidth + 42, page.desktopMode ? 240 : 180)
         Layout.preferredHeight: 32
 
-        radius: 16
         color: pill.hovered ? page.surface3 : page.surface2
         border.width: 1
-        border.color: pill.hovered ? "#3B4658" : page.border
+        border.color: pill.hovered ? "#777777" : page.border
         scale: pill.hovered ? 1.012 : 1.0
 
         Behavior on color { ColorAnimation { duration: 120 } }
@@ -2479,6 +2459,8 @@ Item {
 
                 ctx.closePath()
 
+                ctx.lineCap = "square"
+                ctx.lineJoin = "miter"
                 ctx.lineWidth = 2
                 ctx.strokeStyle = star.filled || star.hovered ? page.warning : page.textMuted
                 ctx.fillStyle = star.filled ? page.warning : "transparent"
@@ -2540,8 +2522,9 @@ Item {
             ctx.strokeStyle = icon.iconColor
             ctx.fillStyle = icon.iconColor
             ctx.lineWidth = Math.max(1.8, s * 0.085)
-            ctx.lineCap = "round"
-            ctx.lineJoin = "round"
+
+            ctx.lineCap = "square"
+            ctx.lineJoin = "miter"
 
             function px(v) {
                 return x + s * v
@@ -2551,23 +2534,8 @@ Item {
                 return y + s * v
             }
 
-            function roundedRectPath(left, top, w, h, r) {
-                ctx.beginPath()
-                ctx.moveTo(left + r, top)
-                ctx.lineTo(left + w - r, top)
-                ctx.quadraticCurveTo(left + w, top, left + w, top + r)
-                ctx.lineTo(left + w, top + h - r)
-                ctx.quadraticCurveTo(left + w, top + h, left + w - r, top + h)
-                ctx.lineTo(left + r, top + h)
-                ctx.quadraticCurveTo(left, top + h, left, top + h - r)
-                ctx.lineTo(left, top + r)
-                ctx.quadraticCurveTo(left, top, left + r, top)
-                ctx.closePath()
-            }
-
             if (icon.name === "tasks") {
-                roundedRectPath(px(0.2), py(0.14), s * 0.6, s * 0.72, s * 0.08)
-                ctx.stroke()
+                ctx.strokeRect(px(0.2), py(0.14), s * 0.6, s * 0.72)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.34), py(0.34))
@@ -2578,15 +2546,12 @@ Item {
                 ctx.lineTo(px(0.58), py(0.66))
                 ctx.stroke()
 
-                ctx.beginPath()
-                ctx.arc(px(0.27), py(0.34), s * 0.015, 0, Math.PI * 2)
-                ctx.arc(px(0.27), py(0.5), s * 0.015, 0, Math.PI * 2)
-                ctx.arc(px(0.27), py(0.66), s * 0.015, 0, Math.PI * 2)
-                ctx.fill()
+                var ds = s * 0.05
+                ctx.fillRect(px(0.27) - ds / 2, py(0.34) - ds / 2, ds, ds)
+                ctx.fillRect(px(0.27) - ds / 2, py(0.5) - ds / 2, ds, ds)
+                ctx.fillRect(px(0.27) - ds / 2, py(0.66) - ds / 2, ds, ds)
             } else if (icon.name === "clock") {
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.34, 0, Math.PI * 2)
-                ctx.stroke()
+                ctx.strokeRect(px(0.16), py(0.16), s * 0.68, s * 0.68)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.5), py(0.3))
@@ -2594,8 +2559,7 @@ Item {
                 ctx.lineTo(px(0.66), py(0.62))
                 ctx.stroke()
             } else if (icon.name === "calendar") {
-                roundedRectPath(px(0.14), py(0.22), s * 0.72, s * 0.62, s * 0.08)
-                ctx.stroke()
+                ctx.strokeRect(px(0.14), py(0.22), s * 0.72, s * 0.62)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.14), py(0.4))
@@ -2606,20 +2570,17 @@ Item {
                 ctx.lineTo(px(0.68), py(0.28))
                 ctx.stroke()
             } else if (icon.name === "room") {
-                roundedRectPath(px(0.2), py(0.16), s * 0.6, s * 0.7, s * 0.08)
-                ctx.stroke()
+                ctx.strokeRect(px(0.2), py(0.16), s * 0.6, s * 0.7)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.5), py(0.16))
                 ctx.lineTo(px(0.5), py(0.86))
                 ctx.stroke()
 
-                ctx.beginPath()
-                ctx.arc(px(0.42), py(0.52), s * 0.025, 0, Math.PI * 2)
-                ctx.fill()
+                var ks = s * 0.05
+                ctx.fillRect(px(0.42) - ks / 2, py(0.52) - ks / 2, ks, ks)
             } else if (icon.name === "topic") {
-                roundedRectPath(px(0.18), py(0.22), s * 0.64, s * 0.56, s * 0.08)
-                ctx.stroke()
+                ctx.strokeRect(px(0.18), py(0.22), s * 0.64, s * 0.56)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.32), py(0.4))
@@ -2628,9 +2589,7 @@ Item {
                 ctx.lineTo(px(0.58), py(0.56))
                 ctx.stroke()
             } else if (icon.name === "check") {
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.34, 0, Math.PI * 2)
-                ctx.stroke()
+                ctx.strokeRect(px(0.16), py(0.16), s * 0.68, s * 0.68)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.34), py(0.51))
@@ -2638,9 +2597,7 @@ Item {
                 ctx.lineTo(px(0.68), py(0.39))
                 ctx.stroke()
             } else if (icon.name === "cancel") {
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.34, 0, Math.PI * 2)
-                ctx.stroke()
+                ctx.strokeRect(px(0.16), py(0.16), s * 0.68, s * 0.68)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.38), py(0.38))
@@ -2661,12 +2618,10 @@ Item {
                 ctx.lineTo(px(0.5), py(0.58))
                 ctx.stroke()
 
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.69), s * 0.025, 0, Math.PI * 2)
-                ctx.fill()
+                var ws = s * 0.05
+                ctx.fillRect(px(0.5) - ws / 2, py(0.69) - ws / 2, ws, ws)
             } else if (icon.name === "empty") {
-                roundedRectPath(px(0.2), py(0.22), s * 0.6, s * 0.52, s * 0.08)
-                ctx.stroke()
+                ctx.strokeRect(px(0.2), py(0.22), s * 0.6, s * 0.52)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.34), py(0.5))
@@ -2692,9 +2647,8 @@ Item {
                 ctx.lineTo(px(0.72), py(0.62))
                 ctx.stroke()
             } else {
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.08, 0, Math.PI * 2)
-                ctx.fill()
+                var dfs = s * 0.16
+                ctx.fillRect(px(0.5) - dfs / 2, py(0.5) - dfs / 2, dfs, dfs)
             }
         }
     }

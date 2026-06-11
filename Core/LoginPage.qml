@@ -12,26 +12,27 @@ Page {
 
     readonly property int contentMaxWidth: 560
 
-    readonly property color bg: "#111318"
-    readonly property color surface: "#181B21"
-    readonly property color surface2: "#20242C"
-    readonly property color surface3: "#2A2F39"
-    readonly property color border: "#313640"
-    readonly property color textMain: "#F4F6F8"
-    readonly property color textSub: "#C8CDD4"
-    readonly property color textMuted: "#8D96A3"
-    readonly property color accent: "#6EA8FE"
-    readonly property color accentSoft: "#1C2B44"
-    readonly property color danger: "#FF6B6B"
-    readonly property color dangerSoft: "#3A2023"
 
-    readonly property color hoverSurface: "#1B2029"
-    readonly property color hoverBorder: "#314B6B"
-    readonly property color primaryBase: "#255FA9"
-    readonly property color primaryHover: "#2B6CBE"
-    readonly property color primaryDown: "#1E4F90"
-    readonly property color primaryBorder: "#3C78C5"
-    readonly property color primaryBorderHover: "#5A91D3"
+    readonly property color bg: "#000000"
+    readonly property color surface: "#111111"
+    readonly property color surface2: "#222222"
+    readonly property color surface3: "#333333"
+    readonly property color border: "#555555"
+    readonly property color textMain: "#FFFFFF"
+    readonly property color textSub: "#DDDDDD"
+    readonly property color textMuted: "#AAAAAA"
+    readonly property color accent: "#FFFFFF"
+    readonly property color accentSoft: "#333333"
+    readonly property color danger: "#FFFFFF"
+    readonly property color dangerSoft: "#222222"
+
+    readonly property color hoverSurface: "#1A1A1A"
+    readonly property color hoverBorder: "#777777"
+    readonly property color primaryBase: "#333333"
+    readonly property color primaryHover: "#444444"
+    readonly property color primaryDown: "#222222"
+    readonly property color primaryBorder: "#FFFFFF"
+    readonly property color primaryBorderHover: "#CCCCCC"
 
     background: Rectangle {
         color: page.bg
@@ -164,7 +165,6 @@ Page {
                 Layout.rightMargin: 24
                 Layout.preferredHeight: titleRow.implicitHeight + 28
 
-                radius: 26
                 color: titleHover.hovered ? page.hoverSurface : page.surface
                 border.width: 1
                 border.color: titleHover.hovered ? page.hoverBorder : page.border
@@ -196,7 +196,6 @@ Page {
 
                 Rectangle {
                     anchors.fill: parent
-                    radius: titleCard.radius
                     color: "transparent"
                     border.width: 1
                     border.color: page.accent
@@ -220,10 +219,9 @@ Page {
                     Rectangle {
                         Layout.preferredWidth: 58
                         Layout.preferredHeight: 58
-                        radius: 20
                         color: page.accentSoft
                         border.width: 1
-                        border.color: "#284568"
+                        border.color: "#555555"
 
                         DrawIcon {
                             anchors.centerIn: parent
@@ -271,7 +269,6 @@ Page {
                 id: card
 
                 color: cardHover.hovered ? page.hoverSurface : page.surface
-                radius: 28
                 border.width: 1
                 border.color: cardHover.hovered ? page.hoverBorder : page.border
                 scale: cardHover.hovered ? 1.002 : 1.0
@@ -309,7 +306,6 @@ Page {
 
                 Rectangle {
                     anchors.fill: parent
-                    radius: card.radius
                     color: "transparent"
                     border.width: 1
                     border.color: page.accent
@@ -434,16 +430,15 @@ Page {
                     Rectangle {
                         id: errorBox
 
-                         visible: opacity > 0 || Layout.preferredHeight > 0
+                        visible: opacity > 0 || Layout.preferredHeight > 0
                         clip: true
 
                         color: page.dangerSoft
-                        radius: 16
                         border.width: 1
-                        border.color: "#5A2D31"
+                        border.color: "#FFFFFF"
 
                         Layout.fillWidth: true
-                         Layout.preferredHeight: errorText.text !== "" ? (errorText.implicitHeight + 20) : 0
+                        Layout.preferredHeight: errorText.text !== "" ? (errorText.implicitHeight + 20) : 0
                         opacity: errorText.text !== "" ? 1.0 : 0.0
 
                         Behavior on opacity {
@@ -461,7 +456,7 @@ Page {
                         }
 
                         RowLayout {
-                                 anchors.left: parent.left
+                            anchors.left: parent.left
                             anchors.right: parent.right
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.leftMargin: 10
@@ -471,8 +466,7 @@ Page {
                             Rectangle {
                                 Layout.preferredWidth: 34
                                 Layout.preferredHeight: 34
-                                radius: 12
-                                color: "#4A2529"
+                                color: "#333333"
 
                                 DrawIcon {
                                     anchors.centerIn: parent
@@ -486,7 +480,7 @@ Page {
                             Text {
                                 id: errorText
 
-                                color: "#FFD7DA"
+                                color: "#FFFFFF"
                                 font.pixelSize: 13
                                 font.bold: true
                                 wrapMode: Text.WordWrap
@@ -506,7 +500,6 @@ Page {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 56
 
-                        radius: 18
                         baseColor: page.primaryBase
                         hoverColor: page.primaryHover
                         downColor: page.primaryDown
@@ -515,7 +508,7 @@ Page {
                         borderHover: page.primaryBorderHover
                         borderDown: page.primaryBorderHover
                         borderDisabled: page.border
-                        contentColor: loginButton.enabled ? "#EAF2FF" : page.textMuted
+                        contentColor: loginButton.enabled ? "#FFFFFF" : page.textMuted
                         textPixelSize: 16
                         textBold: true
                         hoverScale: 1.004
@@ -545,17 +538,16 @@ Page {
                         Layout.alignment: Qt.AlignHCenter
                         Layout.preferredHeight: 44
 
-                        radius: 14
                         baseColor: "transparent"
-                        hoverColor: "#172234"
-                        downColor: "#1E2632"
+                        hoverColor: "#222222"
+                        downColor: "#111111"
                         disabledColor: "transparent"
                         borderBase: "transparent"
-                        borderHover: "#2A4566"
-                        borderDown: "#2C4D72"
+                        borderHover: "#555555"
+                        borderDown: "#777777"
                         borderDisabled: "transparent"
                         borderAlwaysVisible: false
-                        contentColor: forgotButton.hovered ? "#78ADFA" : page.accent
+                        contentColor: "#FFFFFF"
                         textPixelSize: 14
                         textBold: true
                         hoverScale: 1.006
@@ -576,7 +568,6 @@ Page {
             }
         }
     }
-
 
     component AppButton: Rectangle {
         id: button
@@ -642,10 +633,9 @@ Page {
         Rectangle {
             anchors.fill: parent
             anchors.margins: 3
-            radius: Math.max(0, button.radius - 3)
             color: "transparent"
             border.width: 1
-            border.color: "#8AB8FF"
+            border.color: "#FFFFFF"
             opacity: button.innerGlow && button.hovered ? 0.13 : 0.0
 
             Behavior on opacity {
@@ -701,8 +691,7 @@ Page {
 
         Layout.preferredHeight: 56
 
-        radius: 18
-        color: input.activeFocus ? page.surface3 : (fieldHover.hovered ? "#232934" : page.surface2)
+        color: input.activeFocus ? page.surface3 : (fieldHover.hovered ? "#333333" : page.surface2)
         border.width: input.activeFocus ? 2 : 1
         border.color: input.activeFocus ? page.accent : (fieldHover.hovered ? page.hoverBorder : page.border)
         scale: input.activeFocus ? 1.002 : (fieldHover.hovered ? 1.001 : 1.0)
@@ -735,7 +724,6 @@ Page {
         Rectangle {
             anchors.fill: parent
             anchors.margins: 1
-            radius: field.radius - 1
             color: page.accentSoft
             opacity: input.activeFocus ? 0.12 : (fieldHover.hovered ? 0.07 : 0.0)
 
@@ -758,7 +746,7 @@ Page {
 
             color: page.textMain
             selectionColor: page.accent
-            selectedTextColor: "#FFFFFF"
+            selectedTextColor: "#000000"
             font.pixelSize: 16
 
             verticalAlignment: TextInput.AlignVCenter
@@ -829,8 +817,9 @@ Page {
             ctx.strokeStyle = icon.iconColor
             ctx.fillStyle = icon.iconColor
             ctx.lineWidth = Math.max(1.8, s * 0.085)
-            ctx.lineCap = "round"
-            ctx.lineJoin = "round"
+
+            ctx.lineCap = "square"
+            ctx.lineJoin = "miter"
 
             function px(v) {
                 return x + s * v
@@ -840,22 +829,14 @@ Page {
                 return y + s * v
             }
 
-            function roundedRectPath(left, top, w, h, r) {
+            function rectPath(left, top, w, h) {
                 ctx.beginPath()
-                ctx.moveTo(left + r, top)
-                ctx.lineTo(left + w - r, top)
-                ctx.quadraticCurveTo(left + w, top, left + w, top + r)
-                ctx.lineTo(left + w, top + h - r)
-                ctx.quadraticCurveTo(left + w, top + h, left + w - r, top + h)
-                ctx.lineTo(left + r, top + h)
-                ctx.quadraticCurveTo(left, top + h, left, top + h - r)
-                ctx.lineTo(left, top + r)
-                ctx.quadraticCurveTo(left, top, left + r, top)
-                ctx.closePath()
+                ctx.rect(left, top, w, h)
             }
 
             if (icon.name === "slot") {
-                roundedRectPath(px(0.16), py(0.20), s * 0.68, s * 0.60, s * 0.11)
+
+                rectPath(px(0.16), py(0.20), s * 0.68, s * 0.60)
                 ctx.stroke()
 
                 ctx.beginPath()
@@ -865,9 +846,8 @@ Page {
                 ctx.lineTo(px(0.66), py(0.80))
                 ctx.stroke()
 
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.08, 0, Math.PI * 2)
-                ctx.fill()
+
+                ctx.fillRect(px(0.5) - s * 0.08, py(0.5) - s * 0.08, s * 0.16, s * 0.16)
             } else if (icon.name === "warning") {
                 ctx.beginPath()
                 ctx.moveTo(px(0.5), py(0.14))
@@ -881,13 +861,11 @@ Page {
                 ctx.lineTo(px(0.5), py(0.58))
                 ctx.stroke()
 
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.69), s * 0.025, 0, Math.PI * 2)
-                ctx.fill()
+
+                ctx.fillRect(px(0.5) - s * 0.025, py(0.69) - s * 0.025, s * 0.05, s * 0.05)
             } else {
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.08, 0, Math.PI * 2)
-                ctx.fill()
+
+                ctx.fillRect(px(0.5) - s * 0.08, py(0.5) - s * 0.08, s * 0.16, s * 0.16)
             }
         }
     }

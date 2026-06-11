@@ -46,18 +46,19 @@ Item {
     property string stubTitle: ""
     property string stubText: ""
 
-    readonly property color bg: "#111318"
-    readonly property color surface: "#181B21"
-    readonly property color surface2: "#20242C"
-    readonly property color surface3: "#2A2F39"
-    readonly property color border: "#313640"
-    readonly property color textMain: "#F4F6F8"
-    readonly property color textSub: "#C8CDD4"
-    readonly property color textMuted: "#8D96A3"
-    readonly property color accent: "#6EA8FE"
-    readonly property color accentSoft: "#1C2B44"
-    readonly property color danger: "#FF6B6B"
-    readonly property color dangerSoft: "#3A2023"
+
+    readonly property color bg: "#000000"
+    readonly property color surface: "#111111"
+    readonly property color surface2: "#222222"
+    readonly property color surface3: "#333333"
+    readonly property color border: "#555555"
+    readonly property color textMain: "#FFFFFF"
+    readonly property color textSub: "#DDDDDD"
+    readonly property color textMuted: "#AAAAAA"
+    readonly property color accent: "#FFFFFF"
+    readonly property color accentSoft: "#333333"
+    readonly property color danger: "#FFFFFF"
+    readonly property color dangerSoft: "#222222"
 
     function responseCmd(response) {
         if (!response)
@@ -584,7 +585,7 @@ Item {
                 Layout.rightMargin: 20
                 spacing: 10
 
-               ActionRow  {
+                ActionRow  {
                     visible: false
                     title: "Сменить email"
                     subtitle: "Раздел пока в разработке"
@@ -656,7 +657,6 @@ Item {
 
         background: Rectangle {
             color: page.surface
-            radius: 24
             border.width: 1
             border.color: page.border
         }
@@ -667,7 +667,6 @@ Item {
             Rectangle {
                 Layout.preferredWidth: 52
                 Layout.preferredHeight: 52
-                radius: 18
                 color: page.accentSoft
 
                 DrawIcon {
@@ -700,24 +699,23 @@ Item {
             }
         }
         footer: Item {
+            implicitHeight: 54
 
-                    implicitHeight: 54
+            RowLayout {
+                anchors.fill: parent
+                anchors.leftMargin: 16
+                anchors.rightMargin: 16
+                anchors.bottomMargin: 16
+                spacing: 0
 
-                    RowLayout {
-                    anchors.fill: parent
-                    anchors.leftMargin: 16
-                    anchors.rightMargin: 16
-                    anchors.bottomMargin: 16
-                    spacing: 0
+                AppButton {
+                    id: stubOkButton
 
-                    AppButton {
-                        id: stubOkButton
+                    text: "Понятно"
+                    variant: "primary"
 
-                        text: "Понятно"
-                        variant: "primary"
-
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 38
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 38
 
                     onClicked: {
                         stubDialog.close()
@@ -739,7 +737,6 @@ Item {
 
         background: Rectangle {
             color: page.surface
-            radius: 24
             border.width: 1
             border.color: page.border
         }
@@ -750,7 +747,6 @@ Item {
             Rectangle {
                 Layout.preferredWidth: 52
                 Layout.preferredHeight: 52
-                radius: 18
                 color: page.dangerSoft
 
                 DrawIcon {
@@ -784,54 +780,53 @@ Item {
         }
 
         footer: Item {
+            implicitHeight: 54
 
-        implicitHeight: 54
+            RowLayout {
+                anchors.fill: parent
+                anchors.leftMargin: 16
+                anchors.rightMargin: 16
+                anchors.bottomMargin: 16
+                spacing: 12
 
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.leftMargin: 16
-                        anchors.rightMargin: 16
-                        anchors.bottomMargin: 16
-                        spacing: 12
+                AppButton {
+                    id: cancelLogoutButton
 
-                        AppButton {
-                            id: cancelLogoutButton
+                    text: "Отмена"
+                    variant: "neutral"
+                    enabled: !page.loggingOut
 
-                            text: "Отмена"
-                            variant: "neutral"
-                            enabled: !page.loggingOut
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 38
 
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 38
-
-                            onClicked: {
-                                logoutDialog.close()
-                            }
-                        }
-
-                        AppButton {
-                            id: confirmLogoutButton
-
-                            text: "Выйти"
-                            variant: "danger"
-                            enabled: !page.loggingOut
-
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 38
-
-                            onClicked: {
-                                logoutDialog.close()
-
-                                if (page.loggingOut)
-                                    return
-
-                                page.loggingOut = true
-                                page.waitingProfile = false
-                                page.logoutRequested()
-                            }
-                        }
+                    onClicked: {
+                        logoutDialog.close()
                     }
                 }
+
+                AppButton {
+                    id: confirmLogoutButton
+
+                    text: "Выйти"
+                    variant: "danger"
+                    enabled: !page.loggingOut
+
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 38
+
+                    onClicked: {
+                        logoutDialog.close()
+
+                        if (page.loggingOut)
+                            return
+
+                        page.loggingOut = true
+                        page.waitingProfile = false
+                        page.logoutRequested()
+                    }
+                }
+            }
+        }
     }
 
     component ProfileCard: Rectangle {
@@ -844,10 +839,9 @@ Item {
         property bool hovered: hoverArea.containsMouse
         property bool pressed: hoverArea.pressed
 
-        color: card.pressed ? page.surface3 : card.hovered ? "#1D2230" : page.surface
-        radius: 26
+        color: card.pressed ? page.surface3 : card.hovered ? "#222222" : page.surface
         border.width: 1
-        border.color: card.hovered ? "#284568" : page.border
+        border.color: card.hovered ? "#777777" : page.border
         scale: card.pressed ? 0.992 : card.hovered ? 1.006 : 1.0
 
         Layout.preferredHeight: profileLayout.implicitHeight + 32
@@ -885,10 +879,9 @@ Item {
                 Rectangle {
                     Layout.preferredWidth: 76
                     Layout.preferredHeight: 76
-                    radius: 24
                     color: page.accentSoft
                     border.width: 1
-                    border.color: card.hovered ? page.accent : "#284568"
+                    border.color: card.hovered ? page.accent : "#555555"
 
                     Behavior on border.color {
                         ColorAnimation {
@@ -908,7 +901,6 @@ Item {
                         visible: card.loading
                         width: 18
                         height: 18
-                        radius: 9
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
                         color: page.accent
@@ -964,10 +956,9 @@ Item {
             Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: emailText.implicitHeight + 24
-                radius: 18
-                color: card.hovered ? "#222837" : page.surface2
+                color: card.hovered ? "#333333" : page.surface2
                 border.width: 1
-                border.color: card.hovered ? "#284568" : page.border
+                border.color: card.hovered ? "#777777" : page.border
 
                 Behavior on color {
                     ColorAnimation {
@@ -1043,10 +1034,9 @@ Item {
         property bool hovered: hoverHandler.hovered
         property bool pressed: false
 
-        color: card.hovered ? "#1D2230" : page.surface
-        radius: 22
+        color: card.hovered ? "#222222" : page.surface
         border.width: 1
-        border.color: card.hovered ? "#284568" : page.border
+        border.color: card.hovered ? "#777777" : page.border
         scale: card.pressed ? 0.995 : card.hovered ? 1.004 : 1.0
 
         Layout.preferredHeight: cardColumn.implicitHeight
@@ -1112,7 +1102,6 @@ Item {
             anchors.rightMargin: 6
             anchors.topMargin: 4
             anchors.bottomMargin: 4
-            radius: 18
             color: row.hovered ? page.surface2 : "transparent"
             opacity: row.hovered ? 1.0 : 0.0
 
@@ -1137,10 +1126,9 @@ Item {
             Rectangle {
                 Layout.preferredWidth: 42
                 Layout.preferredHeight: 42
-                radius: 15
                 color: row.hovered ? page.accentSoft : page.surface2
                 border.width: 1
-                border.color: row.hovered ? "#284568" : "transparent"
+                border.color: row.hovered ? "#777777" : "transparent"
 
                 Behavior on color {
                     ColorAnimation {
@@ -1229,19 +1217,18 @@ Item {
 
         Rectangle {
             anchors.fill: parent
-            radius: 22
             color: {
                 if (action.danger)
-                    return action.pressed ? "#44272A" : action.hovered ? "#3A2023" : page.dangerSoft
+                    return action.pressed ? "#333333" : action.hovered ? "#222222" : page.dangerSoft
 
-                return action.pressed ? page.surface3 : action.hovered ? "#1D2230" : page.surface
+                return action.pressed ? page.surface3 : action.hovered ? "#222222" : page.surface
             }
             border.width: 1
             border.color: {
                 if (action.danger)
-                    return action.hovered ? page.danger : "#5A2D31"
+                    return action.hovered ? page.danger : "#555555"
 
-                return action.hovered ? "#284568" : page.border
+                return action.hovered ? "#777777" : page.border
             }
 
             Behavior on color {
@@ -1266,10 +1253,9 @@ Item {
             Rectangle {
                 Layout.preferredWidth: 44
                 Layout.preferredHeight: 44
-                radius: 16
-                color: action.danger ? "#4A2529" : action.hovered ? page.accentSoft : page.surface2
+                color: action.danger ? "#333333" : action.hovered ? page.accentSoft : page.surface2
                 border.width: action.hovered && !action.danger ? 1 : 0
-                border.color: "#284568"
+                border.color: "#777777"
 
                 Behavior on color {
                     ColorAnimation {
@@ -1303,7 +1289,7 @@ Item {
 
                 Text {
                     text: action.subtitle
-                    color: action.danger ? "#E79499" : page.textMuted
+                    color: action.danger ? "#DDDDDD" : page.textMuted
                     font.pixelSize: 12
                     maximumLineCount: 1
                     elide: Text.ElideRight
@@ -1359,10 +1345,9 @@ Item {
 
         Rectangle {
             anchors.fill: parent
-            radius: 16
             color: button.pressed ? page.surface3 : button.hovered ? page.accentSoft : page.surface
             border.width: 1
-            border.color: button.hovered ? "#284568" : page.border
+            border.color: button.hovered ? "#777777" : page.border
 
             Behavior on color {
                 ColorAnimation {
@@ -1415,9 +1400,8 @@ Item {
         property bool loading: false
 
         color: page.dangerSoft
-        radius: 22
         border.width: 1
-        border.color: "#5A2D31"
+        border.color: "#555555"
 
         Layout.preferredHeight: errorColumn.implicitHeight + 24
 
@@ -1435,8 +1419,7 @@ Item {
                 Rectangle {
                     Layout.preferredWidth: 42
                     Layout.preferredHeight: 42
-                    radius: 15
-                    color: "#4A2529"
+                    color: "#333333"
 
                     DrawIcon {
                         anchors.centerIn: parent
@@ -1449,7 +1432,7 @@ Item {
 
                 Text {
                     text: box.text
-                    color: "#FFD7DA"
+                    color: "#FFFFFF"
                     font.pixelSize: 13
                     font.bold: true
                     wrapMode: Text.WordWrap
@@ -1499,31 +1482,30 @@ Item {
 
         Rectangle {
             anchors.fill: parent
-            radius: 16
 
             color: {
                 if (!button.enabled)
                     return page.surface3
 
                 if (button.variant === "danger")
-                    return button.pressed ? "#C94D4D" : button.hovered ? "#E85D5D" : page.danger
+                    return button.pressed ? "#222222" : button.hovered ? "#444444" : page.surface3
 
                 if (button.variant === "dangerOutline")
-                    return button.pressed ? "#5A2D31" : button.hovered ? "#3A2023" : "transparent"
+                    return button.pressed ? "#111111" : button.hovered ? "#222222" : "transparent"
 
                 if (button.variant === "neutral")
-                    return button.pressed ? page.surface3 : button.hovered ? "#242A34" : page.surface2
+                    return button.pressed ? "#111111" : button.hovered ? "#333333" : page.surface2
 
-                return button.pressed ? "#255FA9" : button.hovered ? "#2B6CBE" : page.accent
+                return button.pressed ? "#222222" : button.hovered ? "#444444" : page.surface3
             }
 
             border.width: button.variant === "neutral" || button.variant === "dangerOutline" ? 1 : 0
             border.color: {
                 if (button.variant === "dangerOutline")
-                    return page.danger
+                    return page.border
 
                 if (button.variant === "neutral")
-                    return button.hovered ? "#284568" : page.border
+                    return button.hovered ? "#777777" : page.border
 
                 return "transparent"
             }
@@ -1599,8 +1581,9 @@ Item {
             ctx.strokeStyle = icon.iconColor
             ctx.fillStyle = icon.iconColor
             ctx.lineWidth = Math.max(1.8, s * 0.08)
-            ctx.lineCap = "round"
-            ctx.lineJoin = "round"
+
+            ctx.lineCap = "square"
+            ctx.lineJoin = "miter"
 
             function px(v) {
                 return x + s * v
@@ -1611,69 +1594,49 @@ Item {
             }
 
             if (icon.name === "refresh") {
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.28, 0.25 * Math.PI, 1.7 * Math.PI)
-                ctx.stroke()
 
                 ctx.beginPath()
-                ctx.moveTo(px(0.72), py(0.18))
-                ctx.lineTo(px(0.82), py(0.17))
-                ctx.lineTo(px(0.78), py(0.31))
+                ctx.moveTo(px(0.2), py(0.4))
+                ctx.lineTo(px(0.2), py(0.2))
+                ctx.lineTo(px(0.8), py(0.2))
+                ctx.lineTo(px(0.8), py(0.8))
+                ctx.lineTo(px(0.4), py(0.8))
                 ctx.stroke()
 
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.28, 1.25 * Math.PI, 0.7 * Math.PI)
-                ctx.stroke()
 
                 ctx.beginPath()
-                ctx.moveTo(px(0.28), py(0.82))
-                ctx.lineTo(px(0.18), py(0.83))
-                ctx.lineTo(px(0.22), py(0.69))
+                ctx.moveTo(px(0.5), py(0.7))
+                ctx.lineTo(px(0.4), py(0.8))
+                ctx.lineTo(px(0.5), py(0.9))
                 ctx.stroke()
             } else if (icon.name === "mail") {
+                ctx.strokeRect(px(0.14), py(0.24), s * 0.72, s * 0.52)
                 ctx.beginPath()
-                ctx.roundedRect(px(0.14), py(0.24), s * 0.72, s * 0.52, s * 0.08, s * 0.08)
-                ctx.stroke()
-
-                ctx.beginPath()
-                ctx.moveTo(px(0.16), py(0.3))
+                ctx.moveTo(px(0.14), py(0.24))
                 ctx.lineTo(px(0.5), py(0.55))
-                ctx.lineTo(px(0.84), py(0.3))
+                ctx.lineTo(px(0.86), py(0.24))
                 ctx.stroke()
             } else if (icon.name === "lock") {
+                ctx.strokeRect(px(0.2), py(0.42), s * 0.6, s * 0.38)
                 ctx.beginPath()
-                ctx.roundedRect(px(0.2), py(0.42), s * 0.6, s * 0.38, s * 0.08, s * 0.08)
+                ctx.moveTo(px(0.3), py(0.42))
+                ctx.lineTo(px(0.3), py(0.2))
+                ctx.lineTo(px(0.7), py(0.2))
+                ctx.lineTo(px(0.7), py(0.42))
                 ctx.stroke()
 
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.42), s * 0.19, Math.PI, 0, false)
-                ctx.stroke()
-
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.6), s * 0.035, 0, Math.PI * 2)
-                ctx.fill()
-
-                ctx.beginPath()
-                ctx.moveTo(px(0.5), py(0.63))
-                ctx.lineTo(px(0.5), py(0.7))
-                ctx.stroke()
+                var ks = s * 0.08
+                ctx.fillRect(px(0.5) - ks/2, py(0.6) - ks/2, ks, ks)
             } else if (icon.name === "devices") {
-                ctx.beginPath()
-                ctx.roundedRect(px(0.12), py(0.22), s * 0.5, s * 0.38, s * 0.06, s * 0.06)
-                ctx.stroke()
-
-                ctx.beginPath()
-                ctx.roundedRect(px(0.56), py(0.42), s * 0.28, s * 0.38, s * 0.06, s * 0.06)
-                ctx.stroke()
-
+                ctx.strokeRect(px(0.12), py(0.22), s * 0.5, s * 0.38)
+                ctx.strokeRect(px(0.56), py(0.42), s * 0.28, s * 0.38)
                 ctx.beginPath()
                 ctx.moveTo(px(0.34), py(0.68))
                 ctx.lineTo(px(0.48), py(0.68))
                 ctx.stroke()
 
-                ctx.beginPath()
-                ctx.arc(px(0.7), py(0.72), s * 0.015, 0, Math.PI * 2)
-                ctx.fill()
+                var ds = s * 0.04
+                ctx.fillRect(px(0.7) - ds/2, py(0.72) - ds/2, ds, ds)
             } else if (icon.name === "logout") {
                 ctx.beginPath()
                 ctx.moveTo(px(0.18), py(0.2))
@@ -1692,24 +1655,15 @@ Item {
                 ctx.lineTo(px(0.68), py(0.66))
                 ctx.stroke()
             } else if (icon.name === "phone") {
+                ctx.strokeRect(px(0.3), py(0.15), s * 0.4, s * 0.7)
                 ctx.beginPath()
-                ctx.moveTo(px(0.3), py(0.18))
-                ctx.quadraticCurveTo(px(0.2), py(0.22), px(0.24), py(0.36))
-                ctx.quadraticCurveTo(px(0.35), py(0.7), px(0.64), py(0.78))
-                ctx.quadraticCurveTo(px(0.78), py(0.82), px(0.83), py(0.7))
-                ctx.lineTo(px(0.72), py(0.6))
-                ctx.quadraticCurveTo(px(0.67), py(0.55), px(0.6), py(0.6))
-                ctx.lineTo(px(0.53), py(0.65))
-                ctx.quadraticCurveTo(px(0.38), py(0.56), px(0.34), py(0.42))
-                ctx.lineTo(px(0.42), py(0.35))
-                ctx.quadraticCurveTo(px(0.47), py(0.3), px(0.42), py(0.24))
-                ctx.lineTo(px(0.3), py(0.18))
+                ctx.moveTo(px(0.45), py(0.22))
+                ctx.lineTo(px(0.55), py(0.22))
                 ctx.stroke()
+                var ps = s * 0.06
+                ctx.fillRect(px(0.5) - ps/2, py(0.75) - ps/2, ps, ps)
             } else if (icon.name === "calendar") {
-                ctx.beginPath()
-                ctx.roundedRect(px(0.16), py(0.22), s * 0.68, s * 0.6, s * 0.08, s * 0.08)
-                ctx.stroke()
-
+                ctx.strokeRect(px(0.16), py(0.22), s * 0.68, s * 0.6)
                 ctx.beginPath()
                 ctx.moveTo(px(0.16), py(0.4))
                 ctx.lineTo(px(0.84), py(0.4))
@@ -1722,19 +1676,13 @@ Item {
                 ctx.lineTo(px(0.68), py(0.28))
                 ctx.stroke()
 
-                ctx.beginPath()
-                ctx.arc(px(0.36), py(0.56), s * 0.025, 0, Math.PI * 2)
-                ctx.arc(px(0.5), py(0.56), s * 0.025, 0, Math.PI * 2)
-                ctx.arc(px(0.64), py(0.56), s * 0.025, 0, Math.PI * 2)
-                ctx.fill()
+                var cds = s * 0.06
+                ctx.fillRect(px(0.36) - cds/2, py(0.56) - cds/2, cds, cds)
+                ctx.fillRect(px(0.5) - cds/2, py(0.56) - cds/2, cds, cds)
+                ctx.fillRect(px(0.64) - cds/2, py(0.56) - cds/2, cds, cds)
             } else if (icon.name === "user") {
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.34), s * 0.16, 0, Math.PI * 2)
-                ctx.stroke()
-
-                ctx.beginPath()
-                ctx.roundedRect(px(0.24), py(0.58), s * 0.52, s * 0.24, s * 0.12, s * 0.12)
-                ctx.stroke()
+                ctx.strokeRect(px(0.34), py(0.17), s * 0.32, s * 0.32)
+                ctx.strokeRect(px(0.24), py(0.58), s * 0.52, s * 0.24)
             } else if (icon.name === "chevron") {
                 ctx.beginPath()
                 ctx.moveTo(px(0.38), py(0.24))
@@ -1754,26 +1702,23 @@ Item {
                 ctx.lineTo(px(0.5), py(0.58))
                 ctx.stroke()
 
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.69), s * 0.025, 0, Math.PI * 2)
-                ctx.fill()
+                var wds = s * 0.05
+                ctx.fillRect(px(0.5) - wds/2, py(0.69) - wds/2, wds, wds)
             } else if (icon.name === "info") {
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.34, 0, Math.PI * 2)
-                ctx.stroke()
-
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.32), s * 0.025, 0, Math.PI * 2)
-                ctx.fill()
+                ctx.strokeRect(px(0.16), py(0.16), s * 0.68, s * 0.68)
+                var ids = s * 0.06
+                ctx.fillRect(px(0.5) - ids/2, py(0.32) - ids/2, ids, ids)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.5), py(0.46))
                 ctx.lineTo(px(0.5), py(0.68))
                 ctx.stroke()
+            } else if (icon.name === "dot") {
+                var dotS = s * 0.16
+                ctx.fillRect(px(0.5) - dotS/2, py(0.5) - dotS/2, dotS, dotS)
             } else {
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.08, 0, Math.PI * 2)
-                ctx.fill()
+                var defs = s * 0.16
+                ctx.fillRect(px(0.5) - defs/2, py(0.5) - defs/2, defs, defs)
             }
         }
     }

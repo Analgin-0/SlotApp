@@ -56,20 +56,20 @@ Item {
     readonly property bool loading: loadingGroups || loadingSubjects || loadingTeachers || loadingLessonTimes || saving || addingSubject
     readonly property bool isEditMode: editingScheduleId > 0
 
-    readonly property color bg: "#111318"
-    readonly property color surface: "#181B21"
-    readonly property color surface2: "#20242C"
-    readonly property color surface3: "#2A2F39"
-    readonly property color border: "#313640"
-    readonly property color textMain: "#F4F6F8"
-    readonly property color textSub: "#C8CDD4"
-    readonly property color textMuted: "#8D96A3"
-    readonly property color accent: "#6EA8FE"
-    readonly property color accentSoft: "#1C2B44"
-    readonly property color danger: "#FF6B6B"
-    readonly property color dangerSoft: "#3A2023"
-    readonly property color success: "#6EE7A8"
-    readonly property color successSoft: "#173427"
+    readonly property color bg: "#111111"
+    readonly property color surface: "#1A1A1A"
+    readonly property color surface2: "#222222"
+    readonly property color surface3: "#333333"
+    readonly property color border: "#555555"
+    readonly property color textMain: "#FFFFFF"
+    readonly property color textSub: "#DDDDDD"
+    readonly property color textMuted: "#AAAAAA"
+    readonly property color accent: "#DDDDDD"
+    readonly property color accentSoft: "#222222"
+    readonly property color danger: "#FFFFFF"
+    readonly property color dangerSoft: "#333333"
+    readonly property color success: "#FFFFFF"
+    readonly property color successSoft: "#222222"
 
     ListModel { id: groupModel }
     ListModel { id: subjectModel }
@@ -1573,7 +1573,7 @@ Item {
 
         background: Rectangle {
             color: page.surface
-            radius: 24
+            radius: 0
             border.width: 1
             border.color: page.border
         }
@@ -1634,13 +1634,13 @@ Item {
                     Layout.preferredHeight: 48
 
                     background: Rectangle {
-                        radius: 17
-                        color: confirmAddGroupButton.down ? "#5B95EA" : page.accent
+                        radius: 0
+                        color: confirmAddGroupButton.down ? "#AAAAAA" : "#FFFFFF"
                     }
 
                     contentItem: Text {
                         text: confirmAddGroupButton.text
-                        color: "#FFFFFF"
+                        color: "#000000"
                         font.pixelSize: 14
                         font.bold: true
                         horizontalAlignment: Text.AlignHCenter
@@ -1668,7 +1668,7 @@ Item {
 
         background: Rectangle {
             color: page.surface
-            radius: 24
+            radius: 0
             border.width: 1
             border.color: page.border
         }
@@ -1751,17 +1751,17 @@ Item {
                     Layout.preferredHeight: 48
 
                     background: Rectangle {
-                        radius: 17
+                        radius: 0
                         color: !confirmAddSubjectButton.enabled
                                ? page.surface3
                                : confirmAddSubjectButton.down
-                                 ? "#5B95EA"
-                                 : page.accent
+                                 ? "#AAAAAA"
+                                 : "#FFFFFF"
                     }
 
                     contentItem: Text {
                         text: confirmAddSubjectButton.text
-                        color: "#FFFFFF"
+                        color: "#000000"
                         font.pixelSize: 14
                         font.bold: true
                         horizontalAlignment: Text.AlignHCenter
@@ -1778,7 +1778,7 @@ Item {
 
     component HeaderCard: Rectangle {
         color: page.surface
-        radius: 26
+        radius: 0
         border.width: 1
         border.color: page.border
 
@@ -1806,17 +1806,17 @@ Item {
             Rectangle {
                 Layout.preferredWidth: 58
                 Layout.preferredHeight: 58
-                radius: 20
-                color: page.accentSoft
+                radius: 0
+                color: page.surface3
                 border.width: 1
-                border.color: "#284568"
+                border.color: page.border
 
                 DrawIcon {
                     anchors.centerIn: parent
                     width: 30
                     height: 30
                     name: "calendar"
-                    iconColor: page.accent
+                    iconColor: page.textMain
                 }
             }
 
@@ -1864,7 +1864,7 @@ Item {
 
     component FormCard: Rectangle {
         color: page.surface
-        radius: 26
+        radius: 0
         border.width: 1
         border.color: page.border
 
@@ -2103,8 +2103,8 @@ Item {
                 visible: page.loadingTeachers
                 iconName: "clock"
                 text: "Загружаю преподавателей..."
-                iconColor: page.accent
-                bgColor: page.accentSoft
+                iconColor: page.textMuted
+                bgColor: page.surface2
 
                 Layout.fillWidth: true
             }
@@ -2213,7 +2213,7 @@ Item {
 
             Rectangle {
                 color: page.surface2
-                radius: 18
+                radius: 0
                 border.width: 1
                 border.color: page.border
 
@@ -2299,17 +2299,17 @@ Item {
                     Layout.preferredHeight: 50
 
                     background: Rectangle {
-                        radius: 17
+                        radius: 0
                         color: !saveButton.enabled
                                ? page.surface3
                                : saveButton.down
-                                 ? "#5B95EA"
-                                 : page.accent
+                                 ? "#AAAAAA"
+                                 : "#FFFFFF"
                     }
 
                     contentItem: Text {
                         text: saveButton.text
-                        color: "#FFFFFF"
+                        color: "#000000"
                         font.pixelSize: 14
                         font.bold: true
                         horizontalAlignment: Text.AlignHCenter
@@ -2330,10 +2330,10 @@ Item {
         property string title: ""
         property string cabinet: ""
 
-        radius: 20
-        color: page.accentSoft
+        radius: 0
+        color: page.surface3
         border.width: 1
-        border.color: "#284568"
+        border.color: page.border
 
         Layout.preferredHeight: content.implicitHeight + 24
 
@@ -2347,15 +2347,15 @@ Item {
             Rectangle {
                 Layout.preferredWidth: 38
                 Layout.preferredHeight: 38
-                radius: 14
-                color: page.accent
+                radius: 0
+                color: "#FFFFFF"
 
                 DrawIcon {
                     anchors.centerIn: parent
                     width: 20
                     height: 20
                     name: box.title === "Без преподавателя" ? "user" : "check"
-                    iconColor: "#FFFFFF"
+                    iconColor: "#000000"
                 }
             }
 
@@ -2365,7 +2365,7 @@ Item {
 
                 Text {
                     text: "Выбран преподаватель"
-                    color: page.accent
+                    color: page.textSub
                     font.pixelSize: 12
                     font.bold: true
 
@@ -2405,10 +2405,10 @@ Item {
         property string cabinet: ""
         property bool selected: false
 
-        radius: 20
-        color: selected ? page.accentSoft : page.surface2
+        radius: 0
+        color: selected ? page.surface3 : page.surface2
         border.width: selected ? 2 : 1
-        border.color: selected ? page.accent : page.border
+        border.color: selected ? "#FFFFFF" : page.border
 
         Layout.preferredHeight: rowContent.implicitHeight + 22
 
@@ -2422,17 +2422,17 @@ Item {
             Rectangle {
                 Layout.preferredWidth: 36
                 Layout.preferredHeight: 36
-                radius: 13
-                color: card.selected ? page.accent : page.surface3
+                radius: 0
+                color: card.selected ? "#FFFFFF" : page.surface3
                 border.width: 1
-                border.color: card.selected ? "#7FB5FF" : page.border
+                border.color: card.selected ? "#DDDDDD" : page.border
 
                 DrawIcon {
                     anchors.centerIn: parent
                     width: 19
                     height: 19
                     name: card.selected ? "check" : "user"
-                    iconColor: card.selected ? "#FFFFFF" : page.textMuted
+                    iconColor: card.selected ? "#000000" : page.textMuted
                 }
             }
 
@@ -2478,10 +2478,10 @@ Item {
         property string text: ""
         property bool danger: true
 
-        color: box.danger ? page.dangerSoft : page.successSoft
-        radius: 20
+        color: box.danger ? "#333333" : "#222222"
+        radius: 0
         border.width: 1
-        border.color: box.danger ? "#5A2D31" : "#24513C"
+        border.color: box.danger ? "#555555" : "#555555"
 
         Layout.preferredHeight: messageRow.implicitHeight + 24
 
@@ -2495,21 +2495,21 @@ Item {
             Rectangle {
                 Layout.preferredWidth: 38
                 Layout.preferredHeight: 38
-                radius: 14
-                color: box.danger ? "#4A2529" : "#123021"
+                radius: 0
+                color: box.danger ? "#222222" : "#111111"
 
                 DrawIcon {
                     anchors.centerIn: parent
                     width: 20
                     height: 20
                     name: box.danger ? "warning" : "check"
-                    iconColor: box.danger ? page.danger : page.success
+                    iconColor: "#FFFFFF"
                 }
             }
 
             Text {
                 text: box.text
-                color: box.danger ? "#FFD7DA" : "#D8FFE8"
+                color: "#FFFFFF"
                 font.pixelSize: 13
                 font.bold: true
                 wrapMode: Text.WordWrap
@@ -2525,10 +2525,10 @@ Item {
 
         property string iconName: ""
         property string text: ""
-        property color iconColor: page.accent
+        property color iconColor: page.textMuted
         property color bgColor: page.surface2
 
-        radius: 20
+        radius: 0
         color: msg.bgColor
         border.width: 1
         border.color: page.border
@@ -2545,8 +2545,8 @@ Item {
             Rectangle {
                 Layout.preferredWidth: 40
                 Layout.preferredHeight: 40
-                radius: 14
-                color: Qt.rgba(msg.iconColor.r, msg.iconColor.g, msg.iconColor.b, 0.14)
+                radius: 0
+                color: "#222222"
 
                 DrawIcon {
                     anchors.centerIn: parent
@@ -2586,23 +2586,23 @@ Item {
 
         color: page.textMain
         placeholderTextColor: page.textMuted
-        selectionColor: page.accent
-        selectedTextColor: "#FFFFFF"
+        selectionColor: "#AAAAAA"
+        selectedTextColor: "#000000"
 
         font.pixelSize: 15
         leftPadding: 16
         rightPadding: 16
 
         background: Rectangle {
-            radius: 17
+            radius: 0
             color: control.activeFocus ? page.surface3 : page.surface2
             border.width: control.activeFocus ? 2 : 1
-            border.color: control.activeFocus ? page.accent : page.border
+            border.color: control.activeFocus ? "#FFFFFF" : page.border
         }
 
         cursorDelegate: Rectangle {
             width: 2
-            color: page.accent
+            color: "#FFFFFF"
         }
     }
 
@@ -2614,8 +2614,8 @@ Item {
 
         color: page.textMain
         placeholderTextColor: page.textMuted
-        selectionColor: page.accent
-        selectedTextColor: "#FFFFFF"
+        selectionColor: "#AAAAAA"
+        selectedTextColor: "#000000"
 
         font.pixelSize: 15
         leftPadding: 16
@@ -2625,10 +2625,10 @@ Item {
         wrapMode: TextArea.Wrap
 
         background: Rectangle {
-            radius: 17
+            radius: 0
             color: control.activeFocus ? page.surface3 : page.surface2
             border.width: control.activeFocus ? 2 : 1
-            border.color: control.activeFocus ? page.accent : page.border
+            border.color: control.activeFocus ? "#FFFFFF" : page.border
         }
     }
 
@@ -2673,10 +2673,10 @@ Item {
         font.pixelSize: 15
 
         background: Rectangle {
-            radius: 17
+            radius: 0
             color: combo.activeFocus ? page.surface3 : page.surface2
             border.width: combo.activeFocus ? 2 : 1
-            border.color: combo.activeFocus ? page.accent : page.border
+            border.color: combo.activeFocus ? "#FFFFFF" : page.border
             opacity: combo.enabled ? 1.0 : 0.65
         }
 
@@ -2709,7 +2709,7 @@ Item {
 
             background: Rectangle {
                 color: page.surface2
-                radius: 18
+                radius: 0
                 border.width: 1
                 border.color: page.border
             }
@@ -2730,7 +2730,7 @@ Item {
             height: Math.max(44, delegateText.implicitHeight + 18)
 
             background: Rectangle {
-                radius: 14
+                radius: 0
                 color: delegateItem.highlighted ? page.surface3 : "transparent"
             }
 
@@ -2755,7 +2755,7 @@ Item {
         id: control
 
         background: Rectangle {
-            radius: 16
+            radius: 0
             color: !control.enabled ? page.surface3 : control.down ? page.surface3 : page.surface2
             border.width: 1
             border.color: page.border
@@ -2777,7 +2777,7 @@ Item {
         property string iconName: ""
 
         background: Rectangle {
-            radius: 16
+            radius: 0
             color: button.down ? page.surface3 : page.surface2
             border.width: 1
             border.color: page.border
@@ -2811,8 +2811,8 @@ Item {
             ctx.strokeStyle = icon.iconColor
             ctx.fillStyle = icon.iconColor
             ctx.lineWidth = Math.max(1.8, s * 0.085)
-            ctx.lineCap = "round"
-            ctx.lineJoin = "round"
+            ctx.lineCap = "square"
+            ctx.lineJoin = "miter"
 
             function px(v) {
                 return x + s * v
@@ -2822,20 +2822,6 @@ Item {
                 return y + s * v
             }
 
-            function roundedRectPath(left, top, w, h, r) {
-                ctx.beginPath()
-                ctx.moveTo(left + r, top)
-                ctx.lineTo(left + w - r, top)
-                ctx.quadraticCurveTo(left + w, top, left + w, top + r)
-                ctx.lineTo(left + w, top + h - r)
-                ctx.quadraticCurveTo(left + w, top + h, left + w - r, top + h)
-                ctx.lineTo(left + r, top + h)
-                ctx.quadraticCurveTo(left, top + h, left, top + h - r)
-                ctx.lineTo(left, top + r)
-                ctx.quadraticCurveTo(left, top, left + r, top)
-                ctx.closePath()
-            }
-
             if (icon.name === "back") {
                 ctx.beginPath()
                 ctx.moveTo(px(0.62), py(0.24))
@@ -2843,8 +2829,12 @@ Item {
                 ctx.lineTo(px(0.62), py(0.76))
                 ctx.stroke()
             } else if (icon.name === "calendar") {
-                roundedRectPath(px(0.14), py(0.22), s * 0.72, s * 0.62, s * 0.08)
-                ctx.stroke()
+
+                var calLeft = px(0.14)
+                var calTop = py(0.22)
+                var calW = s * 0.72
+                var calH = s * 0.62
+                ctx.strokeRect(calLeft, calTop, calW, calH)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.14), py(0.4))
@@ -2855,15 +2845,15 @@ Item {
                 ctx.lineTo(px(0.68), py(0.28))
                 ctx.stroke()
 
-                ctx.beginPath()
-                ctx.arc(px(0.34), py(0.56), s * 0.025, 0, Math.PI * 2)
-                ctx.arc(px(0.5), py(0.56), s * 0.025, 0, Math.PI * 2)
-                ctx.arc(px(0.66), py(0.56), s * 0.025, 0, Math.PI * 2)
-                ctx.fill()
+
+                var dotSize = s * 0.05
+                ctx.fillRect(px(0.34) - dotSize / 2, py(0.56) - dotSize / 2, dotSize, dotSize)
+                ctx.fillRect(px(0.5) - dotSize / 2, py(0.56) - dotSize / 2, dotSize, dotSize)
+                ctx.fillRect(px(0.66) - dotSize / 2, py(0.56) - dotSize / 2, dotSize, dotSize)
             } else if (icon.name === "clock") {
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.34, 0, Math.PI * 2)
-                ctx.stroke()
+
+                var clockSize = s * 0.68
+                ctx.strokeRect(px(0.5) - clockSize / 2, py(0.5) - clockSize / 2, clockSize, clockSize)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.5), py(0.3))
@@ -2883,13 +2873,13 @@ Item {
                 ctx.lineTo(px(0.5), py(0.58))
                 ctx.stroke()
 
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.69), s * 0.025, 0, Math.PI * 2)
-                ctx.fill()
+
+                var wDotSize = s * 0.05
+                ctx.fillRect(px(0.5) - wDotSize / 2, py(0.69) - wDotSize / 2, wDotSize, wDotSize)
             } else if (icon.name === "check") {
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.34, 0, Math.PI * 2)
-                ctx.stroke()
+
+                var checkSize = s * 0.68
+                ctx.strokeRect(px(0.5) - checkSize / 2, py(0.5) - checkSize / 2, checkSize, checkSize)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.34), py(0.51))
@@ -2897,14 +2887,16 @@ Item {
                 ctx.lineTo(px(0.68), py(0.39))
                 ctx.stroke()
             } else if (icon.name === "user") {
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.33), s * 0.16, 0, Math.PI * 2)
-                ctx.stroke()
+
+                var headSize = s * 0.32
+                ctx.strokeRect(px(0.5) - headSize / 2, py(0.33) - headSize / 2, headSize, headSize)
+
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.22), py(0.82))
-                ctx.quadraticCurveTo(px(0.25), py(0.58), px(0.5), py(0.58))
-                ctx.quadraticCurveTo(px(0.75), py(0.58), px(0.78), py(0.82))
+                ctx.lineTo(px(0.22), py(0.58))
+                ctx.lineTo(px(0.78), py(0.58))
+                ctx.lineTo(px(0.78), py(0.82))
                 ctx.stroke()
             } else if (icon.name === "chevronDown") {
                 ctx.beginPath()
@@ -2913,9 +2905,9 @@ Item {
                 ctx.lineTo(px(0.72), py(0.38))
                 ctx.stroke()
             } else {
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.08, 0, Math.PI * 2)
-                ctx.fill()
+
+                var fallbackSize = s * 0.16
+                ctx.fillRect(px(0.5) - fallbackSize / 2, py(0.5) - fallbackSize / 2, fallbackSize, fallbackSize)
             }
         }
     }

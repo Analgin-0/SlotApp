@@ -44,20 +44,21 @@ Item {
     property var selectedTopics: ["Другое"]
     property var teacherItems: []
 
-    readonly property color bg: "#111318"
-    readonly property color surface: "#181B21"
-    readonly property color surface2: "#20242C"
-    readonly property color surface3: "#2A2F39"
-    readonly property color border: "#313640"
-    readonly property color textMain: "#F4F6F8"
-    readonly property color textSub: "#C8CDD4"
-    readonly property color textMuted: "#8D96A3"
-    readonly property color accent: "#6EA8FE"
-    readonly property color accentSoft: "#1C2B44"
-    readonly property color success: "#6EE7A8"
-    readonly property color successSoft: "#173427"
-    readonly property color danger: "#FF6B6B"
-    readonly property color dangerSoft: "#3A2023"
+
+    readonly property color bg: "#000000"
+    readonly property color surface: "#111111"
+    readonly property color surface2: "#222222"
+    readonly property color surface3: "#333333"
+    readonly property color border: "#555555"
+    readonly property color textMain: "#FFFFFF"
+    readonly property color textSub: "#DDDDDD"
+    readonly property color textMuted: "#AAAAAA"
+    readonly property color accent: "#FFFFFF"
+    readonly property color accentSoft: "#333333"
+    readonly property color success: "#FFFFFF"
+    readonly property color successSoft: "#222222"
+    readonly property color danger: "#FFFFFF"
+    readonly property color dangerSoft: "#222222"
 
     focus: true
 
@@ -916,10 +917,9 @@ Item {
                             Layout.minimumWidth: 150
                             Layout.preferredHeight: 70
 
-                            radius: 20
                             color: dateSelectBox.pressed ? page.surface3 : dateSelectBox.hovered && page.desktopMode ? page.surface3 : page.surface2
                             border.width: dateSelectBox.hovered && page.desktopMode ? 2 : 1
-                            border.color: dateSelectBox.hovered && page.desktopMode ? "#284568" : page.border
+                            border.color: dateSelectBox.hovered && page.desktopMode ? "#555555" : page.border
                             scale: dateSelectBox.pressed ? 0.988 : dateSelectBox.hovered && page.desktopMode ? 1.004 : 1.0
 
                             Behavior on color { ColorAnimation { duration: 140 } }
@@ -942,10 +942,9 @@ Item {
                                 Rectangle {
                                     Layout.preferredWidth: 40
                                     Layout.preferredHeight: 40
-                                    radius: 14
                                     color: page.accentSoft
                                     border.width: 1
-                                    border.color: "#284568"
+                                    border.color: "#555555"
 
                                     DrawIcon {
                                         anchors.centerIn: parent
@@ -1072,7 +1071,6 @@ Item {
                             Layout.minimumWidth: 92
                             Layout.preferredHeight: 52
 
-                            radius: 18
                             color: page.surface2
                             border.width: 1
                             border.color: page.border
@@ -1249,7 +1247,6 @@ Item {
 
         background: Rectangle {
             color: page.surface
-            radius: 28
             border.width: 1
             border.color: page.border
         }
@@ -1352,7 +1349,6 @@ Item {
                 Layout.preferredHeight: 240
 
                 delegate: Rectangle {
-                    radius: 16
                     color: page.isSameDay(model.date, page.selectedDate)
                            ? page.accent
                            : "transparent"
@@ -1361,7 +1357,7 @@ Item {
                         anchors.centerIn: parent
                         text: model.day
                         color: page.isSameDay(model.date, page.selectedDate)
-                               ? "#FFFFFF"
+                               ? "#000000"
                                : model.month === dateDialog.pickerMonth
                                  ? page.textMain
                                  : page.textMuted
@@ -1411,9 +1407,8 @@ Item {
         property bool hovered: formHover.hovered
 
         color: card.hovered && page.desktopMode ? page.surface2 : page.surface
-        radius: 24
         border.width: 1
-        border.color: card.hovered && page.desktopMode ? "#284568" : page.border
+        border.color: card.hovered && page.desktopMode ? "#777777" : page.border
         scale: card.hovered && page.desktopMode ? 1.002 : 1.0
 
         implicitHeight: cardColumn.implicitHeight + 32
@@ -1446,10 +1441,9 @@ Item {
                 Rectangle {
                     Layout.preferredWidth: 38
                     Layout.preferredHeight: 38
-                    radius: 14
                     color: page.accentSoft
                     border.width: 1
-                    border.color: "#284568"
+                    border.color: "#555555"
 
                     DrawIcon {
                         anchors.centerIn: parent
@@ -1494,7 +1488,7 @@ Item {
         color: page.textMain
         placeholderTextColor: page.textMuted
         selectionColor: page.accent
-        selectedTextColor: "#FFFFFF"
+        selectedTextColor: "#000000"
 
         leftPadding: 16
         rightPadding: 16
@@ -1509,7 +1503,6 @@ Item {
         }
 
         background: Rectangle {
-            radius: 17
             color: control.activeFocus
                    ? page.surface3
                    : control.hovered && page.desktopMode
@@ -1521,7 +1514,7 @@ Item {
                           : control.activeFocus
                             ? page.accent
                             : control.hovered && page.desktopMode
-                              ? "#284568"
+                              ? "#777777"
                               : page.border
 
             Behavior on color { ColorAnimation { duration: 140 } }
@@ -1546,7 +1539,7 @@ Item {
         color: page.textMain
         placeholderTextColor: page.textMuted
         selectionColor: page.accent
-        selectedTextColor: "#FFFFFF"
+        selectedTextColor: "#000000"
 
         leftPadding: 16
         rightPadding: 16
@@ -1565,7 +1558,6 @@ Item {
         }
 
         background: Rectangle {
-            radius: 17
             color: control.activeFocus
                    ? page.surface3
                    : control.hovered && page.desktopMode
@@ -1575,7 +1567,7 @@ Item {
             border.color: control.activeFocus
                           ? page.accent
                           : control.hovered && page.desktopMode
-                            ? "#284568"
+                            ? "#777777"
                             : page.border
 
             Behavior on color { ColorAnimation { duration: 140 } }
@@ -1599,10 +1591,9 @@ Item {
         Layout.fillWidth: true
         Layout.preferredHeight: 76
 
-        radius: 20
-        color: box.hovered && page.desktopMode ? "#203553" : page.accentSoft
+        color: box.hovered && page.desktopMode ? "#333333" : page.accentSoft
         border.width: 1
-        border.color: box.hovered && page.desktopMode ? "#3D6697" : "#284568"
+        border.color: box.hovered && page.desktopMode ? "#777777" : "#555555"
 
         Behavior on color { ColorAnimation { duration: 140 } }
         Behavior on border.color { ColorAnimation { duration: 140 } }
@@ -1622,7 +1613,6 @@ Item {
                 Layout.preferredWidth: 40
                 Layout.preferredHeight: 40
 
-                radius: 15
                 color: page.accent
 
                 DrawIcon {
@@ -1630,7 +1620,7 @@ Item {
                     width: 22
                     height: 22
                     name: "check"
-                    iconColor: "#FFFFFF"
+                    iconColor: "#000000"
                 }
             }
 
@@ -1685,7 +1675,6 @@ Item {
         Layout.fillWidth: true
         Layout.preferredHeight: 74
 
-        radius: 20
         color: card.selected
                ? page.accentSoft
                : card.hovered && page.desktopMode
@@ -1695,7 +1684,7 @@ Item {
         border.color: card.selected
                       ? page.accent
                       : card.hovered && page.desktopMode
-                        ? "#284568"
+                        ? "#777777"
                         : page.border
         scale: mouseArea.pressed ? 0.988 : card.hovered && page.desktopMode ? 1.004 : 1.0
 
@@ -1713,10 +1702,9 @@ Item {
                 Layout.preferredWidth: 38
                 Layout.preferredHeight: 38
 
-                radius: 15
                 color: card.selected ? page.accent : card.hovered && page.desktopMode ? page.accentSoft : page.surface3
                 border.width: 1
-                border.color: card.selected || (card.hovered && page.desktopMode) ? "#7FB5FF" : page.border
+                border.color: card.selected || (card.hovered && page.desktopMode) ? "#FFFFFF" : page.border
 
                 Behavior on color { ColorAnimation { duration: 140 } }
                 Behavior on border.color { ColorAnimation { duration: 140 } }
@@ -1726,7 +1714,7 @@ Item {
                     width: 20
                     height: 20
                     name: card.selected ? "check" : "user"
-                    iconColor: card.selected ? "#FFFFFF" : card.hovered && page.desktopMode ? page.accent : page.textMuted
+                    iconColor: card.selected ? "#000000" : card.hovered && page.desktopMode ? page.accent : page.textMuted
                 }
             }
 
@@ -1789,10 +1777,9 @@ Item {
 
         Rectangle {
             anchors.fill: parent
-            radius: 16
             color: {
                 if (control.selected)
-                    return control.hovered && page.desktopMode ? "#203553" : page.accentSoft
+                    return control.hovered && page.desktopMode ? "#333333" : page.accentSoft
 
                 if (mouseArea.pressed)
                     return page.surface3
@@ -1803,7 +1790,7 @@ Item {
                 return page.surface2
             }
             border.width: control.selected || (control.hovered && page.desktopMode) ? 2 : 1
-            border.color: control.selected ? page.accent : control.hovered && page.desktopMode ? "#284568" : page.border
+            border.color: control.selected ? page.accent : control.hovered && page.desktopMode ? "#777777" : page.border
 
             Behavior on color { ColorAnimation { duration: 130 } }
             Behavior on border.color { ColorAnimation { duration: 130 } }
@@ -1856,7 +1843,6 @@ Item {
 
         Rectangle {
             anchors.fill: parent
-            radius: 16
             color: {
                 if (!control.enabled)
                     return page.surface2
@@ -1870,7 +1856,7 @@ Item {
                 return page.surface2
             }
             border.width: 1
-            border.color: control.hovered && page.desktopMode ? "#284568" : page.border
+            border.color: control.hovered && page.desktopMode ? "#777777" : page.border
 
             Behavior on color { ColorAnimation { duration: 130 } }
             Behavior on border.color { ColorAnimation { duration: 130 } }
@@ -1931,7 +1917,6 @@ Item {
 
         Rectangle {
             anchors.fill: parent
-            radius: 16
             color: {
                 if (mouseArea.pressed)
                     return page.accentSoft
@@ -1991,21 +1976,20 @@ Item {
 
         Rectangle {
             anchors.fill: parent
-            radius: 20
             color: {
                 if (!control.enabled)
                     return page.surface3
 
                 if (mouseArea.pressed)
-                    return "#255FA9"
+                    return "#222222"
 
                 if (control.hovered && page.desktopMode)
-                    return "#2B6CBE"
+                    return "#444444"
 
-                return page.accent
+                return page.surface3
             }
             border.width: 1
-            border.color: control.hovered && page.desktopMode ? "#9CC7FF" : "#7FB5FF"
+            border.color: control.hovered && page.desktopMode ? "#FFFFFF" : "#777777"
 
             Behavior on color { ColorAnimation { duration: 130 } }
             Behavior on border.color { ColorAnimation { duration: 130 } }
@@ -2045,10 +2029,9 @@ Item {
         property color bgColor: page.surface2
         property bool hovered: msgHover.hovered
 
-        radius: 18
         color: row.hovered && page.desktopMode ? page.surface3 : row.bgColor
         border.width: 1
-        border.color: row.hovered && page.desktopMode ? "#284568" : page.border
+        border.color: row.hovered && page.desktopMode ? "#777777" : page.border
 
         Layout.preferredHeight: msgLayout.implicitHeight + 22
 
@@ -2070,7 +2053,6 @@ Item {
             Rectangle {
                 Layout.preferredWidth: 36
                 Layout.preferredHeight: 36
-                radius: 13
                 color: Qt.rgba(row.iconColor.r, row.iconColor.g, row.iconColor.b, 0.14)
 
                 DrawIcon {
@@ -2126,8 +2108,9 @@ Item {
             ctx.strokeStyle = icon.iconColor
             ctx.fillStyle = icon.iconColor
             ctx.lineWidth = Math.max(1.8, s * 0.085)
-            ctx.lineCap = "round"
-            ctx.lineJoin = "round"
+
+            ctx.lineCap = "square"
+            ctx.lineJoin = "miter"
 
             function px(v) {
                 return x + s * v
@@ -2135,20 +2118,6 @@ Item {
 
             function py(v) {
                 return y + s * v
-            }
-
-            function roundedRectPath(left, top, w, h, r) {
-                ctx.beginPath()
-                ctx.moveTo(left + r, top)
-                ctx.lineTo(left + w - r, top)
-                ctx.quadraticCurveTo(left + w, top, left + w, top + r)
-                ctx.lineTo(left + w, top + h - r)
-                ctx.quadraticCurveTo(left + w, top + h, left + w - r, top + h)
-                ctx.lineTo(left + r, top + h)
-                ctx.quadraticCurveTo(left, top + h, left, top + h - r)
-                ctx.lineTo(left, top + r)
-                ctx.quadraticCurveTo(left, top, left + r, top)
-                ctx.closePath()
             }
 
             if (icon.name === "back") {
@@ -2170,8 +2139,7 @@ Item {
                 ctx.lineTo(px(0.38), py(0.72))
                 ctx.stroke()
             } else if (icon.name === "topic") {
-                roundedRectPath(px(0.18), py(0.22), s * 0.64, s * 0.56, s * 0.08)
-                ctx.stroke()
+                ctx.strokeRect(px(0.18), py(0.22), s * 0.64, s * 0.56)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.32), py(0.4))
@@ -2188,22 +2156,19 @@ Item {
                 ctx.closePath()
                 ctx.stroke()
 
-                ctx.beginPath()
-                ctx.arc(px(0.42), py(0.36), s * 0.035, 0, Math.PI * 2)
-                ctx.fill()
+                var ts = s * 0.07
+                ctx.fillRect(px(0.42) - ts / 2, py(0.36) - ts / 2, ts, ts)
             } else if (icon.name === "user") {
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.33), s * 0.16, 0, Math.PI * 2)
-                ctx.stroke()
+                ctx.strokeRect(px(0.34), py(0.17), s * 0.32, s * 0.32)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.22), py(0.82))
-                ctx.quadraticCurveTo(px(0.25), py(0.58), px(0.5), py(0.58))
-                ctx.quadraticCurveTo(px(0.75), py(0.58), px(0.78), py(0.82))
+                ctx.lineTo(px(0.22), py(0.58))
+                ctx.lineTo(px(0.78), py(0.58))
+                ctx.lineTo(px(0.78), py(0.82))
                 ctx.stroke()
             } else if (icon.name === "calendar") {
-                roundedRectPath(px(0.14), py(0.22), s * 0.72, s * 0.62, s * 0.08)
-                ctx.stroke()
+                ctx.strokeRect(px(0.14), py(0.22), s * 0.72, s * 0.62)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.14), py(0.4))
@@ -2214,15 +2179,12 @@ Item {
                 ctx.lineTo(px(0.68), py(0.28))
                 ctx.stroke()
 
-                ctx.beginPath()
-                ctx.arc(px(0.34), py(0.58), s * 0.025, 0, Math.PI * 2)
-                ctx.arc(px(0.5), py(0.58), s * 0.025, 0, Math.PI * 2)
-                ctx.arc(px(0.66), py(0.58), s * 0.025, 0, Math.PI * 2)
-                ctx.fill()
+                var cds = s * 0.05
+                ctx.fillRect(px(0.34) - cds / 2, py(0.58) - cds / 2, cds, cds)
+                ctx.fillRect(px(0.5) - cds / 2, py(0.58) - cds / 2, cds, cds)
+                ctx.fillRect(px(0.66) - cds / 2, py(0.58) - cds / 2, cds, cds)
             } else if (icon.name === "clock") {
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.34, 0, Math.PI * 2)
-                ctx.stroke()
+                ctx.strokeRect(px(0.16), py(0.16), s * 0.68, s * 0.68)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.5), py(0.3))
@@ -2236,9 +2198,8 @@ Item {
                 ctx.lineTo(px(0.74), py(0.36))
                 ctx.stroke()
             } else {
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.08, 0, Math.PI * 2)
-                ctx.fill()
+                var defs = s * 0.16
+                ctx.fillRect(px(0.5) - defs / 2, py(0.5) - defs / 2, defs, defs)
             }
         }
     }

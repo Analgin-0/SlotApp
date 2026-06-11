@@ -31,22 +31,23 @@ Item {
     readonly property int headerIconSize: page.width < 420 ? 46 : 58
     readonly property int headerTitleSize: page.width < 420 ? 24 : 29
 
-    readonly property color bg: "#111318"
-    readonly property color surface: "#181B21"
-    readonly property color surface2: "#20242C"
-    readonly property color surface3: "#2A2F39"
-    readonly property color border: "#313640"
-    readonly property color textMain: "#F4F6F8"
-    readonly property color textSub: "#C8CDD4"
-    readonly property color textMuted: "#8D96A3"
-    readonly property color accent: "#6EA8FE"
-    readonly property color accentSoft: "#1C2B44"
-    readonly property color danger: "#FF6B6B"
-    readonly property color dangerSoft: "#3A2023"
-    readonly property color success: "#6EE7A8"
-    readonly property color successSoft: "#173427"
-    readonly property color warning: "#FFD166"
-    readonly property color warningSoft: "#392F18"
+
+    readonly property color bg: "#000000"
+    readonly property color surface: "#111111"
+    readonly property color surface2: "#222222"
+    readonly property color surface3: "#333333"
+    readonly property color border: "#555555"
+    readonly property color textMain: "#FFFFFF"
+    readonly property color textSub: "#DDDDDD"
+    readonly property color textMuted: "#AAAAAA"
+    readonly property color accent: "#FFFFFF"
+    readonly property color accentSoft: "#333333"
+    readonly property color success: "#FFFFFF"
+    readonly property color successSoft: "#222222"
+    readonly property color danger: "#FFFFFF"
+    readonly property color dangerSoft: "#222222"
+    readonly property color warning: "#FFFFFF"
+    readonly property color warningSoft: "#222222"
 
     ListModel {
         id: sessionsModel
@@ -71,12 +72,12 @@ Item {
 
         var deletedCount = 0
 
-             for (var i = sessionsModel.count - 1; i >= 0; i--) {
+        for (var i = sessionsModel.count - 1; i >= 0; i--) {
             var item = sessionsModel.get(i)
 
             if (item.isRevoked && !item.isCurrent) {
-                  Db.deleteTableData("UserSession", item.sessionId)
-                  sessionsModel.remove(i)
+                Db.deleteTableData("UserSession", item.sessionId)
+                sessionsModel.remove(i)
                 deletedCount++
             }
         }
@@ -98,9 +99,7 @@ Item {
             return
 
         errorText = ""
-
-         sessionsMessage = sessionsModel.count === 0 ? "Загружаем сессии..." : ""
-
+        sessionsMessage = sessionsModel.count === 0 ? "Загружаем сессии..." : ""
         waitingList = true
         Db.getMySessions()
     }
@@ -132,9 +131,7 @@ Item {
 
         var s = String(value).trim().toLowerCase()
 
-        return s === "true"
-                || s === "yes"
-                || s === "да"
+        return s === "true" || s === "yes" || s === "да"
     }
 
     function formatDateTime(value) {
@@ -219,12 +216,12 @@ Item {
             var revoked = safeBool(session.is_revoked)
 
             sessionsModel.append({
-                                     sessionId: Number(session.id || 0),
-                                     title: formatSessionTitle(session),
-                                     text: formatSessionText(session),
-                                     isCurrent: current,
-                                     isRevoked: revoked
-                                 })
+                sessionId: Number(session.id || 0),
+                title: formatSessionTitle(session),
+                text: formatSessionText(session),
+                isCurrent: current,
+                isRevoked: revoked
+            })
         }
     }
 
@@ -544,7 +541,7 @@ Item {
                 iconName: page.waitingList ? "clock" : "empty"
                 text: page.sessionsMessage
                 iconColor: page.waitingList ? page.accent : page.textMuted
-                bgColor: page.waitingList ? page.accentSoft : page.surface
+                bgColor: page.waitingList ? page.surface3 : page.surface
 
                 Layout.fillWidth: true
                 Layout.maximumWidth: page.contentMaxWidth
@@ -608,12 +605,10 @@ Item {
         property bool hovered: hoverArea.containsMouse
 
         color: card.hovered && page.desktopMode ? page.surface2 : page.surface
-        radius: 26
         border.width: 1
-        border.color: card.hovered && page.desktopMode ? "#284568" : page.border
+        border.color: card.hovered && page.desktopMode ? "#777777" : page.border
 
         Layout.preferredHeight: headerColumn.implicitHeight + (page.width < 420 ? 28 : 34)
-
         scale: card.hovered && page.desktopMode ? 1.004 : 1.0
 
         Behavior on color { ColorAnimation { duration: 150 } }
@@ -655,10 +650,9 @@ Item {
                 Rectangle {
                     Layout.preferredWidth: page.headerIconSize
                     Layout.preferredHeight: page.headerIconSize
-                    radius: page.width < 420 ? 17 : 20
-                    color: page.accentSoft
+                    color: page.surface3
                     border.width: 1
-                    border.color: "#284568"
+                    border.color: page.border
 
                     DrawIcon {
                         anchors.centerIn: parent
@@ -721,15 +715,15 @@ Item {
                 Badge {
                     visible: page.waitingList
                     text: "Обновление"
-                    colorBg: page.accentSoft
+                    colorBg: page.surface3
                     colorText: page.accent
                 }
 
                 Badge {
                     visible: page.waitingRevoke || page.waitingRevokeOthers || page.waitingDelete
                     text: "Изменение"
-                    colorBg: page.warningSoft
-                    colorText: page.warning
+                    colorBg: page.surface3
+                    colorText: page.accent
                 }
 
                 Item {
@@ -746,13 +740,11 @@ Item {
         property bool pressed: pressHandler.pressed
 
         color: card.hovered && page.desktopMode ? page.surface2 : page.surface
-        radius: 26
         border.width: 1
-        border.color: card.hovered && page.desktopMode ? "#284568" : page.border
+        border.color: card.hovered && page.desktopMode ? "#777777" : page.border
+        scale: card.pressed ? 0.992 : card.hovered && page.desktopMode ? 1.004 : 1.0
 
         Layout.preferredHeight: actionsColumn.implicitHeight + 30
-
-        scale: card.pressed ? 0.992 : card.hovered && page.desktopMode ? 1.004 : 1.0
 
         Behavior on color { ColorAnimation { duration: 150 } }
         Behavior on border.color { ColorAnimation { duration: 150 } }
@@ -785,10 +777,9 @@ Item {
                 Rectangle {
                     Layout.preferredWidth: 44
                     Layout.preferredHeight: 44
-                    radius: 16
-                    color: page.accentSoft
+                    color: page.surface3
                     border.width: 1
-                    border.color: "#284568"
+                    border.color: page.border
 
                     DrawIcon {
                         anchors.centerIn: parent
@@ -900,7 +891,6 @@ Item {
         Rectangle {
             Layout.preferredWidth: counterText.implicitWidth + 18
             Layout.preferredHeight: 28
-            radius: 14
             color: page.surface2
             border.width: 1
             border.color: page.border
@@ -932,13 +922,11 @@ Item {
         property bool pressed: pressHandler.pressed
 
         color: card.hovered && page.desktopMode ? page.surface2 : page.surface
-        radius: 26
         border.width: 1
-        border.color: card.revoked ? "#5A2D31" : card.hovered && page.desktopMode ? "#284568" : page.border
+        border.color: card.revoked ? "#555555" : card.hovered && page.desktopMode ? "#777777" : page.border
+        scale: card.pressed ? 0.992 : card.hovered && page.desktopMode ? 1.004 : 1.0
 
         Layout.preferredHeight: sessionColumn.implicitHeight + 32
-
-        scale: card.pressed ? 0.992 : card.hovered && page.desktopMode ? 1.004 : 1.0
 
         Behavior on color { ColorAnimation { duration: 150 } }
         Behavior on border.color { ColorAnimation { duration: 150 } }
@@ -971,29 +959,16 @@ Item {
                 Rectangle {
                     Layout.preferredWidth: 50
                     Layout.preferredHeight: 50
-                    radius: 18
-                    color: card.revoked
-                           ? page.dangerSoft
-                           : card.currentSession
-                             ? page.successSoft
-                             : page.accentSoft
+                    color: card.revoked ? page.surface2 : card.currentSession ? page.surface3 : page.surface3
                     border.width: 1
-                    border.color: card.revoked
-                                  ? "#5A2D31"
-                                  : card.currentSession
-                                    ? "#24513C"
-                                    : "#284568"
+                    border.color: card.revoked ? page.border : card.currentSession ? page.border : page.border
 
                     DrawIcon {
                         anchors.centerIn: parent
                         width: 26
                         height: 26
                         name: card.revoked ? "logout" : card.currentSession ? "check" : "device"
-                        iconColor: card.revoked
-                                   ? page.danger
-                                   : card.currentSession
-                                     ? page.success
-                                     : page.accent
+                        iconColor: card.revoked ? page.textMuted : card.currentSession ? page.accent : page.textMain
                     }
                 }
 
@@ -1019,16 +994,8 @@ Item {
 
                         Badge {
                             text: card.currentSession ? "Текущая" : card.revoked ? "Завершена" : "Активная"
-                            colorBg: card.currentSession
-                                     ? page.successSoft
-                                     : card.revoked
-                                       ? page.dangerSoft
-                                       : page.accentSoft
-                            colorText: card.currentSession
-                                       ? page.success
-                                       : card.revoked
-                                         ? page.danger
-                                         : page.accent
+                            colorBg: card.currentSession ? page.surface3 : card.revoked ? page.surface2 : page.surface3
+                            colorText: card.currentSession ? page.accent : card.revoked ? page.textMuted : page.textMain
                         }
 
                         Item {
@@ -1042,7 +1009,6 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredHeight: detailsText.implicitHeight + 24
 
-                radius: 20
                 color: page.surface2
                 border.width: 1
                 border.color: page.border
@@ -1102,7 +1068,6 @@ Item {
         property color colorText: page.textSub
         property bool hovered: hoverArea.containsMouse
 
-        radius: 999
         color: badge.hovered && page.desktopMode ? page.surface3 : badge.colorBg
         border.width: badge.hovered && page.desktopMode ? 1 : 0
         border.color: page.border
@@ -1143,13 +1108,11 @@ Item {
         property bool pressed: pressHandler.pressed
 
         color: card.hovered && page.desktopMode ? page.surface2 : card.bgColor
-        radius: 24
         border.width: 1
-        border.color: card.hovered && page.desktopMode ? "#284568" : page.border
+        border.color: card.hovered && page.desktopMode ? "#777777" : page.border
+        scale: card.pressed ? 0.992 : 1.0
 
         Layout.preferredHeight: msgRow.implicitHeight + 28
-
-        scale: card.pressed ? 0.992 : 1.0
 
         Behavior on color { ColorAnimation { duration: 150 } }
         Behavior on border.color { ColorAnimation { duration: 150 } }
@@ -1178,7 +1141,6 @@ Item {
             Rectangle {
                 Layout.preferredWidth: 44
                 Layout.preferredHeight: 44
-                radius: 16
                 color: Qt.rgba(card.iconColor.r, card.iconColor.g, card.iconColor.b, 0.14)
 
                 DrawIcon {
@@ -1209,14 +1171,16 @@ Item {
         property string text: ""
         property bool hovered: hoverArea.containsMouse
 
-        color: page.dangerSoft
-        radius: 22
+        color: box.hovered ? "#333333" : page.dangerSoft
         border.width: 1
-        border.color: box.hovered && page.desktopMode ? page.danger : "#5A2D31"
+        border.color: box.hovered ? page.danger : "#555555"
+        scale: box.hovered ? 1.003 : 1.0
 
         Layout.preferredHeight: errorRow.implicitHeight + 24
 
+        Behavior on color { ColorAnimation { duration: 150 } }
         Behavior on border.color { ColorAnimation { duration: 150 } }
+        Behavior on scale { NumberAnimation { duration: 120; easing.type: Easing.OutQuad } }
 
         MouseArea {
             id: hoverArea
@@ -1235,8 +1199,7 @@ Item {
             Rectangle {
                 Layout.preferredWidth: 42
                 Layout.preferredHeight: 42
-                radius: 15
-                color: "#4A2529"
+                color: "#333333"
 
                 DrawIcon {
                     anchors.centerIn: parent
@@ -1249,7 +1212,7 @@ Item {
 
             Text {
                 text: box.text
-                color: "#FFD7DA"
+                color: "#FFFFFF"
                 font.pixelSize: 13
                 font.bold: true
                 wrapMode: Text.WordWrap
@@ -1280,18 +1243,17 @@ Item {
 
         Rectangle {
             anchors.fill: parent
-            radius: page.width < 420 ? 15 : 17
             color: {
                 if (!button.enabled)
                     return page.surface2
                 if (mouseArea.pressed)
                     return page.surface3
                 if (button.hovered && page.desktopMode)
-                    return page.accentSoft
+                    return page.surface3
                 return page.surface2
             }
             border.width: 1
-            border.color: button.hovered && page.desktopMode ? "#284568" : page.border
+            border.color: button.hovered && page.desktopMode ? "#777777" : page.border
 
             Behavior on color { ColorAnimation { duration: 130 } }
             Behavior on border.color { ColorAnimation { duration: 130 } }
@@ -1344,7 +1306,6 @@ Item {
 
         Rectangle {
             anchors.fill: parent
-            radius: button.smallButton ? 17 : 18
 
             color: {
                 if (!button.enabled)
@@ -1352,18 +1313,18 @@ Item {
 
                 if (button.variant === "danger") {
                     if (mouseArea.pressed)
-                        return "#B83F45"
+                        return "#222222"
                     if (button.hovered && page.desktopMode)
-                        return "#E85D5D"
-                    return page.danger
+                        return "#333333"
+                    return page.surface3
                 }
 
                 if (button.variant === "sessionDanger") {
                     if (mouseArea.pressed)
-                        return "#4A2529"
+                        return "#111111"
                     if (button.hovered && page.desktopMode)
-                        return "#552B30"
-                    return page.dangerSoft
+                        return "#222222"
+                    return page.surface2
                 }
 
                 if (button.variant === "delete" || button.variant === "neutral") {
@@ -1374,26 +1335,25 @@ Item {
                     return page.surface2
                 }
 
-                // tonal
                 if (mouseArea.pressed)
-                    return "#203B60"
+                    return "#333333"
                 if (button.hovered && page.desktopMode)
-                    return "#243F66"
-                return page.accentSoft
+                    return "#444444"
+                return page.surface3
             }
 
             border.width: 1
             border.color: {
                 if (button.variant === "danger")
-                    return button.hovered && page.desktopMode ? "#FF8A8A" : "#C95252"
+                    return button.hovered && page.desktopMode ? "#FFFFFF" : "#777777"
 
                 if (button.variant === "sessionDanger")
-                    return button.hovered && page.desktopMode ? page.danger : "#5A2D31"
+                    return button.hovered && page.desktopMode ? "#FFFFFF" : "#555555"
 
                 if (button.variant === "delete" || button.variant === "neutral")
-                    return button.hovered && page.desktopMode ? page.textMuted : page.border
+                    return button.hovered && page.desktopMode ? "#777777" : page.border
 
-                return button.hovered && page.desktopMode ? page.accent : "#284568"
+                return button.hovered && page.desktopMode ? "#FFFFFF" : "#777777"
             }
 
             Behavior on color { ColorAnimation { duration: 130 } }
@@ -1417,7 +1377,7 @@ Item {
                     if (button.variant === "danger")
                         return "#FFFFFF"
                     if (button.variant === "sessionDanger")
-                        return page.danger
+                        return page.accent
                     if (button.variant === "delete" || button.variant === "neutral")
                         return button.hovered && page.desktopMode ? page.textMain : page.textSub
                     return page.accent
@@ -1435,7 +1395,7 @@ Item {
                     if (button.variant === "danger")
                         return "#FFFFFF"
                     if (button.variant === "sessionDanger")
-                        return page.danger
+                        return page.accent
                     if (button.variant === "delete" || button.variant === "neutral")
                         return button.hovered && page.desktopMode ? page.textMain : page.textSub
                     return page.accent
@@ -1486,8 +1446,9 @@ Item {
             ctx.strokeStyle = icon.iconColor
             ctx.fillStyle = icon.iconColor
             ctx.lineWidth = Math.max(1.8, s * 0.085)
-            ctx.lineCap = "round"
-            ctx.lineJoin = "round"
+
+            ctx.lineCap = "square"
+            ctx.lineJoin = "miter"
 
             function px(v) {
                 return x + s * v
@@ -1497,20 +1458,6 @@ Item {
                 return y + s * v
             }
 
-            function roundedRectPath(left, top, w, h, r) {
-                ctx.beginPath()
-                ctx.moveTo(left + r, top)
-                ctx.lineTo(left + w - r, top)
-                ctx.quadraticCurveTo(left + w, top, left + w, top + r)
-                ctx.lineTo(left + w, top + h - r)
-                ctx.quadraticCurveTo(left + w, top + h, left + w - r, top + h)
-                ctx.lineTo(left + r, top + h)
-                ctx.quadraticCurveTo(left, top + h, left, top + h - r)
-                ctx.lineTo(left, top + r)
-                ctx.quadraticCurveTo(left, top, left + r, top)
-                ctx.closePath()
-            }
-
             if (icon.name === "back") {
                 ctx.beginPath()
                 ctx.moveTo(px(0.62), py(0.24))
@@ -1518,32 +1465,28 @@ Item {
                 ctx.lineTo(px(0.62), py(0.76))
                 ctx.stroke()
             } else if (icon.name === "devices") {
-                roundedRectPath(px(0.14), py(0.2), s * 0.5, s * 0.42, s * 0.07)
-                ctx.stroke()
-
-                roundedRectPath(px(0.5), py(0.38), s * 0.36, s * 0.46, s * 0.07)
-                ctx.stroke()
+                ctx.strokeRect(px(0.12), py(0.22), s * 0.5, s * 0.38)
+                ctx.strokeRect(px(0.56), py(0.42), s * 0.28, s * 0.38)
 
                 ctx.beginPath()
-                ctx.moveTo(px(0.28), py(0.72))
-                ctx.lineTo(px(0.5), py(0.72))
-                ctx.moveTo(px(0.39), py(0.62))
-                ctx.lineTo(px(0.39), py(0.72))
+                ctx.moveTo(px(0.34), py(0.68))
+                ctx.lineTo(px(0.48), py(0.68))
                 ctx.stroke()
+
+                var ds = s * 0.05
+                ctx.fillRect(px(0.7) - ds / 2, py(0.72) - ds / 2, ds, ds)
             } else if (icon.name === "device") {
-                roundedRectPath(px(0.24), py(0.12), s * 0.52, s * 0.76, s * 0.1)
-                ctx.stroke()
+                ctx.strokeRect(px(0.24), py(0.12), s * 0.52, s * 0.76)
 
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.78), s * 0.025, 0, Math.PI * 2)
-                ctx.fill()
+                var ds2 = s * 0.05
+                ctx.fillRect(px(0.5) - ds2 / 2, py(0.78) - ds2 / 2, ds2, ds2)
             } else if (icon.name === "shield") {
                 ctx.beginPath()
                 ctx.moveTo(px(0.5), py(0.12))
                 ctx.lineTo(px(0.8), py(0.24))
                 ctx.lineTo(px(0.75), py(0.58))
-                ctx.quadraticCurveTo(px(0.68), py(0.78), px(0.5), py(0.88))
-                ctx.quadraticCurveTo(px(0.32), py(0.78), px(0.25), py(0.58))
+                ctx.lineTo(px(0.5), py(0.88))
+                ctx.lineTo(px(0.25), py(0.58))
                 ctx.lineTo(px(0.2), py(0.24))
                 ctx.closePath()
                 ctx.stroke()
@@ -1554,8 +1497,7 @@ Item {
                 ctx.lineTo(px(0.66), py(0.39))
                 ctx.stroke()
             } else if (icon.name === "logout") {
-                roundedRectPath(px(0.16), py(0.2), s * 0.42, s * 0.6, s * 0.08)
-                ctx.stroke()
+                ctx.strokeRect(px(0.16), py(0.2), s * 0.42, s * 0.6)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.48), py(0.5))
@@ -1565,9 +1507,7 @@ Item {
                 ctx.lineTo(px(0.7), py(0.64))
                 ctx.stroke()
             } else if (icon.name === "check") {
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.34, 0, Math.PI * 2)
-                ctx.stroke()
+                ctx.strokeRect(px(0.16), py(0.16), s * 0.68, s * 0.68)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.34), py(0.51))
@@ -1575,9 +1515,7 @@ Item {
                 ctx.lineTo(px(0.68), py(0.39))
                 ctx.stroke()
             } else if (icon.name === "clock") {
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.34, 0, Math.PI * 2)
-                ctx.stroke()
+                ctx.strokeRect(px(0.16), py(0.16), s * 0.68, s * 0.68)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.5), py(0.3))
@@ -1585,9 +1523,7 @@ Item {
                 ctx.lineTo(px(0.66), py(0.62))
                 ctx.stroke()
             } else if (icon.name === "refresh") {
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.3, Math.PI * 0.18, Math.PI * 1.62)
-                ctx.stroke()
+                ctx.strokeRect(px(0.16), py(0.16), s * 0.68, s * 0.68)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.72), py(0.27))
@@ -1600,8 +1536,7 @@ Item {
                 ctx.lineTo(px(0.75), py(0.32))
                 ctx.stroke()
 
-                roundedRectPath(px(0.3), py(0.36), s * 0.4, s * 0.44, s * 0.06)
-                ctx.stroke()
+                ctx.strokeRect(px(0.3), py(0.36), s * 0.4, s * 0.44)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.4), py(0.24))
@@ -1624,21 +1559,18 @@ Item {
                 ctx.lineTo(px(0.5), py(0.58))
                 ctx.stroke()
 
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.69), s * 0.025, 0, Math.PI * 2)
-                ctx.fill()
+                var ws = s * 0.06
+                ctx.fillRect(px(0.5) - ws / 2, py(0.69) - ws / 2, ws, ws)
             } else if (icon.name === "empty") {
-                roundedRectPath(px(0.2), py(0.22), s * 0.6, s * 0.52, s * 0.08)
-                ctx.stroke()
+                ctx.strokeRect(px(0.2), py(0.22), s * 0.6, s * 0.52)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.34), py(0.5))
                 ctx.lineTo(px(0.66), py(0.5))
                 ctx.stroke()
             } else {
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.08, 0, Math.PI * 2)
-                ctx.fill()
+                var defs = s * 0.16
+                ctx.fillRect(px(0.5) - defs / 2, py(0.5) - defs / 2, defs, defs)
             }
         }
     }

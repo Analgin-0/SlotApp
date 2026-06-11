@@ -42,20 +42,21 @@ Item {
     property string nearestCabinet: ""
     property string nearestDescription: ""
 
-    readonly property color bg: "#111318"
-    readonly property color surface: "#181B21"
-    readonly property color surface2: "#20242C"
-    readonly property color surface3: "#2A2F39"
-    readonly property color border: "#313640"
-    readonly property color textMain: "#F4F6F8"
-    readonly property color textSub: "#C8CDD4"
-    readonly property color textMuted: "#8D96A3"
-    readonly property color accent: "#6EA8FE"
-    readonly property color accentSoft: "#1C2B44"
-    readonly property color danger: "#FF6B6B"
-    readonly property color dangerSoft: "#3A2023"
-    readonly property color success: "#6EE7A8"
-    readonly property color successSoft: "#173427"
+
+    readonly property color bg: "#000000"
+    readonly property color surface: "#111111"
+    readonly property color surface2: "#222222"
+    readonly property color surface3: "#333333"
+    readonly property color border: "#555555"
+    readonly property color textMain: "#FFFFFF"
+    readonly property color textSub: "#DDDDDD"
+    readonly property color textMuted: "#AAAAAA"
+    readonly property color accent: "#FFFFFF"
+    readonly property color accentSoft: "#333333"
+    readonly property color danger: "#FFFFFF"
+    readonly property color dangerSoft: "#222222"
+    readonly property color success: "#FFFFFF"
+    readonly property color successSoft: "#222222"
 
     readonly property int desktopBreakpoint: 900
     readonly property bool desktopMode: page.width >= page.desktopBreakpoint
@@ -766,7 +767,6 @@ Item {
         page.appointmentsLoading = true
         page.scheduleLoading = true
 
-
         if (Db.isConnect()) {
             Db.getMyProfile()
             Db.getAppointments()
@@ -980,8 +980,7 @@ Item {
             Rectangle {
                 id: greetingCard
 
-                color: (greetingMouse.containsMouse || greetingMouse.pressed) ? "#1E2530" : page.surface
-                radius: page.desktopMode ? 30 : 26
+                color: (greetingMouse.containsMouse || greetingMouse.pressed) ? "#222222" : page.surface
                 border.width: 1
                 border.color: (greetingMouse.containsMouse || greetingMouse.pressed) ? page.accent : page.border
 
@@ -1058,10 +1057,9 @@ Item {
                         Rectangle {
                             Layout.preferredWidth: page.desktopMode ? 64 : 58
                             Layout.preferredHeight: page.desktopMode ? 64 : 58
-                            radius: page.desktopMode ? 22 : 20
                             color: page.accentSoft
                             border.width: 1
-                            border.color: (greetingMouse.containsMouse || greetingMouse.pressed) ? page.accent : "#284568"
+                            border.color: (greetingMouse.containsMouse || greetingMouse.pressed) ? page.accent : "#555555"
 
                             Behavior on border.color {
                                 ColorAnimation {
@@ -1290,8 +1288,7 @@ Item {
         property color colorBg: page.surface2
         property color colorText: page.textSub
 
-        radius: 999
-        color: badgeMouse.containsMouse ? "#24324A" : badge.colorBg
+        color: badgeMouse.containsMouse ? "#333333" : badge.colorBg
 
         Layout.preferredHeight: page.desktopMode ? 32 : 30
         Layout.preferredWidth: badgeText.implicitWidth + (page.desktopMode ? 26 : 22)
@@ -1337,8 +1334,7 @@ Item {
         property string emptyText: ""
         property bool loading: false
 
-        color: (appointmentMouse.containsMouse || appointmentMouse.pressed) ? "#1E2530" : page.surface
-        radius: page.desktopMode ? 28 : 26
+        color: (appointmentMouse.containsMouse || appointmentMouse.pressed) ? "#222222" : page.surface
         border.width: 1
         border.color: (appointmentMouse.containsMouse || appointmentMouse.pressed) ? page.accent : page.border
 
@@ -1394,8 +1390,7 @@ Item {
                 Rectangle {
                     Layout.preferredWidth: 48
                     Layout.preferredHeight: 48
-                    radius: 17
-                    color: (appointmentMouse.containsMouse || appointmentMouse.pressed) && card.hasAppointment ? "#243F63" : card.hasAppointment ? page.accentSoft : page.surface2
+                    color: (appointmentMouse.containsMouse || appointmentMouse.pressed) && card.hasAppointment ? "#444444" : card.hasAppointment ? page.accentSoft : page.surface2
 
                     Behavior on color {
                         ColorAnimation {
@@ -1497,8 +1492,7 @@ Item {
     component ScheduleCard: Rectangle {
         id: scheduleCard
 
-        color: (scheduleMouse.containsMouse || scheduleMouse.pressed) ? "#1E2530" : page.surface
-        radius: page.desktopMode ? 28 : 26
+        color: (scheduleMouse.containsMouse || scheduleMouse.pressed) ? "#222222" : page.surface
         border.width: 1
         border.color: (scheduleMouse.containsMouse || scheduleMouse.pressed) ? page.accent : page.border
 
@@ -1586,8 +1580,7 @@ Item {
                 delegate: Rectangle {
                     id: lessonCard
 
-                    color: (lessonMouse.containsMouse || lessonMouse.pressed) ? "#263246" : page.surface2
-                    radius: 20
+                    color: (lessonMouse.containsMouse || lessonMouse.pressed) ? "#333333" : page.surface2
                     border.width: 1
                     border.color: (lessonMouse.containsMouse || lessonMouse.pressed) ? page.accent : page.border
 
@@ -1636,8 +1629,7 @@ Item {
                         Rectangle {
                             Layout.preferredWidth: page.desktopMode ? 92 : 86
                             Layout.preferredHeight: 46
-                            radius: 16
-                            color: (lessonMouse.containsMouse || lessonMouse.pressed) ? "#274B79" : page.accentSoft
+                            color: (lessonMouse.containsMouse || lessonMouse.pressed) ? "#555555" : page.accentSoft
 
                             Behavior on color {
                                 ColorAnimation {
@@ -1693,8 +1685,7 @@ Item {
         property string iconName: ""
         property string text: ""
 
-        radius: 18
-        color: (detailMouse.containsMouse || detailMouse.pressed) ? "#263246" : page.surface2
+        color: (detailMouse.containsMouse || detailMouse.pressed) ? "#333333" : page.surface2
         border.width: 1
         border.color: (detailMouse.containsMouse || detailMouse.pressed) ? page.accent : page.border
 
@@ -1767,8 +1758,7 @@ Item {
         property color bgColor: page.surface2
         property bool touched: messageTouch.pressed
 
-        radius: 20
-        color: messageMouse.containsMouse || row.touched ? "#263246" : row.bgColor
+        color: messageMouse.containsMouse || row.touched ? "#333333" : row.bgColor
         border.width: 1
         border.color: messageMouse.containsMouse || row.touched ? page.accent : page.border
 
@@ -1819,7 +1809,6 @@ Item {
             Rectangle {
                 Layout.preferredWidth: 40
                 Layout.preferredHeight: 40
-                radius: 14
                 color: Qt.rgba(row.iconColor.r, row.iconColor.g, row.iconColor.b, 0.14)
 
                 DrawIcon {
@@ -1850,10 +1839,9 @@ Item {
         property string text: ""
         property bool touched: errorTouch.pressed
 
-        color: errorMouse.containsMouse || box.touched ? "#4A262A" : page.dangerSoft
-        radius: 22
+        color: errorMouse.containsMouse || box.touched ? "#333333" : page.dangerSoft
         border.width: 1
-        border.color: errorMouse.containsMouse || box.touched ? page.danger : "#5A2D31"
+        border.color: errorMouse.containsMouse || box.touched ? page.danger : "#555555"
 
         Layout.preferredHeight: errRow.implicitHeight + 24
         scale: box.touched ? 0.992 : 1.0
@@ -1902,8 +1890,7 @@ Item {
             Rectangle {
                 Layout.preferredWidth: 42
                 Layout.preferredHeight: 42
-                radius: 15
-                color: "#4A2529"
+                color: "#333333"
 
                 DrawIcon {
                     anchors.centerIn: parent
@@ -1916,7 +1903,7 @@ Item {
 
             Text {
                 text: box.text
-                color: "#FFD7DA"
+                color: "#FFFFFF"
                 font.pixelSize: 13
                 font.bold: true
                 wrapMode: Text.WordWrap
@@ -1949,8 +1936,9 @@ Item {
             ctx.strokeStyle = icon.iconColor
             ctx.fillStyle = icon.iconColor
             ctx.lineWidth = Math.max(1.8, s * 0.085)
-            ctx.lineCap = "round"
-            ctx.lineJoin = "round"
+
+            ctx.lineCap = "square"
+            ctx.lineJoin = "miter"
 
             function px(v) {
                 return x + s * v
@@ -1960,22 +1948,13 @@ Item {
                 return y + s * v
             }
 
-            function roundedRectPath(left, top, w, h, r) {
+            function rectPath(left, top, w, h) {
                 ctx.beginPath()
-                ctx.moveTo(left + r, top)
-                ctx.lineTo(left + w - r, top)
-                ctx.quadraticCurveTo(left + w, top, left + w, top + r)
-                ctx.lineTo(left + w, top + h - r)
-                ctx.quadraticCurveTo(left + w, top + h, left + w - r, top + h)
-                ctx.lineTo(left + r, top + h)
-                ctx.quadraticCurveTo(left, top + h, left, top + h - r)
-                ctx.lineTo(left, top + r)
-                ctx.quadraticCurveTo(left, top, left + r, top)
-                ctx.closePath()
+                ctx.rect(left, top, w, h)
             }
 
             if (icon.name === "tasks") {
-                roundedRectPath(px(0.2), py(0.14), s * 0.6, s * 0.72, s * 0.08)
+                rectPath(px(0.2), py(0.14), s * 0.6, s * 0.72)
                 ctx.stroke()
 
                 ctx.beginPath()
@@ -1987,13 +1966,13 @@ Item {
                 ctx.lineTo(px(0.58), py(0.66))
                 ctx.stroke()
 
-                ctx.beginPath()
-                ctx.arc(px(0.27), py(0.34), s * 0.015, 0, Math.PI * 2)
-                ctx.arc(px(0.27), py(0.5), s * 0.015, 0, Math.PI * 2)
-                ctx.arc(px(0.27), py(0.66), s * 0.015, 0, Math.PI * 2)
-                ctx.fill()
+
+                var dSize = s * 0.03
+                ctx.fillRect(px(0.27) - dSize / 2, py(0.34) - dSize / 2, dSize, dSize)
+                ctx.fillRect(px(0.27) - dSize / 2, py(0.5) - dSize / 2, dSize, dSize)
+                ctx.fillRect(px(0.27) - dSize / 2, py(0.66) - dSize / 2, dSize, dSize)
             } else if (icon.name === "calendar") {
-                roundedRectPath(px(0.14), py(0.22), s * 0.72, s * 0.62, s * 0.08)
+                rectPath(px(0.14), py(0.22), s * 0.72, s * 0.62)
                 ctx.stroke()
 
                 ctx.beginPath()
@@ -2005,16 +1984,17 @@ Item {
                 ctx.lineTo(px(0.68), py(0.28))
                 ctx.stroke()
 
-                ctx.beginPath()
-                ctx.arc(px(0.34), py(0.56), s * 0.025, 0, Math.PI * 2)
-                ctx.arc(px(0.5), py(0.56), s * 0.025, 0, Math.PI * 2)
-                ctx.arc(px(0.66), py(0.56), s * 0.025, 0, Math.PI * 2)
-                ctx.arc(px(0.34), py(0.7), s * 0.025, 0, Math.PI * 2)
-                ctx.arc(px(0.5), py(0.7), s * 0.025, 0, Math.PI * 2)
-                ctx.fill()
+
+                var cdSize = s * 0.05
+                ctx.fillRect(px(0.34) - cdSize / 2, py(0.56) - cdSize / 2, cdSize, cdSize)
+                ctx.fillRect(px(0.5) - cdSize / 2, py(0.56) - cdSize / 2, cdSize, cdSize)
+                ctx.fillRect(px(0.66) - cdSize / 2, py(0.56) - cdSize / 2, cdSize, cdSize)
+                ctx.fillRect(px(0.34) - cdSize / 2, py(0.7) - cdSize / 2, cdSize, cdSize)
+                ctx.fillRect(px(0.5) - cdSize / 2, py(0.7) - cdSize / 2, cdSize, cdSize)
             } else if (icon.name === "clock") {
+
                 ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.34, 0, Math.PI * 2)
+                ctx.rect(px(0.16), py(0.16), s * 0.68, s * 0.68)
                 ctx.stroke()
 
                 ctx.beginPath()
@@ -2023,7 +2003,7 @@ Item {
                 ctx.lineTo(px(0.66), py(0.62))
                 ctx.stroke()
             } else if (icon.name === "room") {
-                roundedRectPath(px(0.2), py(0.16), s * 0.6, s * 0.7, s * 0.08)
+                rectPath(px(0.2), py(0.16), s * 0.6, s * 0.7)
                 ctx.stroke()
 
                 ctx.beginPath()
@@ -2031,9 +2011,9 @@ Item {
                 ctx.lineTo(px(0.5), py(0.86))
                 ctx.stroke()
 
-                ctx.beginPath()
-                ctx.arc(px(0.42), py(0.52), s * 0.025, 0, Math.PI * 2)
-                ctx.fill()
+
+                var kSize = s * 0.05
+                ctx.fillRect(px(0.42) - kSize / 2, py(0.52) - kSize / 2, kSize, kSize)
             } else if (icon.name === "warning") {
                 ctx.beginPath()
                 ctx.moveTo(px(0.5), py(0.14))
@@ -2047,12 +2027,13 @@ Item {
                 ctx.lineTo(px(0.5), py(0.58))
                 ctx.stroke()
 
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.69), s * 0.025, 0, Math.PI * 2)
-                ctx.fill()
+
+                var wSize = s * 0.05
+                ctx.fillRect(px(0.5) - wSize / 2, py(0.69) - wSize / 2, wSize, wSize)
             } else if (icon.name === "check") {
+
                 ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.34, 0, Math.PI * 2)
+                ctx.rect(px(0.16), py(0.16), s * 0.68, s * 0.68)
                 ctx.stroke()
 
                 ctx.beginPath()
@@ -2061,7 +2042,7 @@ Item {
                 ctx.lineTo(px(0.68), py(0.39))
                 ctx.stroke()
             } else if (icon.name === "empty") {
-                roundedRectPath(px(0.2), py(0.22), s * 0.6, s * 0.52, s * 0.08)
+                rectPath(px(0.2), py(0.22), s * 0.6, s * 0.52)
                 ctx.stroke()
 
                 ctx.beginPath()
@@ -2069,9 +2050,9 @@ Item {
                 ctx.lineTo(px(0.66), py(0.5))
                 ctx.stroke()
             } else {
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.08, 0, Math.PI * 2)
-                ctx.fill()
+
+                var defaultSize = s * 0.16
+                ctx.fillRect(px(0.5) - defaultSize / 2, py(0.5) - defaultSize / 2, defaultSize, defaultSize)
             }
         }
     }

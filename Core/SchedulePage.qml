@@ -27,22 +27,23 @@ Item {
     property var allScheduleItems: []
     property int visibleLessonsCount: 0
 
-    readonly property color bg: "#111318"
-    readonly property color surface: "#181B21"
-    readonly property color surface2: "#20242C"
-    readonly property color surface3: "#2A2F39"
-    readonly property color border: "#313640"
-    readonly property color textMain: "#F4F6F8"
-    readonly property color textSub: "#C8CDD4"
-    readonly property color textMuted: "#8D96A3"
-    readonly property color accent: "#6EA8FE"
-    readonly property color accentSoft: "#1C2B44"
-    readonly property color danger: "#FF6B6B"
-    readonly property color dangerSoft: "#3A2023"
-    readonly property color success: "#6EE7A8"
-    readonly property color successSoft: "#173427"
-    readonly property color warning: "#FFD166"
-    readonly property color warningSoft: "#392F18"
+
+    readonly property color bg: "#000000"
+    readonly property color surface: "#111111"
+    readonly property color surface2: "#222222"
+    readonly property color surface3: "#333333"
+    readonly property color border: "#555555"
+    readonly property color textMain: "#FFFFFF"
+    readonly property color textSub: "#DDDDDD"
+    readonly property color textMuted: "#AAAAAA"
+    readonly property color accent: "#FFFFFF"
+    readonly property color accentSoft: "#333333"
+    readonly property color danger: "#FFFFFF"
+    readonly property color dangerSoft: "#222222"
+    readonly property color success: "#FFFFFF"
+    readonly property color successSoft: "#222222"
+    readonly property color warning: "#FFFFFF"
+    readonly property color warningSoft: "#222222"
 
     ListModel {
         id: displayScheduleModel
@@ -705,7 +706,7 @@ Item {
                 iconName: "clock"
                 text: "Загружаю расписание..."
                 iconColor: page.accent
-                bgColor: page.accentSoft
+                bgColor: page.surface2
 
                 Layout.fillWidth: true
                 Layout.leftMargin: 20
@@ -779,10 +780,10 @@ Item {
         property bool hovered: hoverArea.containsMouse
         property bool pressed: hoverArea.pressed
 
-        color: card.pressed ? page.surface3 : card.hovered ? page.surface2 : page.surface
-        radius: 28
+
+        color: card.pressed ? page.surface3 : card.hovered ? "#333333" : page.surface2
         border.width: 1
-        border.color: card.hovered ? "#284568" : page.border
+        border.color: card.hovered ? "#777777" : page.border
         scale: card.pressed ? 0.992 : card.hovered ? 1.006 : 1.0
 
         Layout.preferredHeight: headerColumn.implicitHeight + 34
@@ -830,10 +831,9 @@ Item {
                 Rectangle {
                     Layout.preferredWidth: 58
                     Layout.preferredHeight: 58
-                    radius: 20
-                    color: page.accentSoft
+                    color: page.surface3
                     border.width: 1
-                    border.color: "#284568"
+                    border.color: "#555555"
 
                     DrawIcon {
                         anchors.centerIn: parent
@@ -887,19 +887,19 @@ Item {
 
                 Badge {
                     text: page.currentWeekTitle()
-                    colorBg: page.accentSoft
+                    colorBg: page.surface3
                     colorText: page.accent
                 }
 
                 Badge {
                     text: page.formatLessonsCount(page.visibleLessonsCount)
-                    colorBg: page.surface2
+                    colorBg: page.surface3
                     colorText: page.textSub
                 }
 
                 Badge {
                     text: page.dayName(page.currentDbDay())
-                    colorBg: page.successSoft
+                    colorBg: page.surface3
                     colorText: page.success
                 }
 
@@ -918,10 +918,9 @@ Item {
         property bool hovered: hoverArea.containsMouse
 
         height: 54
-        radius: 27
-        color: card.hovered ? page.surface2 : page.surface
+        color: card.hovered ? "#333333" : page.surface2
         border.width: 1
-        border.color: card.hovered ? "#284568" : page.border
+        border.color: card.hovered ? "#777777" : page.border
 
         Layout.preferredHeight: 54
 
@@ -977,18 +976,17 @@ Item {
 
         Rectangle {
             anchors.fill: parent
-            radius: 22
             color: {
                 if (control.selected)
                     return page.accent
                 if (control.pressed)
                     return page.surface3
                 if (control.hovered)
-                    return page.surface2
+                    return page.surface3
                 return "transparent"
             }
             border.width: control.selected || control.hovered ? 1 : 0
-            border.color: control.selected ? "#7FB5FF" : page.border
+            border.color: control.selected ? page.accent : page.border
 
             Behavior on color {
                 ColorAnimation {
@@ -1008,7 +1006,7 @@ Item {
         Text {
             anchors.centerIn: parent
             text: control.text
-            color: control.selected ? "#FFFFFF" : control.hovered ? page.textMain : page.textSub
+            color: control.selected ? "#000000" : control.hovered ? page.textMain : page.textSub
             font.pixelSize: page.desktopMode ? 15 : 14
             font.bold: true
             horizontalAlignment: Text.AlignHCenter
@@ -1123,16 +1121,16 @@ Item {
 
         implicitHeight: dayRow.implicitHeight + 24
 
-        radius: 24
+
         color: {
             if (card.pressed)
                 return page.surface3
             if (card.isToday)
-                return card.hovered ? "#213A5D" : page.accentSoft
+                return card.hovered ? "#444444" : page.surface3
             return card.hovered ? page.surface3 : page.surface2
         }
         border.width: 1
-        border.color: card.isToday ? "#284568" : card.hovered ? "#3D4654" : page.border
+        border.color: card.isToday ? page.accent : card.hovered ? "#777777" : page.border
         scale: card.pressed ? 0.992 : card.hovered ? 1.004 : 1.0
 
         Behavior on color {
@@ -1174,15 +1172,14 @@ Item {
             Rectangle {
                 Layout.preferredWidth: 48
                 Layout.preferredHeight: 48
-                radius: 17
                 color: card.isToday ? page.accent : page.surface3
                 border.width: 1
-                border.color: card.isToday ? "#7FB5FF" : page.border
+                border.color: card.isToday ? page.accent : page.border
 
                 Text {
                     anchors.centerIn: parent
                     text: card.dayShort
-                    color: card.isToday ? "#FFFFFF" : page.textSub
+                    color: card.isToday ? "#000000" : page.textSub
                     font.pixelSize: 17
                     font.bold: true
                 }
@@ -1209,10 +1206,9 @@ Item {
 
                     Rectangle {
                         visible: card.isToday
-                        radius: 999
-                        color: page.successSoft
+                        color: page.surface3
                         border.width: 1
-                        border.color: "#24513C"
+                        border.color: page.border
 
                         Layout.preferredHeight: 26
                         Layout.preferredWidth: todayText.implicitWidth + 18
@@ -1222,7 +1218,7 @@ Item {
 
                             anchors.centerIn: parent
                             text: "Сегодня"
-                            color: page.success
+                            color: page.textMain
                             font.pixelSize: 11
                             font.bold: true
                         }
@@ -1244,7 +1240,6 @@ Item {
             Rectangle {
                 Layout.preferredWidth: countLabel.implicitWidth + 20
                 Layout.preferredHeight: 32
-                radius: 16
                 color: card.lessonCount > 0 ? page.surface : page.surface3
                 border.width: 1
                 border.color: page.border
@@ -1279,10 +1274,10 @@ Item {
 
         implicitHeight: cardColumn.implicitHeight + 32
 
-        radius: 26
-        color: card.pressed ? page.surface3 : card.hovered ? page.surface2 : page.surface
+
+        color: card.pressed ? page.surface3 : card.hovered ? "#222222" : page.surface
         border.width: 1
-        border.color: card.hovered ? "#284568" : page.border
+        border.color: card.hovered ? "#777777" : page.border
         scale: card.pressed ? 0.992 : card.hovered ? 1.006 : 1.0
         transformOrigin: Item.Center
 
@@ -1320,7 +1315,6 @@ Item {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             width: card.hovered ? 7 : 5
-            radius: 3
             color: page.accent
             opacity: card.hovered ? 1.0 : 0.9
 
@@ -1353,10 +1347,9 @@ Item {
                 Rectangle {
                     Layout.preferredWidth: 86
                     Layout.preferredHeight: 62
-                    radius: 20
-                    color: page.accentSoft
+                    color: page.surface3
                     border.width: 1
-                    border.color: "#284568"
+                    border.color: page.border
 
                     ColumnLayout {
                         anchors.centerIn: parent
@@ -1394,7 +1387,6 @@ Item {
 
                         Rectangle {
                             visible: card.weekText.length > 0
-                            radius: 999
                             color: page.surface2
                             border.width: 1
                             border.color: page.border
@@ -1407,7 +1399,7 @@ Item {
 
                                 anchors.centerIn: parent
                                 text: card.weekText
-                                color: card.weekText === "Каждую неделю" ? page.success : page.accent
+                                color: card.weekText === "Каждую неделю" ? page.textMain : page.accent
                                 font.pixelSize: 11
                                 font.bold: true
                                 maximumLineCount: 1
@@ -1449,7 +1441,6 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredHeight: titleColumn.implicitHeight + 22
 
-                radius: 20
                 color: page.surface2
                 border.width: 1
                 border.color: page.border
@@ -1493,7 +1484,6 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredHeight: teacherRow.implicitHeight + 18
 
-                radius: 18
                 color: page.surface2
                 border.width: 1
                 border.color: page.border
@@ -1508,8 +1498,7 @@ Item {
                     Rectangle {
                         Layout.preferredWidth: 32
                         Layout.preferredHeight: 32
-                        radius: 12
-                        color: page.accentSoft
+                        color: page.surface3
 
                         DrawIcon {
                             anchors.centerIn: parent
@@ -1557,10 +1546,9 @@ Item {
 
         implicitHeight: emptyRow.implicitHeight + 20
 
-        radius: 22
         color: card.pressed ? page.surface3 : card.hovered ? page.surface2 : page.surface
         border.width: 1
-        border.color: card.hovered ? "#3D4654" : page.border
+        border.color: card.hovered ? "#777777" : page.border
         opacity: card.hovered ? 0.92 : 0.78
         scale: card.pressed ? 0.994 : card.hovered ? 1.003 : 1.0
 
@@ -1610,7 +1598,6 @@ Item {
             Rectangle {
                 Layout.preferredWidth: 38
                 Layout.preferredHeight: 38
-                radius: 14
                 color: page.surface2
                 border.width: 1
                 border.color: page.border
@@ -1644,8 +1631,7 @@ Item {
         property color colorText: page.textSub
         property bool hovered: hoverArea.containsMouse
 
-        radius: 999
-        color: badge.hovered ? page.surface3 : badge.colorBg
+        color: badge.hovered ? "#444444" : badge.colorBg
         border.width: badge.hovered ? 1 : 0
         border.color: page.border
         scale: badge.hovered ? 1.035 : 1.0
@@ -1697,10 +1683,9 @@ Item {
         Layout.preferredWidth: Math.min(label.implicitWidth + 42, page.desktopMode ? 220 : 170)
         Layout.preferredHeight: 30
 
-        radius: 15
         color: pill.hovered ? page.surface3 : page.surface2
         border.width: 1
-        border.color: pill.hovered ? "#3D4654" : page.border
+        border.color: pill.hovered ? "#777777" : page.border
         scale: pill.hovered ? 1.018 : 1.0
 
         Behavior on color {
@@ -1768,11 +1753,12 @@ Item {
         property color bgColor: page.surface2
         property bool hovered: hoverArea.containsMouse
 
-        radius: 22
         color: card.hovered ? Qt.rgba(card.iconColor.r, card.iconColor.g, card.iconColor.b, 0.16) : card.bgColor
         border.width: 1
         border.color: card.hovered ? Qt.rgba(card.iconColor.r, card.iconColor.g, card.iconColor.b, 0.45) : page.border
         scale: card.hovered ? 1.003 : 1.0
+
+        Layout.preferredHeight: msgRow.implicitHeight + 24
 
         Behavior on color {
             ColorAnimation {
@@ -1802,8 +1788,6 @@ Item {
             acceptedButtons: Qt.NoButton
         }
 
-        Layout.preferredHeight: msgRow.implicitHeight + 24
-
         RowLayout {
             id: msgRow
 
@@ -1814,7 +1798,6 @@ Item {
             Rectangle {
                 Layout.preferredWidth: 40
                 Layout.preferredHeight: 40
-                radius: 14
                 color: Qt.rgba(card.iconColor.r, card.iconColor.g, card.iconColor.b, 0.14)
 
                 DrawIcon {
@@ -1846,10 +1829,11 @@ Item {
         property bool hovered: hoverArea.containsMouse
 
         color: box.hovered ? "#44272A" : page.dangerSoft
-        radius: 22
         border.width: 1
         border.color: box.hovered ? page.danger : "#5A2D31"
         scale: box.hovered ? 1.003 : 1.0
+
+        Layout.preferredHeight: errRow.implicitHeight + 24
 
         Behavior on color {
             ColorAnimation {
@@ -1879,8 +1863,6 @@ Item {
             acceptedButtons: Qt.NoButton
         }
 
-        Layout.preferredHeight: errRow.implicitHeight + 24
-
         RowLayout {
             id: errRow
 
@@ -1891,8 +1873,7 @@ Item {
             Rectangle {
                 Layout.preferredWidth: 42
                 Layout.preferredHeight: 42
-                radius: 15
-                color: "#4A2529"
+                color: "#333333"
 
                 DrawIcon {
                     anchors.centerIn: parent
@@ -1938,8 +1919,9 @@ Item {
             ctx.strokeStyle = icon.iconColor
             ctx.fillStyle = icon.iconColor
             ctx.lineWidth = Math.max(1.8, s * 0.085)
-            ctx.lineCap = "round"
-            ctx.lineJoin = "round"
+
+            ctx.lineCap = "square"
+            ctx.lineJoin = "miter"
 
             function px(v) {
                 return x + s * v
@@ -1949,23 +1931,8 @@ Item {
                 return y + s * v
             }
 
-            function roundedRectPath(left, top, w, h, r) {
-                ctx.beginPath()
-                ctx.moveTo(left + r, top)
-                ctx.lineTo(left + w - r, top)
-                ctx.quadraticCurveTo(left + w, top, left + w, top + r)
-                ctx.lineTo(left + w, top + h - r)
-                ctx.quadraticCurveTo(left + w, top + h, left + w - r, top + h)
-                ctx.lineTo(left + r, top + h)
-                ctx.quadraticCurveTo(left, top + h, left, top + h - r)
-                ctx.lineTo(left, top + r)
-                ctx.quadraticCurveTo(left, top, left + r, top)
-                ctx.closePath()
-            }
-
             if (icon.name === "calendar") {
-                roundedRectPath(px(0.14), py(0.22), s * 0.72, s * 0.62, s * 0.08)
-                ctx.stroke()
+                ctx.strokeRect(px(0.14), py(0.22), s * 0.72, s * 0.62)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.14), py(0.4))
@@ -1976,17 +1943,14 @@ Item {
                 ctx.lineTo(px(0.68), py(0.28))
                 ctx.stroke()
 
-                ctx.beginPath()
-                ctx.arc(px(0.34), py(0.56), s * 0.025, 0, Math.PI * 2)
-                ctx.arc(px(0.5), py(0.56), s * 0.025, 0, Math.PI * 2)
-                ctx.arc(px(0.66), py(0.56), s * 0.025, 0, Math.PI * 2)
-                ctx.arc(px(0.34), py(0.7), s * 0.025, 0, Math.PI * 2)
-                ctx.arc(px(0.5), py(0.7), s * 0.025, 0, Math.PI * 2)
-                ctx.fill()
+                var cds = s * 0.06
+                ctx.fillRect(px(0.34) - cds / 2, py(0.58) - cds / 2, cds, cds)
+                ctx.fillRect(px(0.5) - cds / 2, py(0.58) - cds / 2, cds, cds)
+                ctx.fillRect(px(0.66) - cds / 2, py(0.58) - cds / 2, cds, cds)
+                ctx.fillRect(px(0.34) - cds / 2, py(0.72) - cds / 2, cds, cds)
+                ctx.fillRect(px(0.5) - cds / 2, py(0.72) - cds / 2, cds, cds)
             } else if (icon.name === "clock") {
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.34, 0, Math.PI * 2)
-                ctx.stroke()
+                ctx.strokeRect(px(0.16), py(0.16), s * 0.68, s * 0.68)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.5), py(0.3))
@@ -1994,40 +1958,22 @@ Item {
                 ctx.lineTo(px(0.66), py(0.62))
                 ctx.stroke()
             } else if (icon.name === "room") {
-                roundedRectPath(px(0.2), py(0.16), s * 0.6, s * 0.7, s * 0.08)
-                ctx.stroke()
+                ctx.strokeRect(px(0.2), py(0.16), s * 0.6, s * 0.7)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.5), py(0.16))
                 ctx.lineTo(px(0.5), py(0.86))
                 ctx.stroke()
 
-                ctx.beginPath()
-                ctx.arc(px(0.42), py(0.52), s * 0.025, 0, Math.PI * 2)
-                ctx.fill()
+                var ks = s * 0.05
+                ctx.fillRect(px(0.42) - ks / 2, py(0.52) - ks / 2, ks, ks)
             } else if (icon.name === "group") {
-                ctx.beginPath()
-                ctx.arc(px(0.36), py(0.35), s * 0.12, 0, Math.PI * 2)
-                ctx.stroke()
-
-                ctx.beginPath()
-                ctx.arc(px(0.64), py(0.35), s * 0.12, 0, Math.PI * 2)
-                ctx.stroke()
-
-                ctx.beginPath()
-                ctx.moveTo(px(0.18), py(0.78))
-                ctx.quadraticCurveTo(px(0.22), py(0.57), px(0.36), py(0.57))
-                ctx.quadraticCurveTo(px(0.5), py(0.57), px(0.54), py(0.78))
-                ctx.stroke()
-
-                ctx.beginPath()
-                ctx.moveTo(px(0.46), py(0.78))
-                ctx.quadraticCurveTo(px(0.5), py(0.57), px(0.64), py(0.57))
-                ctx.quadraticCurveTo(px(0.78), py(0.57), px(0.82), py(0.78))
-                ctx.stroke()
+                ctx.strokeRect(px(0.25), py(0.2), s * 0.2, s * 0.2)
+                ctx.strokeRect(px(0.55), py(0.2), s * 0.2, s * 0.2)
+                ctx.strokeRect(px(0.15), py(0.5), s * 0.4, s * 0.3)
+                ctx.strokeRect(px(0.45), py(0.5), s * 0.4, s * 0.3)
             } else if (icon.name === "subgroup") {
-                roundedRectPath(px(0.18), py(0.22), s * 0.64, s * 0.56, s * 0.08)
-                ctx.stroke()
+                ctx.strokeRect(px(0.18), py(0.22), s * 0.64, s * 0.56)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.32), py(0.4))
@@ -2036,15 +1982,8 @@ Item {
                 ctx.lineTo(px(0.58), py(0.56))
                 ctx.stroke()
             } else if (icon.name === "user") {
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.33), s * 0.16, 0, Math.PI * 2)
-                ctx.stroke()
-
-                ctx.beginPath()
-                ctx.moveTo(px(0.22), py(0.82))
-                ctx.quadraticCurveTo(px(0.25), py(0.58), px(0.5), py(0.58))
-                ctx.quadraticCurveTo(px(0.75), py(0.58), px(0.78), py(0.82))
-                ctx.stroke()
+                ctx.strokeRect(px(0.34), py(0.17), s * 0.32, s * 0.32)
+                ctx.strokeRect(px(0.24), py(0.58), s * 0.52, s * 0.24)
             } else if (icon.name === "warning") {
                 ctx.beginPath()
                 ctx.moveTo(px(0.5), py(0.14))
@@ -2058,21 +1997,34 @@ Item {
                 ctx.lineTo(px(0.5), py(0.58))
                 ctx.stroke()
 
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.69), s * 0.025, 0, Math.PI * 2)
-                ctx.fill()
+                var ws = s * 0.06
+                ctx.fillRect(px(0.5) - ws / 2, py(0.69) - ws / 2, ws, ws)
             } else if (icon.name === "empty") {
-                roundedRectPath(px(0.2), py(0.22), s * 0.6, s * 0.52, s * 0.08)
-                ctx.stroke()
+                ctx.strokeRect(px(0.2), py(0.22), s * 0.6, s * 0.52)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.34), py(0.5))
                 ctx.lineTo(px(0.66), py(0.5))
                 ctx.stroke()
-            } else {
+            } else if (icon.name === "tasks") {
+                ctx.strokeRect(px(0.2), py(0.14), s * 0.6, s * 0.72)
+
                 ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.08, 0, Math.PI * 2)
-                ctx.fill()
+                ctx.moveTo(px(0.34), py(0.34))
+                ctx.lineTo(px(0.7), py(0.34))
+                ctx.moveTo(px(0.34), py(0.5))
+                ctx.lineTo(px(0.7), py(0.5))
+                ctx.moveTo(px(0.34), py(0.66))
+                ctx.lineTo(px(0.58), py(0.66))
+                ctx.stroke()
+
+                var ds = s * 0.05
+                ctx.fillRect(px(0.27) - ds / 2, py(0.34) - ds / 2, ds, ds)
+                ctx.fillRect(px(0.27) - ds / 2, py(0.5) - ds / 2, ds, ds)
+                ctx.fillRect(px(0.27) - ds / 2, py(0.66) - ds / 2, ds, ds)
+            } else {
+                var defs = s * 0.16
+                ctx.fillRect(px(0.5) - defs / 2, py(0.5) - defs / 2, defs, defs)
             }
         }
     }

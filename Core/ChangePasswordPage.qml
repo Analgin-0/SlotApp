@@ -3,7 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import App.Core 1.0
 
-Page {
+Item {
     id: page
 
     focus: true
@@ -34,24 +34,23 @@ Page {
     property string errorText: ""
     property string infoText: ""
 
-    readonly property color bg: "#111318"
-    readonly property color surface: "#181B21"
-    readonly property color surface2: "#20242C"
-    readonly property color surface3: "#2A2F39"
-    readonly property color border: "#313640"
-    readonly property color textMain: "#F4F6F8"
-    readonly property color textSub: "#C8CDD4"
-    readonly property color textMuted: "#8D96A3"
-    readonly property color accent: "#6EA8FE"
-    readonly property color accentSoft: "#1C2B44"
-    readonly property color danger: "#FF6B6B"
-    readonly property color dangerSoft: "#3A2023"
-    readonly property color success: "#6EE7A8"
-    readonly property color successSoft: "#173427"
 
-    background: Rectangle {
-        color: page.bg
-    }
+    readonly property color bg: "#000000"
+    readonly property color surface: "#111111"
+    readonly property color surface2: "#222222"
+    readonly property color surface3: "#333333"
+    readonly property color border: "#555555"
+    readonly property color textMain: "#FFFFFF"
+    readonly property color textSub: "#DDDDDD"
+    readonly property color textMuted: "#AAAAAA"
+    readonly property color accent: "#FFFFFF"
+    readonly property color accentSoft: "#333333"
+    readonly property color danger: "#FFFFFF"
+    readonly property color dangerSoft: "#222222"
+    readonly property color success: "#FFFFFF"
+    readonly property color successSoft: "#222222"
+
+
 
     function responseCmd(obj) {
         if (!obj)
@@ -384,7 +383,7 @@ Page {
 
     Timer {
         id: keyboardEnsureTimer
-            interval: 420
+        interval: 420
         repeat: false
 
         onTriggered: {
@@ -822,7 +821,6 @@ Page {
 
         background: Rectangle {
             color: page.surface
-            radius: 24
             border.width: 1
             border.color: page.border
         }
@@ -832,7 +830,7 @@ Page {
 
             IconCircle {
                 iconText: "✓"
-                bgColor: page.successSoft
+                bgColor: page.surface2
                 textColor: page.success
 
                 Layout.preferredWidth: 58
@@ -880,10 +878,9 @@ Page {
         property bool hovered: hoverArea.containsMouse
         property bool pressed: pressHandler.pressed
 
-        color: card.hovered && page.desktopMode ? page.surface2 : page.surface
-        radius: 26
+        color: card.pressed ? page.surface3 : card.hovered && page.desktopMode ? page.surface2 : page.surface
         border.width: 1
-        border.color: card.hovered && page.desktopMode ? "#284568" : page.border
+        border.color: card.hovered && page.desktopMode ? "#777777" : page.border
 
         Layout.preferredHeight: headerRow.implicitHeight + (page.compactMode ? 28 : 32)
 
@@ -916,10 +913,9 @@ Page {
             Rectangle {
                 Layout.preferredWidth: page.compactMode ? 50 : 58
                 Layout.preferredHeight: page.compactMode ? 50 : 58
-                radius: page.compactMode ? 17 : 20
-                color: page.accentSoft
+                color: page.surface3
                 border.width: 1
-                border.color: "#284568"
+                border.color: page.border
 
                 DrawIcon {
                     anchors.centerIn: parent
@@ -970,10 +966,9 @@ Page {
         property bool pressed: pressHandler.pressed
 
         height: 52
-        radius: 26
         color: card.hovered && page.desktopMode ? page.surface2 : page.surface
         border.width: 1
-        border.color: card.hovered && page.desktopMode ? "#284568" : page.border
+        border.color: card.hovered && page.desktopMode ? "#777777" : page.border
 
         Layout.preferredHeight: 52
 
@@ -1013,12 +1008,13 @@ Page {
         property string text: ""
         property bool selected: false
         property bool hovered: mouseArea.containsMouse
+        property bool pressed: mouseArea.pressed
 
         Layout.preferredHeight: 42
         Layout.fillHeight: true
 
         opacity: enabled ? 1.0 : 0.45
-        scale: mouseArea.pressed ? 0.97 : control.hovered && page.desktopMode ? 1.015 : 1.0
+        scale: control.pressed ? 0.982 : control.hovered && page.desktopMode ? 1.015 : 1.0
 
         Behavior on scale {
             NumberAnimation {
@@ -1029,10 +1025,9 @@ Page {
 
         Rectangle {
             anchors.fill: parent
-            radius: 21
             color: {
                 if (control.selected)
-                    return mouseArea.pressed ? "#255FA9" : control.hovered && page.desktopMode ? "#2B6CBE" : page.accent
+                    return mouseArea.pressed ? "#CCCCCC" : control.hovered && page.desktopMode ? "#DDDDDD" : page.accent
 
                 if (mouseArea.pressed)
                     return page.surface3
@@ -1045,27 +1040,44 @@ Page {
             border.width: control.hovered && page.desktopMode && !control.selected ? 1 : 0
             border.color: page.border
 
-            Behavior on color { ColorAnimation { duration: 130 } }
+            Behavior on color {
+                ColorAnimation {
+                    duration: 140
+                    easing.type: Easing.OutQuad
+                }
+            }
+
+            Behavior on border.color {
+                ColorAnimation {
+                    duration: 140
+                    easing.type: Easing.OutQuad
+                }
+            }
         }
 
         Text {
-            anchors.fill: parent
-            anchors.leftMargin: 8
-            anchors.rightMargin: 8
+            anchors.centerIn: parent
             text: control.text
-            color: control.selected ? "#FFFFFF" : control.hovered && page.desktopMode ? page.textMain : page.textSub
+            color: control.selected ? "#000000" : control.hovered && page.desktopMode ? page.textMain : page.textSub
             font.pixelSize: page.compactMode ? 13 : 14
             font.bold: true
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             maximumLineCount: 1
             elide: Text.ElideRight
+
+            Behavior on color {
+                ColorAnimation {
+                    duration: 130
+                    easing.type: Easing.OutQuad
+                }
+            }
         }
 
         MouseArea {
             id: mouseArea
+
             anchors.fill: parent
-            enabled: control.enabled
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
 
@@ -1084,9 +1096,8 @@ Page {
         property bool pressed: pressHandler.pressed
 
         color: card.hovered && page.desktopMode ? page.surface2 : page.surface
-        radius: 26
         border.width: 1
-        border.color: card.hovered && page.desktopMode ? "#284568" : page.border
+        border.color: card.hovered && page.desktopMode ? "#777777" : page.border
 
         Layout.fillWidth: true
         Layout.leftMargin: page.pageSideMargin
@@ -1144,10 +1155,9 @@ Page {
         property string text: ""
         property bool hovered: hoverArea.containsMouse
 
-        radius: 18
-        color: pill.hovered && page.desktopMode ? "#203553" : page.accentSoft
+        color: pill.hovered && page.desktopMode ? page.surface3 : page.surface2
         border.width: 1
-        border.color: pill.hovered && page.desktopMode ? "#3D6697" : "#284568"
+        border.color: pill.hovered && page.desktopMode ? "#777777" : page.border
 
         Layout.fillWidth: true
         Layout.preferredHeight: pillText.implicitHeight + 24
@@ -1185,7 +1195,6 @@ Page {
         property bool pressed: pressHandler.pressed
 
         color: box.danger ? page.dangerSoft : page.successSoft
-        radius: 20
         border.width: 1
         border.color: {
             if (box.danger)
@@ -1250,7 +1259,6 @@ Page {
         property color bgColor: page.surface2
         property color textColor: page.textMain
 
-        radius: width / 2
         color: icon.bgColor
         border.width: 1
         border.color: page.border
@@ -1287,7 +1295,6 @@ Page {
 
         Rectangle {
             anchors.fill: parent
-            radius: 16
             color: {
                 if (!button.enabled)
                     return page.surface2
@@ -1296,12 +1303,12 @@ Page {
                     return page.surface3
 
                 if (button.hovered && page.desktopMode)
-                    return page.accentSoft
+                    return page.surface3
 
-                return page.surface
+                return page.surface2
             }
             border.width: 1
-            border.color: button.hovered && page.desktopMode ? "#284568" : page.border
+            border.color: button.hovered && page.desktopMode ? "#777777" : page.border
 
             Behavior on color { ColorAnimation { duration: 130 } }
             Behavior on border.color { ColorAnimation { duration: 130 } }
@@ -1350,8 +1357,9 @@ Page {
             ctx.strokeStyle = icon.iconColor
             ctx.fillStyle = icon.iconColor
             ctx.lineWidth = Math.max(1.8, s * 0.08)
-            ctx.lineCap = "round"
-            ctx.lineJoin = "round"
+
+            ctx.lineCap = "square"
+            ctx.lineJoin = "miter"
 
             function px(v) {
                 return x + s * v
@@ -1359,20 +1367,6 @@ Page {
 
             function py(v) {
                 return y + s * v
-            }
-
-            function roundedRectPath(left, top, w, h, r) {
-                ctx.beginPath()
-                ctx.moveTo(left + r, top)
-                ctx.lineTo(left + w - r, top)
-                ctx.quadraticCurveTo(left + w, top, left + w, top + r)
-                ctx.lineTo(left + w, top + h - r)
-                ctx.quadraticCurveTo(left + w, top + h, left + w - r, top + h)
-                ctx.lineTo(left + r, top + h)
-                ctx.quadraticCurveTo(left, top + h, left, top + h - r)
-                ctx.lineTo(left, top + r)
-                ctx.quadraticCurveTo(left, top, left + r, top)
-                ctx.closePath()
             }
 
             if (icon.name === "back") {
@@ -1386,8 +1380,8 @@ Page {
                 ctx.moveTo(px(0.5), py(0.12))
                 ctx.lineTo(px(0.78), py(0.24))
                 ctx.lineTo(px(0.78), py(0.48))
-                ctx.quadraticCurveTo(px(0.78), py(0.72), px(0.5), py(0.88))
-                ctx.quadraticCurveTo(px(0.22), py(0.72), px(0.22), py(0.48))
+                ctx.lineTo(px(0.5), py(0.88))
+                ctx.lineTo(px(0.22), py(0.72))
                 ctx.lineTo(px(0.22), py(0.24))
                 ctx.closePath()
                 ctx.stroke()
@@ -1399,8 +1393,7 @@ Page {
                 ctx.lineTo(px(0.43), py(0.75))
                 ctx.stroke()
             } else if (icon.name === "mail") {
-                roundedRectPath(px(0.14), py(0.24), s * 0.72, s * 0.52, s * 0.08)
-                ctx.stroke()
+                ctx.strokeRect(px(0.14), py(0.24), s * 0.72, s * 0.52)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.16), py(0.3))
@@ -1408,155 +1401,62 @@ Page {
                 ctx.lineTo(px(0.84), py(0.3))
                 ctx.stroke()
             } else {
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.08, 0, Math.PI * 2)
-                ctx.fill()
+                var dfs = s * 0.16
+                ctx.fillRect(px(0.5) - dfs / 2, py(0.5) - dfs / 2, dfs, dfs)
             }
         }
     }
 
-    component AppTextField: Rectangle {
-        id: field
+    component AppTextField: TextField {
+        id: control
 
-        property alias text: input.text
-        property alias placeholderText: placeholder.text
-        property alias echoMode: input.echoMode
-        property alias inputMethodHints: input.inputMethodHints
-        property bool hovered: hoverArea.containsMouse
+        property bool error: false
 
-        signal accepted()
+        Layout.fillWidth: true
+        Layout.preferredHeight: 52
 
-        function forceActiveFocus() {
-            if (page.activeTextInput && page.activeTextInput !== input)
-                page.activeTextInput.cursorVisible = false
+        hoverEnabled: true
 
-            page.activeTextInput = input
-            input.forceActiveFocus()
-            input.cursorVisible = true
-            page.lastFocusedField = field
+        font.pixelSize: 15
+        color: page.textMain
+        placeholderTextColor: page.textMuted
+        selectionColor: page.accent
+        selectedTextColor: "#000000"
 
-            Qt.callLater(function() {
-                keyboardEnsureTimer.restart()
-            })
-        }
+        leftPadding: 16
+        rightPadding: 16
 
-        height: 56
-        implicitHeight: 56
+        scale: activeFocus ? 1.002 : hovered && page.desktopMode ? 1.002 : 1.0
 
-        Layout.preferredHeight: 56
-
-        radius: 18
-        color: {
-            if (input.activeFocus)
-                return page.surface3
-
-            if (field.hovered && page.desktopMode && field.enabled)
-                return page.surface3
-
-            return page.surface2
-        }
-        border.width: input.activeFocus || (field.hovered && page.desktopMode && field.enabled) ? 2 : 1
-        border.color: {
-            if (input.activeFocus)
-                return page.accent
-
-            if (field.hovered && page.desktopMode && field.enabled)
-                return "#284568"
-
-            return page.border
-        }
-        opacity: enabled ? 1.0 : 0.55
-        scale: input.activeFocus ? 1.0 : 1.0
-
-        Behavior on border.color {
-            ColorAnimation {
-                duration: 150
+        Behavior on scale {
+            NumberAnimation {
+                duration: 110
+                easing.type: Easing.OutQuad
             }
         }
 
-        Behavior on color {
-            ColorAnimation {
-                duration: 150
-            }
+        background: Rectangle {
+            color: control.activeFocus
+                   ? page.surface3
+                   : control.hovered && page.desktopMode && control.enabled
+                     ? page.surface3
+                     : page.surface2
+            border.width: control.activeFocus || (control.hovered && page.desktopMode && control.enabled) ? 2 : 1
+            border.color: control.error
+                          ? page.danger
+                          : control.activeFocus
+                            ? page.accent
+                            : control.hovered && page.desktopMode && control.enabled
+                              ? "#777777"
+                              : page.border
+
+            Behavior on color { ColorAnimation { duration: 140 } }
+            Behavior on border.color { ColorAnimation { duration: 140 } }
         }
 
-        MouseArea {
-            id: hoverArea
-            anchors.fill: parent
-            hoverEnabled: true
-            acceptedButtons: Qt.NoButton
-        }
-
-        TextInput {
-            id: input
-
-            anchors.fill: parent
-            anchors.leftMargin: 16
-            anchors.rightMargin: 16
-
-            enabled: field.enabled
-
-            color: page.textMain
-            selectionColor: page.accent
-            selectedTextColor: "#FFFFFF"
-            font.pixelSize: 16
-
-            verticalAlignment: TextInput.AlignVCenter
-            clip: true
-
-            cursorVisible: false
-
-            echoMode: TextInput.Normal
-
-            cursorDelegate: Rectangle {
-                width: 2
-                visible: input.activeFocus && page.activeTextInput === input
-                color: page.accent
-            }
-
-            onActiveFocusChanged: {
-                if (input.activeFocus) {
-                    if (page.activeTextInput && page.activeTextInput !== input)
-                        page.activeTextInput.cursorVisible = false
-
-                    page.activeTextInput = input
-                    input.cursorVisible = true
-                    page.lastFocusedField = field
-
-                    Qt.callLater(function() {
-                        keyboardEnsureTimer.restart()
-                    })
-                } else {
-                    input.cursorVisible = false
-                }
-            }
-
-            onAccepted: {
-                field.accepted()
-            }
-        }
-
-        Text {
-            id: placeholder
-
-            anchors.fill: parent
-            anchors.leftMargin: 16
-            anchors.rightMargin: 16
-
-            opacity: (input.text.length === 0 && input.preeditText.length === 0) ? 1.0 : 0.0
-
-            Behavior on opacity {
-                NumberAnimation {
-                    duration: 150
-                    easing.type: Easing.InOutQuad
-                }
-            }
-
-            color: field.hovered && page.desktopMode && field.enabled ? page.textSub : page.textMuted
-            font.pixelSize: 16
-            verticalAlignment: Text.AlignVCenter
-            elide: Text.ElideRight
-            enabled: false
+        onActiveFocusChanged: {
+            if (activeFocus)
+                page.requestEnsureVisible(control)
         }
     }
 
@@ -1568,6 +1468,7 @@ Page {
         property string text: ""
         property string variant: "primary"
         property bool hovered: mouseArea.containsMouse
+        property bool pressed: mouseArea.pressed
 
         Layout.preferredHeight: 50
 
@@ -1583,7 +1484,6 @@ Page {
 
         Rectangle {
             anchors.fill: parent
-            radius: 17
 
             color: {
                 if (!button.enabled)
@@ -1591,17 +1491,17 @@ Page {
 
                 if (button.variant === "primary") {
                     if (mouseArea.pressed)
-                        return "#255FA9"
+                        return "#222222"
                     if (button.hovered && page.desktopMode)
-                        return "#2B6CBE"
-                    return page.accent
+                        return "#444444"
+                    return page.surface3
                 }
 
                 if (button.variant === "outlined") {
                     if (mouseArea.pressed)
                         return page.surface3
                     if (button.hovered && page.desktopMode)
-                        return page.accentSoft
+                        return page.surface3
                     return "transparent"
                 }
 
@@ -1617,10 +1517,10 @@ Page {
             border.width: button.variant === "outlined" || (button.hovered && page.desktopMode) ? 1 : 0
             border.color: {
                 if (button.variant === "outlined")
-                    return button.hovered && page.desktopMode ? "#284568" : page.border
+                    return button.hovered && page.desktopMode ? "#777777" : page.border
 
                 if (button.hovered && page.desktopMode)
-                    return "#7FB5FF"
+                    return "#FFFFFF"
 
                 return "transparent"
             }
@@ -1643,7 +1543,7 @@ Page {
                     return "#FFFFFF"
 
                 if (button.variant === "outlined")
-                    return button.hovered && page.desktopMode ? page.accent : page.accent
+                    return button.hovered && page.desktopMode ? page.textMain : page.accent
 
                 return button.hovered && page.desktopMode ? page.textMain : page.textSub
             }
@@ -1668,5 +1568,4 @@ Page {
             }
         }
     }
-
 }

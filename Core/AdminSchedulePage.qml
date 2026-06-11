@@ -27,22 +27,27 @@ Item {
 
     readonly property bool loading: loadingSchedule || deleting
 
-    readonly property color bg: "#111318"
-    readonly property color surface: "#181B21"
-    readonly property color surface2: "#20242C"
-    readonly property color surface3: "#2A2F39"
-    readonly property color border: "#313640"
-    readonly property color textMain: "#F4F6F8"
-    readonly property color textSub: "#C8CDD4"
-    readonly property color textMuted: "#8D96A3"
-    readonly property color accent: "#6EA8FE"
-    readonly property color accentSoft: "#1C2B44"
-    readonly property color danger: "#FF6B6B"
-    readonly property color dangerSoft: "#3A2023"
-    readonly property color success: "#6EE7A8"
-    readonly property color successSoft: "#173427"
-    readonly property color warning: "#FFD166"
-    readonly property color warningSoft: "#392F18"
+
+    readonly property color bg: "#000000"
+    readonly property color surface: "#111111"
+    readonly property color surface2: "#222222"
+    readonly property color surface3: "#333333"
+    readonly property color border: "#555555"
+    readonly property color textMain: "#FFFFFF"
+    readonly property color textSub: "#DDDDDD"
+    readonly property color textMuted: "#AAAAAA"
+    readonly property color accent: "#FFFFFF"
+    readonly property color accentSoft: "#333333"
+    readonly property color danger: "#FFFFFF"
+    readonly property color dangerSoft: "#222222"
+    readonly property color success: "#FFFFFF"
+    readonly property color successSoft: "#222222"
+    readonly property color warning: "#FFFFFF"
+    readonly property color warningSoft: "#222222"
+
+    readonly property int desktopBreakpoint: 900
+    readonly property bool desktopMode: page.width >= page.desktopBreakpoint
+    readonly property int contentMaxWidth: 1040
 
     ListModel {
         id: scheduleModel
@@ -848,13 +853,12 @@ Item {
             id: fabBg
 
             anchors.fill: parent
-            radius: 24
 
             color: page.loading
                    ? page.surface3
                    : fabArea.pressed
-                     ? page.accentSoft
-                     : page.surface
+                     ? page.surface3
+                     : page.surface2
 
             border.width: 1
             border.color: page.loading ? page.border : page.accent
@@ -862,7 +866,6 @@ Item {
             Rectangle {
                 anchors.fill: parent
                 anchors.margins: 6
-                radius: 19
                 color: page.loading ? "transparent" : page.accent
                 opacity: fabArea.pressed ? 0.72 : 1.0
             }
@@ -872,7 +875,7 @@ Item {
                 width: 28
                 height: 28
                 name: "plus"
-                iconColor: "#FFFFFF"
+                iconColor: "#000000"
             }
         }
 
@@ -903,7 +906,6 @@ Item {
 
         background: Rectangle {
             color: page.surface
-            radius: 24
             border.width: 1
             border.color: page.border
         }
@@ -957,12 +959,13 @@ Item {
                     Layout.preferredHeight: 48
 
                     background: Rectangle {
-                        radius: 17
                         color: !confirmDeleteButton.enabled
                                ? page.surface3
                                : confirmDeleteButton.down
-                                 ? "#E35A5A"
-                                 : page.danger
+                                 ? "#333333"
+                                 : page.surface2
+                        border.width: 1
+                        border.color: confirmDeleteButton.hovered ? page.textMain : page.border
                     }
 
                     contentItem: Text {
@@ -984,8 +987,7 @@ Item {
     }
 
     component HeaderCard: Rectangle {
-        color: page.surface
-        radius: 26
+        color: page.surface2
         border.width: 1
         border.color: page.border
 
@@ -1001,10 +1003,9 @@ Item {
             Rectangle {
                 Layout.preferredWidth: 58
                 Layout.preferredHeight: 58
-                radius: 20
-                color: page.accentSoft
+                color: page.surface3
                 border.width: 1
-                border.color: "#284568"
+                border.color: page.border
 
                 DrawIcon {
                     anchors.centerIn: parent
@@ -1057,9 +1058,8 @@ Item {
 
     component FilterCard: Rectangle {
         color: page.surface2
-        radius: 26
         border.width: 1
-        border.color: "#284568"
+        border.color: page.border
 
         Layout.preferredHeight: filterColumn.implicitHeight + 34
 
@@ -1068,7 +1068,6 @@ Item {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             width: 5
-            radius: 3
             color: page.accent
             opacity: 0.9
         }
@@ -1087,10 +1086,9 @@ Item {
                 Rectangle {
                     Layout.preferredWidth: 42
                     Layout.preferredHeight: 42
-                    radius: 15
-                    color: page.accentSoft
+                    color: page.surface3
                     border.width: 1
-                    border.color: "#284568"
+                    border.color: page.border
 
                     DrawIcon {
                         anchors.centerIn: parent
@@ -1127,8 +1125,7 @@ Item {
             Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 1
-                color: "#284568"
-                opacity: 0.8
+                color: page.border
             }
 
             FieldLabel {
@@ -1171,7 +1168,6 @@ Item {
 
     component ScheduleListCard: Rectangle {
         color: page.surface
-        radius: 26
         border.width: 1
         border.color: page.border
 
@@ -1216,7 +1212,7 @@ Item {
                 iconName: "clock"
                 text: "Загружаю расписание..."
                 iconColor: page.accent
-                bgColor: page.accentSoft
+                bgColor: page.surface3
 
                 Layout.fillWidth: true
             }
@@ -1366,10 +1362,9 @@ Item {
         implicitHeight: groupHeaderContent.implicitHeight + 24
         height: implicitHeight
 
-        radius: 22
-        color: page.accentSoft
+        color: page.surface3
         border.width: 1
-        border.color: "#284568"
+        border.color: page.border
 
         RowLayout {
             id: groupHeaderContent
@@ -1381,14 +1376,13 @@ Item {
             Rectangle {
                 Layout.preferredWidth: 42
                 Layout.preferredHeight: 42
-                radius: 15
                 color: page.accent
                 opacity: 0.95
 
                 Text {
                     anchors.centerIn: parent
                     text: "Г"
-                    color: "#FFFFFF"
+                    color: "#000000"
                     font.pixelSize: 18
                     font.bold: true
                 }
@@ -1430,10 +1424,9 @@ Item {
         implicitHeight: dayHeaderContent.implicitHeight + 18
         height: implicitHeight
 
-        radius: 18
-        color: "#172233"
+        color: page.surface3
         border.width: 1
-        border.color: "#284568"
+        border.color: page.border
 
         RowLayout {
             id: dayHeaderContent
@@ -1448,7 +1441,6 @@ Item {
             Rectangle {
                 Layout.preferredWidth: 10
                 Layout.preferredHeight: 10
-                radius: 5
                 color: page.accent
             }
 
@@ -1493,7 +1485,6 @@ Item {
         implicitHeight: rowContent.implicitHeight + 24
         height: implicitHeight
 
-        radius: 22
         color: page.surface2
         border.width: 1
         border.color: page.border
@@ -1508,10 +1499,9 @@ Item {
             Rectangle {
                 Layout.preferredWidth: 78
                 Layout.preferredHeight: 62
-                radius: 18
-                color: row.isActive ? page.accentSoft : page.surface3
+                color: row.isActive ? page.surface3 : page.surface3
                 border.width: 1
-                border.color: row.isActive ? "#284568" : page.border
+                border.color: row.isActive ? "#777777" : page.border
 
                 ColumnLayout {
                     anchors.centerIn: parent
@@ -1563,10 +1553,9 @@ Item {
                     }
 
                     Rectangle {
-                        radius: 10
-                        color: page.accentSoft
+                        color: page.surface3
                         border.width: 1
-                        border.color: "#284568"
+                        border.color: page.border
 
                         Layout.preferredHeight: 26
                         Layout.preferredWidth: groupText.implicitWidth + 18
@@ -1660,9 +1649,8 @@ Item {
         property bool danger: true
 
         color: box.danger ? page.dangerSoft : page.successSoft
-        radius: 20
         border.width: 1
-        border.color: box.danger ? "#5A2D31" : "#24513C"
+        border.color: box.danger ? "#5A2D31" : "#555555"
 
         Layout.preferredHeight: messageRow.implicitHeight + 24
 
@@ -1676,8 +1664,7 @@ Item {
             Rectangle {
                 Layout.preferredWidth: 38
                 Layout.preferredHeight: 38
-                radius: 14
-                color: box.danger ? "#4A2529" : "#123021"
+                color: "#333333"
 
                 DrawIcon {
                     anchors.centerIn: parent
@@ -1709,7 +1696,6 @@ Item {
         property color iconColor: page.accent
         property color bgColor: page.surface2
 
-        radius: 20
         color: msg.bgColor
         border.width: 1
         border.color: page.border
@@ -1726,7 +1712,6 @@ Item {
             Rectangle {
                 Layout.preferredWidth: 40
                 Layout.preferredHeight: 40
-                radius: 14
                 color: Qt.rgba(msg.iconColor.r, msg.iconColor.g, msg.iconColor.b, 0.14)
 
                 DrawIcon {
@@ -1801,16 +1786,14 @@ Item {
         font.pixelSize: 15
 
         background: Rectangle {
-            radius: 17
-
             color: combo.filterStyle
-                   ? combo.activeFocus ? page.surface : "#172233"
+                   ? combo.activeFocus ? page.surface : page.surface3
                    : combo.activeFocus ? page.surface3 : page.surface2
 
             border.width: combo.activeFocus ? 2 : 1
 
             border.color: combo.filterStyle
-                          ? combo.activeFocus ? page.accent : "#284568"
+                          ? combo.activeFocus ? page.accent : page.border
                           : combo.activeFocus ? page.accent : page.border
 
             opacity: combo.enabled ? 1.0 : 0.65
@@ -1845,7 +1828,6 @@ Item {
 
             background: Rectangle {
                 color: page.surface2
-                radius: 18
                 border.width: 1
                 border.color: page.border
             }
@@ -1866,8 +1848,7 @@ Item {
             height: Math.max(44, delegateText.implicitHeight + 18)
 
             background: Rectangle {
-                radius: 14
-                color: delegateItem.highlighted ? page.surface3 : "transparent"
+                color: highlighted ? page.surface3 : "transparent"
             }
 
             contentItem: Text {
@@ -1891,10 +1872,9 @@ Item {
         id: control
 
         background: Rectangle {
-            radius: 16
             color: !control.enabled ? page.surface3 : control.down ? page.surface3 : page.surface2
             border.width: 1
-            border.color: page.border
+            border.color: control.down ? page.accent : page.border
         }
 
         contentItem: Text {
@@ -1923,40 +1903,26 @@ Item {
             ctx.clearRect(0, 0, width, height)
 
             var s = Math.min(width, height)
-            var ox = (width - s) / 2
-            var oy = (height - s) / 2
+            var x = (width - s) / 2
+            var y = (height - s) / 2
 
             ctx.strokeStyle = icon.iconColor
             ctx.fillStyle = icon.iconColor
             ctx.lineWidth = Math.max(1.8, s * 0.085)
-            ctx.lineCap = "round"
-            ctx.lineJoin = "round"
+
+            ctx.lineCap = "square"
+            ctx.lineJoin = "miter"
 
             function px(v) {
-                return ox + s * v
+                return x + s * v
             }
 
             function py(v) {
-                return oy + s * v
-            }
-
-            function roundedRectPath(l, t, w, h, r) {
-                ctx.beginPath()
-                ctx.moveTo(l + r, t)
-                ctx.lineTo(l + w - r, t)
-                ctx.quadraticCurveTo(l + w, t, l + w, t + r)
-                ctx.lineTo(l + w, t + h - r)
-                ctx.quadraticCurveTo(l + w, t + h, l + w - r, t + h)
-                ctx.lineTo(l + r, t + h)
-                ctx.quadraticCurveTo(l, t + h, l, t + h - r)
-                ctx.lineTo(l, t + r)
-                ctx.quadraticCurveTo(l, t, l + r, t)
-                ctx.closePath()
+                return y + s * v
             }
 
             if (icon.name === "calendar") {
-                roundedRectPath(px(0.14), py(0.22), s * 0.72, s * 0.62, s * 0.08)
-                ctx.stroke()
+                ctx.strokeRect(px(0.14), py(0.22), s * 0.72, s * 0.62)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.14), py(0.4))
@@ -1967,11 +1933,10 @@ Item {
                 ctx.lineTo(px(0.68), py(0.28))
                 ctx.stroke()
 
-                ctx.beginPath()
-                ctx.arc(px(0.34), py(0.56), s * 0.025, 0, Math.PI * 2)
-                ctx.arc(px(0.5), py(0.56), s * 0.025, 0, Math.PI * 2)
-                ctx.arc(px(0.66), py(0.56), s * 0.025, 0, Math.PI * 2)
-                ctx.fill()
+                var cds = s * 0.06
+                ctx.fillRect(px(0.34) - cds / 2, py(0.56) - cds / 2, cds, cds)
+                ctx.fillRect(px(0.5) - cds / 2, py(0.56) - cds / 2, cds, cds)
+                ctx.fillRect(px(0.66) - cds / 2, py(0.56) - cds / 2, cds, cds)
             } else if (icon.name === "filter") {
                 ctx.beginPath()
                 ctx.moveTo(px(0.18), py(0.26))
@@ -1990,17 +1955,14 @@ Item {
                 ctx.lineTo(px(0.76), py(0.5))
                 ctx.stroke()
             } else if (icon.name === "empty") {
-                roundedRectPath(px(0.2), py(0.22), s * 0.6, s * 0.52, s * 0.08)
-                ctx.stroke()
+                ctx.strokeRect(px(0.2), py(0.22), s * 0.6, s * 0.52)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.34), py(0.5))
                 ctx.lineTo(px(0.66), py(0.5))
                 ctx.stroke()
             } else if (icon.name === "clock") {
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.34, 0, Math.PI * 2)
-                ctx.stroke()
+                ctx.strokeRect(px(0.16), py(0.16), s * 0.68, s * 0.68)
 
                 ctx.beginPath()
                 ctx.moveTo(px(0.5), py(0.3))
@@ -2020,18 +1982,13 @@ Item {
                 ctx.lineTo(px(0.5), py(0.58))
                 ctx.stroke()
 
-                ctx.beginPath()
-                ctx.arc(px(0.5), py(0.69), s * 0.025, 0, Math.PI * 2)
-                ctx.fill()
+                var ws = s * 0.05
+                ctx.fillRect(px(0.5) - ws / 2, py(0.69) - ws / 2, ws, ws)
             } else if (icon.name === "check") {
                 ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.34, 0, Math.PI * 2)
-                ctx.stroke()
-
-                ctx.beginPath()
-                ctx.moveTo(px(0.34), py(0.51))
-                ctx.lineTo(px(0.46), py(0.63))
-                ctx.lineTo(px(0.68), py(0.39))
+                ctx.moveTo(px(0.28), py(0.52))
+                ctx.lineTo(px(0.43), py(0.67))
+                ctx.lineTo(px(0.74), py(0.36))
                 ctx.stroke()
             } else if (icon.name === "chevronDown") {
                 ctx.beginPath()
@@ -2039,10 +1996,15 @@ Item {
                 ctx.lineTo(px(0.5), py(0.62))
                 ctx.lineTo(px(0.72), py(0.38))
                 ctx.stroke()
-            } else {
+            } else if (icon.name === "chevronUp") {
                 ctx.beginPath()
-                ctx.arc(px(0.5), py(0.5), s * 0.08, 0, Math.PI * 2)
-                ctx.fill()
+                ctx.moveTo(px(0.28), py(0.62))
+                ctx.lineTo(px(0.5), py(0.38))
+                ctx.lineTo(px(0.72), py(0.62))
+                ctx.stroke()
+            } else {
+                var defs = s * 0.16
+                ctx.fillRect(px(0.5) - defs / 2, py(0.5) - defs / 2, defs, defs)
             }
         }
     }
