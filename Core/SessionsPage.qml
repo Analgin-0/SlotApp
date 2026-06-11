@@ -750,7 +750,7 @@ Item {
         border.width: 1
         border.color: card.hovered && page.desktopMode ? "#284568" : page.border
 
-        Layout.preferredHeight: actionsColumn.implicitHeight + 32
+        Layout.preferredHeight: actionsColumn.implicitHeight + 30
 
         scale: card.pressed ? 0.992 : card.hovered && page.desktopMode ? 1.004 : 1.0
 
@@ -775,27 +775,27 @@ Item {
             id: actionsColumn
 
             anchors.fill: parent
-            anchors.margins: 16
-            spacing: 12
+            anchors.margins: page.width < 420 ? 14 : 16
+            spacing: 14
 
             RowLayout {
                 Layout.fillWidth: true
-                spacing: 10
+                spacing: 12
 
                 Rectangle {
-                    Layout.preferredWidth: 40
-                    Layout.preferredHeight: 40
-                    radius: 14
-                    color: page.surface2
+                    Layout.preferredWidth: 44
+                    Layout.preferredHeight: 44
+                    radius: 16
+                    color: page.accentSoft
                     border.width: 1
-                    border.color: page.border
+                    border.color: "#284568"
 
                     DrawIcon {
                         anchors.centerIn: parent
-                        width: 22
-                        height: 22
+                        width: 23
+                        height: 23
                         name: "shield"
-                        iconColor: page.textSub
+                        iconColor: page.accent
                     }
                 }
 
@@ -804,19 +804,23 @@ Item {
                     spacing: 2
 
                     Text {
-                        text: "Безопасность"
+                        text: "Действия с сессиями"
                         color: page.textMain
-                        font.pixelSize: 18
+                        font.pixelSize: page.width < 420 ? 17 : 18
                         font.bold: true
+                        maximumLineCount: 1
+                        elide: Text.ElideRight
 
                         Layout.fillWidth: true
                     }
 
                     Text {
-                        text: "Проверьте активные входы и завершите лишние."
+                        text: "Обновление списка и выходы с других устройств"
                         color: page.textMuted
                         font.pixelSize: 12
+                        maximumLineCount: 2
                         wrapMode: Text.WordWrap
+                        elide: Text.ElideRight
 
                         Layout.fillWidth: true
                     }
@@ -825,19 +829,18 @@ Item {
 
             GridLayout {
                 Layout.fillWidth: true
+                columns: page.width < 640 ? 1 : 3
                 columnSpacing: 10
                 rowSpacing: 10
 
-
-                columns: page.width < 550 ? 2 : 3
-
                 AppButton {
                     text: page.waitingList ? "Загрузка..." : "Обновить"
+                    iconName: "refresh"
                     variant: "tonal"
                     enabled: !page.busy()
 
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 38
+                    Layout.preferredHeight: 46
 
                     onClicked: {
                         page.startLoad()
@@ -845,12 +848,13 @@ Item {
                 }
 
                 AppButton {
-                    text: "Удалить старые"
+                    text: "Убрать завершённые"
+                    iconName: "trash"
                     variant: "neutral"
                     enabled: !page.busy()
 
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 38
+                    Layout.preferredHeight: 46
 
                     onClicked: {
                         page.clearRevokedSessions()
@@ -858,14 +862,13 @@ Item {
                 }
 
                 AppButton {
-                    text: page.waitingRevokeOthers ? "Завершаем..." : "Выйти везде"
+                    text: page.waitingRevokeOthers ? "Выходим..." : "Выйти со всех других"
+                    iconName: "logout"
                     variant: "danger"
                     enabled: !page.busy()
 
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 38
-
-                      Layout.columnSpan: page.width < 550 ? 2 : 1
+                    Layout.preferredHeight: 46
 
                     onClicked: {
                         page.revokeOtherSessions()
@@ -1060,10 +1063,13 @@ Item {
             AppButton {
                 visible: !card.currentSession && !card.revoked
                 text: page.waitingRevoke && page.revokeSessionId === card.sessionIdValue
-                      ? "Завершаем..."
-                      : "Завершить сессию"
+                      ? "Выходим..."
+                      : "Выйти из этой сессии"
+                iconName: "logout"
                 variant: "sessionDanger"
                 enabled: !page.busy()
+
+                Layout.fillWidth: true
 
                 onClicked: {
                     card.revokeClicked(card.sessionIdValue)
@@ -1075,8 +1081,11 @@ Item {
                 text: page.waitingDelete && page.deleteSessionId === card.sessionIdValue
                       ? "Удаляем..."
                       : "Удалить из списка"
+                iconName: "trash"
                 variant: "delete"
                 enabled: !page.busy()
+
+                Layout.fillWidth: true
 
                 onClicked: {
                     card.deleteClicked(card.sessionIdValue)
@@ -1315,14 +1324,16 @@ Item {
         signal clicked()
 
         property string text: ""
+        property string iconName: ""
         property string variant: "tonal"
         property bool hovered: mouseArea.containsMouse
         property bool dangerLike: variant === "danger" || variant === "sessionDanger"
+        property bool smallButton: variant === "sessionDanger" || variant === "delete"
 
-        Layout.preferredHeight: variant === "sessionDanger" || variant === "delete" ? 44 : 50
+        Layout.preferredHeight: button.smallButton ? 44 : 46
 
         opacity: enabled ? 1.0 : 0.45
-        scale: mouseArea.pressed ? 0.975 : button.hovered && page.desktopMode ? 1.015 : 1.0
+        scale: mouseArea.pressed ? 0.97 : button.hovered && page.desktopMode ? 1.018 : 1.0
 
         Behavior on scale {
             NumberAnimation {
@@ -1333,7 +1344,7 @@ Item {
 
         Rectangle {
             anchors.fill: parent
-            radius: button.variant === "sessionDanger" || button.variant === "delete" ? 17 : 18
+            radius: button.smallButton ? 17 : 18
 
             color: {
                 if (!button.enabled)
@@ -1341,7 +1352,7 @@ Item {
 
                 if (button.variant === "danger") {
                     if (mouseArea.pressed)
-                        return "#C94A4A"
+                        return "#B83F45"
                     if (button.hovered && page.desktopMode)
                         return "#E85D5D"
                     return page.danger
@@ -1349,13 +1360,13 @@ Item {
 
                 if (button.variant === "sessionDanger") {
                     if (mouseArea.pressed)
-                        return "#44272A"
-                    if (button.hovered && page.desktopMode)
                         return "#4A2529"
+                    if (button.hovered && page.desktopMode)
+                        return "#552B30"
                     return page.dangerSoft
                 }
 
-                if (button.variant === "delete") {
+                if (button.variant === "delete" || button.variant === "neutral") {
                     if (mouseArea.pressed)
                         return page.surface3
                     if (button.hovered && page.desktopMode)
@@ -1363,61 +1374,81 @@ Item {
                     return page.surface2
                 }
 
+                // tonal
                 if (mouseArea.pressed)
-                    return "#255FA9"
+                    return "#203B60"
                 if (button.hovered && page.desktopMode)
-                    return "#2B6CBE"
-                return page.accent
+                    return "#243F66"
+                return page.accentSoft
             }
 
-            border.width: button.variant === "sessionDanger" || button.variant === "delete" || (button.hovered && page.desktopMode) ? 1 : 0
-
+            border.width: 1
             border.color: {
-                if (button.variant === "sessionDanger")
-                    return page.danger
+                if (button.variant === "danger")
+                    return button.hovered && page.desktopMode ? "#FF8A8A" : "#C95252"
 
-                if (button.variant === "delete")
+                if (button.variant === "sessionDanger")
+                    return button.hovered && page.desktopMode ? page.danger : "#5A2D31"
+
+                if (button.variant === "delete" || button.variant === "neutral")
                     return button.hovered && page.desktopMode ? page.textMuted : page.border
 
-                if (button.hovered && page.desktopMode)
-                    return button.dangerLike ? page.danger : "#7FB5FF"
-
-                return "transparent"
+                return button.hovered && page.desktopMode ? page.accent : "#284568"
             }
 
             Behavior on color { ColorAnimation { duration: 130 } }
             Behavior on border.color { ColorAnimation { duration: 130 } }
         }
 
-        Text {
-            anchors.fill: parent
-            anchors.leftMargin: 12
-            anchors.rightMargin: 12
-            text: button.text
+        RowLayout {
+            id: contentRow
 
-            color: {
-                if (!button.enabled)
-                    return page.textMuted
+            anchors.centerIn: parent
+            width: parent.width - 22
+            height: parent.height
+            spacing: button.iconName.length > 0 ? 8 : 0
 
-                if (button.variant === "danger")
-                    return "#FFFFFF"
+            DrawIcon {
+                visible: button.iconName.length > 0
+                name: button.iconName
+                iconColor: {
+                    if (!button.enabled)
+                        return page.textMuted
+                    if (button.variant === "danger")
+                        return "#FFFFFF"
+                    if (button.variant === "sessionDanger")
+                        return page.danger
+                    if (button.variant === "delete" || button.variant === "neutral")
+                        return button.hovered && page.desktopMode ? page.textMain : page.textSub
+                    return page.accent
+                }
 
-                if (button.variant === "sessionDanger")
-                    return page.danger
-
-                if (button.variant === "delete")
-                    return button.hovered && page.desktopMode ? page.textMain : page.textSub
-
-                return "#FFFFFF"
+                Layout.preferredWidth: button.smallButton ? 18 : 20
+                Layout.preferredHeight: button.smallButton ? 18 : 20
             }
 
-            font.pixelSize: button.variant === "sessionDanger" || button.variant === "delete" ? 13 : 14
-            font.bold: true
+            Text {
+                text: button.text
+                color: {
+                    if (!button.enabled)
+                        return page.textMuted
+                    if (button.variant === "danger")
+                        return "#FFFFFF"
+                    if (button.variant === "sessionDanger")
+                        return page.danger
+                    if (button.variant === "delete" || button.variant === "neutral")
+                        return button.hovered && page.desktopMode ? page.textMain : page.textSub
+                    return page.accent
+                }
+                font.pixelSize: button.smallButton ? 13 : 14
+                font.bold: true
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                maximumLineCount: 1
+                elide: Text.ElideRight
 
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            maximumLineCount: 1
-            elide: Text.ElideRight
+                Layout.fillWidth: true
+            }
         }
 
         MouseArea {
@@ -1552,6 +1583,33 @@ Item {
                 ctx.moveTo(px(0.5), py(0.3))
                 ctx.lineTo(px(0.5), py(0.52))
                 ctx.lineTo(px(0.66), py(0.62))
+                ctx.stroke()
+            } else if (icon.name === "refresh") {
+                ctx.beginPath()
+                ctx.arc(px(0.5), py(0.5), s * 0.3, Math.PI * 0.18, Math.PI * 1.62)
+                ctx.stroke()
+
+                ctx.beginPath()
+                ctx.moveTo(px(0.72), py(0.27))
+                ctx.lineTo(px(0.76), py(0.48))
+                ctx.lineTo(px(0.58), py(0.42))
+                ctx.stroke()
+            } else if (icon.name === "trash") {
+                ctx.beginPath()
+                ctx.moveTo(px(0.25), py(0.32))
+                ctx.lineTo(px(0.75), py(0.32))
+                ctx.stroke()
+
+                roundedRectPath(px(0.3), py(0.36), s * 0.4, s * 0.44, s * 0.06)
+                ctx.stroke()
+
+                ctx.beginPath()
+                ctx.moveTo(px(0.4), py(0.24))
+                ctx.lineTo(px(0.6), py(0.24))
+                ctx.moveTo(px(0.43), py(0.48))
+                ctx.lineTo(px(0.43), py(0.68))
+                ctx.moveTo(px(0.57), py(0.48))
+                ctx.lineTo(px(0.57), py(0.68))
                 ctx.stroke()
             } else if (icon.name === "warning") {
                 ctx.beginPath()

@@ -28,7 +28,7 @@ static QString platformName();
 
 Db* Db::get()
 {
-    static Db* db = new Db(nullptr, "192.168.0.102");
+    static Db* db = new Db(nullptr, "192.168.240.166");
     return db;
 }
 
